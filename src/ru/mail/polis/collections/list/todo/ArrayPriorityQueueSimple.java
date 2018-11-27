@@ -28,13 +28,20 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
      * Complexity = O(n)
      *
      * @param collection the collection whose elements are to be placed into this priority queue
-     * @throws NullPointerException if the specified collection or comparator is null
+     * @throws NullPointerException if the specified collection is null
      */
     public ArrayPriorityQueueSimple(Collection<E> collection) {
-        this();
-        //todo: do some stuff with collection
+        this(collection, Comparator.naturalOrder());
     }
 
+    /**
+     * Creates a {@code IPriorityQueue} that orders its elements according to the specified comparator.
+     *
+     * Complexity = O(n)
+     *
+     * @param comparator comparator the comparator that will be used to order this priority queue.
+     * @throws NullPointerException if the specified comparator is null
+     */
     public ArrayPriorityQueueSimple(Comparator<E> comparator) {
         this.comparator = Objects.requireNonNull(comparator, "comparator");
     }
