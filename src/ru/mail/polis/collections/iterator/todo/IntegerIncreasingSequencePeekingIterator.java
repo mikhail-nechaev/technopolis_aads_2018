@@ -11,14 +11,16 @@ import java.util.NoSuchElementException;
 public class IntegerIncreasingSequencePeekingIterator implements IIncreasingSequenceIterator<Integer> {
 
     /**
+     * minStep = 1
+     *
      * first must be less or equal last
-     * size must be positive
+     *
      * maxStep must be positive
      *
      * @param first — min value in iterator
-     * @param last - max value in iterator
+     * @param last - max value in iterator included
      * @param maxStep — max diff between adjacent values
-     * @throws IllegalArgumentException if args invalid
+     * @throws IllegalArgumentException if arguments is invalid
      */
     public IntegerIncreasingSequencePeekingIterator(int first, int last, int maxStep) {
 
@@ -27,6 +29,8 @@ public class IntegerIncreasingSequencePeekingIterator implements IIncreasingSequ
 
     /**
      * Returns {@code true} if the iteration has more elements.
+     *
+     * In other words, returns {@code false} if lastNextElement + minStep > last.
      *
      * @return {@code true} if the iteration has more elements
      */

@@ -8,7 +8,7 @@ import java.util.stream.IntStream;
  * Created by Nechaev Mikhail
  * Since 25/11/2018.
  */
-public abstract class CheckedOpenHashTableEntity implements OpenHashTableEntity {
+public abstract class CheckedOpenHashTableEntity implements IOpenHashTableEntity {
 
     /**
      * Проверяет корректность хеш-функции

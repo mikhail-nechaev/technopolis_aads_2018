@@ -5,12 +5,23 @@ import ru.mail.polis.collections.set.sorted.ISortedSetIterable;
 import java.util.Comparator;
 import java.util.Iterator;
 
+/**
+ * A AVL tree with iterator based {@link ru.mail.polis.collections.set.sorted.ISelfBalancingSortedTreeSet} implementation.
+ *
+ * @param <E> the type of elements maintained by this set
+ */
 public class AVLTreeIterable<E extends Comparable<E>> extends AVLTree<E> implements ISortedSetIterable<E> {
 
     public AVLTreeIterable() {
         super();
     }
 
+    /**
+     * Creates a {@code ISelfBalancingSortedTreeSet} that orders its elements according to the specified comparator.
+     *
+     * @param comparator comparator the comparator that will be used to order this priority queue.
+     * @throws NullPointerException if the specified comparator is null
+     */
     public AVLTreeIterable(Comparator<E> comparator) {
         super(comparator);
     }

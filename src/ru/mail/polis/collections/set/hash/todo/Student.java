@@ -3,9 +3,9 @@ package ru.mail.polis.collections.set.hash.todo;
 import java.time.LocalDate;
 import java.util.Objects;
 
-import ru.mail.polis.collections.set.hash.CheckedOpenHashTableEntity;
+import ru.mail.polis.collections.set.hash.AbstractOpenHashTableEntity;
 
-public class Student extends CheckedOpenHashTableEntity {
+public class Student extends AbstractOpenHashTableEntity {
 
     private final long id;
     private final String firstName;
@@ -49,14 +49,20 @@ public class Student extends CheckedOpenHashTableEntity {
 
     @Override
     public int hashCode(int tableSize, int probId) throws IllegalArgumentException {
-        //todo: use base hashCode with additional logic
-        return 0;
+        //todo: see IOpenHashTableEntity contract
+        //todo: use this in OpenHashTable
+        throw new UnsupportedOperationException("todo: implement this");
     }
 
     @Override
     public int hashCode() {
-        //don't forget hashCode - equals contract
-        return 0;
+        //todo: don't forget [hashCode - equals] contract
+        throw new UnsupportedOperationException("todo: implement this");
+    }
+
+    @Override
+    protected int hashCode2() {
+        throw new UnsupportedOperationException("todo: implement this");
     }
 
     @Override

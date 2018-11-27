@@ -5,6 +5,7 @@ import ru.mail.polis.collections.list.IPriorityQueue;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.Objects;
 
 /**
  * Resizable array implementation of the {@link IPriorityQueue} interface based on a priority heap.
@@ -21,22 +22,42 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
         this(Comparator.naturalOrder());
     }
 
+    /**
+     * Creates a {@code IPriorityQueue} containing the elements in the specified collection.
+     *
+     * Complexity = O(n)
+     *
+     * @param collection the collection whose elements are to be placed into this priority queue
+     * @throws NullPointerException if the specified collection or comparator is null
+     */
     public ArrayPriorityQueueSimple(Collection<E> collection) {
         this();
         //todo: do some stuff with collection
     }
 
     public ArrayPriorityQueueSimple(Comparator<E> comparator) {
-        this.comparator = comparator;
+        this.comparator = Objects.requireNonNull(comparator, "comparator");
     }
 
+    /**
+     * Creates a {@code IPriorityQueue} containing the elements in the specified collection
+     *  that orders its elements according to the specified comparator.
+     *
+     * Complexity = O(n)
+     *
+     * @param collection the collection whose elements are to be placed into this priority queue
+     * @param comparator comparator the comparator that will be used to order this priority queue.
+     * @throws NullPointerException if the specified collection or comparator is null
+     */
     public ArrayPriorityQueueSimple(Collection<E> collection, Comparator<E> comparator) {
-        this.comparator = comparator;
+        this.comparator = Objects.requireNonNull(comparator, "comparator");
         //todo: do some stuff with collection
     }
 
     /**
      * Inserts the specified element into this priority queue.
+     *
+     * Complexity = O(log(n))
      *
      * @param value the element to add
      * @throws NullPointerException if the specified element is null
@@ -49,6 +70,8 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
     /**
      * Retrieves and removes the head of this queue.
      *
+     * Complexity = O(log(n))
+     *
      * @return the head of this queue
      * @throws java.util.NoSuchElementException if this queue is empty
      */
@@ -59,6 +82,8 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
 
     /**
      * Retrieves, but does not remove, the head of this queue.
+     *
+     * Complexity = O(1)
      *
      * @return the head of this queue
      * @throws java.util.NoSuchElementException if this queue is empty
@@ -71,6 +96,8 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
     /**
      * Returns {@code true} if this collection contains the specified element.
      * aka collection contains element el such that {@code Objects.equals(el, value) == true}
+     *
+     * Complexity = O(n)
      *
      * @param value element whose presence in this collection is to be tested
      * @return {@code true} if this collection contains the specified element
