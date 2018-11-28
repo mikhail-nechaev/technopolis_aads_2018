@@ -37,8 +37,6 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
     /**
      * Creates a {@code IPriorityQueue} that orders its elements according to the specified comparator.
      *
-     * Complexity = O(n)
-     *
      * @param comparator comparator the comparator that will be used to order this priority queue.
      * @throws NullPointerException if the specified comparator is null
      */
