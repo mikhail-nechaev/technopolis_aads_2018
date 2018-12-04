@@ -3,42 +3,19 @@
 Homework for Algorithms and Data structures on Java for students [Technopolis](https://polis.mail.ru/pages/index/) in [Peter the Great St.Petersburg Polytechnic University](https://english.spbstu.ru).
 
 ---
+**Deadline 18.12.2018**
 
-**2.5 point on every task = 10**
-
-1) ArrayDequeSimple
-
-2) LinkedDequeSimple
-
-3) ArrayPriorityQueueSimple
-
-4) MergingPeekingIncreasingIterator + IntegerIncreasingSequencePeekingIterator
-
-
-**7.5 point on every task = 15**
-
-5) ArrayDequeFull
-
-6) LinkedDequeFull
-
-**5 point on every task = 25**
-
-7) AVLTree
-
-8) AVLTreeIterable
-
-9) RedBlackTree: add
-
-10) RedBlackTree: add + remove
-
-11) OpenHashTable + Student
-
-**+1 point for every iterator with remove in ... = 5**
-
-* ArrayDequeSimple
-* LinkedDequeSimple
-* ArrayPriorityQueueSimple
-* AVLTreeIterable (ascending + descending)
-* OpenHashTable
-
-**max points = 55**
+| Points | Iterator remove | Class | Test |
+| ------ |-----------------| ----- | ---- |
+| 2.5    | +1 point TestIDequeRemove | ArrayDequeSimple | TestIDeque
+| 2.5    | +1 point TestIDequeRemove | LinkedDequeSimple | TestIDeque
+| 2.5    | +1 point        | ArrayPriorityQueueSimple | TestIPriorityQueue
+| 2.5    | -               | MergingPeekingIncreasingIterator + IntegerIncreasingSequencePeekingIterator | TestIntegerIncreasingSequencePeekingIterator + TestMergingPeekingIncreasingIterator 
+| 7.5    | -               | ArrayDequeFull | TestIDeque + TestFullDeque
+| 7.5    | -               | LinkedDequeFull | TestIDeque + TestFullDeque
+| 5.0    | -               | AVLTree | --
+| 5.0    | +1 point        | AVLTreeIterable | --
+| 5.0    | -               | RedBlackTree (add) | --
+| 5.0    | -               | RedBlackTree (add + remove) | --
+| 5.0    | +1 point        | OpenHashTable + Student | -- |
+| =50    | =5 | |

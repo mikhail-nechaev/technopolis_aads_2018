@@ -2,21 +2,15 @@ package ru.mail.polis.collections.list.todo;
 
 import ru.mail.polis.collections.list.IDeque;
 
-import java.util.LinkedList;
 import java.util.ListIterator;
-import java.util.NoSuchElementException;
 
 /**
  * Linked list implementation of the {@link IDeque} interface with no capacity restrictions.
  *
  * @param <E> the type of elements held in this deque
  */
-public class LinkedDequeSimple<E> implements IDeque<E> {
-    private LinkedList<E> deque;
+public abstract class LinkedDequeSimple<E> implements IDeque<E> {
 
-    public LinkedDequeSimple(){
-        deque = new LinkedList<>();
-    }
     /**
      * Inserts the specified element at the front of this deque.
      *
@@ -25,10 +19,7 @@ public class LinkedDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public void addFirst(E value) {
-        if(value == null) {
-            throw new NullPointerException();
-        }
-        deque.addFirst(value);
+        throw new UnsupportedOperationException("todo: implement this");
     }
 
     /**
@@ -39,10 +30,7 @@ public class LinkedDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public E removeFirst() {
-        if(isEmpty()){
-            throw new NoSuchElementException();
-        }
-        return deque.removeFirst();
+        throw new UnsupportedOperationException("todo: implement this");
     }
 
     /**
@@ -53,10 +41,7 @@ public class LinkedDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public E getFirst() {
-        if(isEmpty()){
-            throw new NoSuchElementException();
-        }
-        return deque.getFirst();
+        throw new UnsupportedOperationException("todo: implement this");
     }
 
     /**
@@ -67,10 +52,7 @@ public class LinkedDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public void addLast(E value) {
-        if(value == null){
-            throw new NullPointerException();
-        }
-        deque.addLast(value);
+        throw new UnsupportedOperationException("todo: implement this");
     }
 
     /**
@@ -81,10 +63,7 @@ public class LinkedDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public E removeLast() {
-        if(isEmpty()){
-            throw new NoSuchElementException();
-        }
-        return deque.removeLast();
+        throw new UnsupportedOperationException("todo: implement this");
     }
 
     /**
@@ -95,10 +74,7 @@ public class LinkedDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public E getLast() {
-        if(isEmpty()){
-            throw new NoSuchElementException();
-        }
-        return deque.getLast();
+        throw new UnsupportedOperationException("todo: implement this");
     }
 
     /**
@@ -111,10 +87,7 @@ public class LinkedDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public boolean contains(E value) {
-        if(value == null){
-            throw new NullPointerException();
-        }
-        return deque.contains(value);
+        throw new UnsupportedOperationException("todo: implement this");
     }
 
     /**
@@ -124,7 +97,7 @@ public class LinkedDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public int size() {
-        return deque.size();
+        throw new UnsupportedOperationException("todo: implement this");
     }
 
     /**
@@ -134,7 +107,7 @@ public class LinkedDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public boolean isEmpty() {
-        return deque.isEmpty();
+        throw new UnsupportedOperationException("todo: implement this");
     }
 
     /**
@@ -143,7 +116,7 @@ public class LinkedDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public void clear() {
-        deque.clear();
+        throw new UnsupportedOperationException("todo: implement this");
     }
 
     /**
@@ -154,6 +127,6 @@ public class LinkedDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public ListIterator<E> iterator() {
-        return deque.listIterator();
+        throw new UnsupportedOperationException("todo: implement this");
     }
 }
