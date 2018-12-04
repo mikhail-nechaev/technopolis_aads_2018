@@ -1,8 +1,11 @@
 package ru.mail.polis.collections.list.todo;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Deque;
 import java.util.Iterator;
+import java.util.ListIterator;
+import java.util.Objects;
 
 public class ArrayDequeFull<E> extends ArrayDequeSimple<E> implements Deque<E> {
 
@@ -45,6 +48,14 @@ public class ArrayDequeFull<E> extends ArrayDequeSimple<E> implements Deque<E> {
 
     @Override
     public boolean removeLastOccurrence(Object o) {
+        Objects.requireNonNull(o);
+        Iterator<E> it = descendingIterator();
+        while(it.hasNext()){
+            if(o.equals(it.next())) {
+                it.remove();
+                return true;
+            }
+        }
         return false;
     }
 
@@ -92,7 +103,14 @@ public class ArrayDequeFull<E> extends ArrayDequeSimple<E> implements Deque<E> {
 
     @Override
     public boolean remove(Object o) {
+        ListIterator<E> it = iterator();
         if(o != null){
+            while(it.hasNext()){
+                if(o.equals(it.next())){
+                    it.remove();
+                    return true;
+                }
+            }
         }
         return false;
     }
@@ -102,9 +120,9 @@ public class ArrayDequeFull<E> extends ArrayDequeSimple<E> implements Deque<E> {
         if(c == null){
             throw new NullPointerException();
         }
-        Iterator i = c.iterator();
-        while(i.hasNext()){
-            if(!contains(i.next())){
+        Iterator it = c.iterator();
+        while(it.hasNext()){
+            if(!contains(it.next())){
                 return false;
             }
         }
@@ -113,17 +131,42 @@ public class ArrayDequeFull<E> extends ArrayDequeSimple<E> implements Deque<E> {
 
     @Override
     public boolean addAll(Collection<? extends E> c) {
-        return false;
+        Object[] a = c.toArray();
+        if(a.length == 0){
+            return false;
+        }
+        for(Object e : a){
+            addLast((E)e);
+        }
+        return true;
     }
 
     @Override
     public boolean removeAll(Collection<?> c) {
-        return false;
+        Objects.requireNonNull(c);
+        boolean modified = false;
+        ListIterator<E> it = iterator();
+        while (it.hasNext()) {
+            if (c.contains(it.next())) {
+                it.remove();
+                modified = true;
+            }
+        }
+        return modified;
     }
 
     @Override
     public boolean retainAll(Collection<?> c) {
-        return false;
+        Objects.requireNonNull(c);
+        boolean modified = false;
+        ListIterator<E> it = iterator();
+        while (it.hasNext()) {
+            if (!c.contains(it.next())) {
+                it.remove();
+                modified = true;
+            }
+        }
+        return modified;
     }
 
     @Override
@@ -133,16 +176,47 @@ public class ArrayDequeFull<E> extends ArrayDequeSimple<E> implements Deque<E> {
 
     @Override
     public Object[] toArray() {
-        return new Object[0];
+        Object[] r = new Object[size()];
+        Iterator<E> it = iterator();
+        for (int i = 0; i < r.length; i++) {
+            if (! it.hasNext()) // fewer elements than expected
+                return Arrays.copyOf(r, i);
+            r[i] = it.next();
+        }
+        return r;
     }
 
     @Override
     public <T> T[] toArray(T[] a) {
-        return null;
+        Iterator<E> it = iterator();
+        for (int i = 0; i < a.length; i++) {
+            if (! it.hasNext()) // fewer elements than expected
+                return Arrays.copyOf(a, i);
+            a[i] = (T)it.next();
+        }
+        return a;
     }
 
     @Override
     public Iterator<E> descendingIterator() {
-        return null;
+        return new ArrayDequeFullDescendingIterator();
+    }
+    private class ArrayDequeFullDescendingIterator implements Iterator<E> {
+        private ListIterator<E> it;
+        ArrayDequeFullDescendingIterator() {
+            it = iterator();
+            while(it.hasNext()) {
+                it.next();
+            }
+        }
+        @Override
+        public boolean hasNext() {
+            return it.hasPrevious();
+        }
+
+        @Override
+        public E next() {
+            return it.previous();
+        }
     }
 }

@@ -51,6 +51,7 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
         maxSize = newMaxSize;
         deque = newDeque;
     }
+
     /**
      * Inserts the specified element at the front of this deque.
      *
@@ -237,7 +238,7 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
     public void clear() {
         head = 0;
         tail = 1;
-        modCount = 0;
+        modCount++;
     }
 
     /**
@@ -278,7 +279,7 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
 
         @Override
         public boolean hasPrevious() {
-            return nextIndex != head;
+            return nextIndex != (head + 1)%maxSize;
         }
 
         @Override
@@ -286,10 +287,7 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
             checkForComodification();
             if (!hasPrevious())
                 throw new NoSuchElementException();
-            if(nextIndex == 0)
-                nextIndex = maxSize - 1;
-            else
-                nextIndex--;
+            nextIndex = (nextIndex == 0) ? maxSize - 1 : nextIndex - 1;
             lastReturned = next = deque[nextIndex];
             return lastReturned;
         }
