@@ -2,15 +2,21 @@ package ru.mail.polis.collections.list.todo;
 
 import ru.mail.polis.collections.list.IDeque;
 
+import java.util.LinkedList;
 import java.util.ListIterator;
+import java.util.NoSuchElementException;
 
 /**
  * Linked list implementation of the {@link IDeque} interface with no capacity restrictions.
  *
  * @param <E> the type of elements held in this deque
  */
-public abstract class LinkedDequeSimple<E> implements IDeque<E> {
+public class LinkedDequeSimple<E> implements IDeque<E> {
+    private LinkedList<E> deque;
 
+    public LinkedDequeSimple(){
+        deque = new LinkedList<>();
+    }
     /**
      * Inserts the specified element at the front of this deque.
      *
@@ -19,7 +25,10 @@ public abstract class LinkedDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public void addFirst(E value) {
-        throw new UnsupportedOperationException("todo: implement this");
+        if(value == null) {
+            throw new NullPointerException();
+        }
+        deque.addFirst(value);
     }
 
     /**
@@ -30,7 +39,10 @@ public abstract class LinkedDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public E removeFirst() {
-        throw new UnsupportedOperationException("todo: implement this");
+        if(isEmpty()){
+            throw new NoSuchElementException();
+        }
+        return deque.removeFirst();
     }
 
     /**
@@ -41,7 +53,10 @@ public abstract class LinkedDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public E getFirst() {
-        throw new UnsupportedOperationException("todo: implement this");
+        if(isEmpty()){
+            throw new NoSuchElementException();
+        }
+        return deque.getFirst();
     }
 
     /**
@@ -52,7 +67,10 @@ public abstract class LinkedDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public void addLast(E value) {
-        throw new UnsupportedOperationException("todo: implement this");
+        if(value == null){
+            throw new NullPointerException();
+        }
+        deque.addLast(value);
     }
 
     /**
@@ -63,7 +81,10 @@ public abstract class LinkedDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public E removeLast() {
-        throw new UnsupportedOperationException("todo: implement this");
+        if(isEmpty()){
+            throw new NoSuchElementException();
+        }
+        return deque.removeLast();
     }
 
     /**
@@ -74,7 +95,10 @@ public abstract class LinkedDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public E getLast() {
-        throw new UnsupportedOperationException("todo: implement this");
+        if(isEmpty()){
+            throw new NoSuchElementException();
+        }
+        return deque.getLast();
     }
 
     /**
@@ -87,7 +111,10 @@ public abstract class LinkedDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public boolean contains(E value) {
-        throw new UnsupportedOperationException("todo: implement this");
+        if(value == null){
+            throw new NullPointerException();
+        }
+        return deque.contains(value);
     }
 
     /**
@@ -97,7 +124,7 @@ public abstract class LinkedDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public int size() {
-        throw new UnsupportedOperationException("todo: implement this");
+        return deque.size();
     }
 
     /**
@@ -107,7 +134,7 @@ public abstract class LinkedDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public boolean isEmpty() {
-        throw new UnsupportedOperationException("todo: implement this");
+        return deque.isEmpty();
     }
 
     /**
@@ -116,7 +143,7 @@ public abstract class LinkedDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public void clear() {
-        throw new UnsupportedOperationException("todo: implement this");
+        deque.clear();
     }
 
     /**
@@ -127,6 +154,6 @@ public abstract class LinkedDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public ListIterator<E> iterator() {
-        throw new UnsupportedOperationException("todo: implement this");
+        return deque.listIterator();
     }
 }

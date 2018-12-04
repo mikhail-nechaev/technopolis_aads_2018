@@ -2,7 +2,9 @@ package ru.mail.polis.collections.list.todo;
 
 import ru.mail.polis.collections.list.IDeque;
 
+import java.util.ConcurrentModificationException;
 import java.util.ListIterator;
+import java.util.NoSuchElementException;
 
 /**
  * Resizable cyclic array implementation of the {@link IDeque} interface.
@@ -12,7 +14,43 @@ import java.util.ListIterator;
  * @param <E> the type of elements held in this deque
  */
 public class ArrayDequeSimple<E> implements IDeque<E> {
+    private E[] deque;
+    private int head;
+    private int tail;
+    private int maxSize;
+    private int modCount = 0;
 
+    public ArrayDequeSimple(){
+        maxSize = 10;
+        deque = (E[])new Object[maxSize];
+        head = 0;
+        tail = 1;
+    }
+    /**
+     * Resize capacity and copy old value to new Deque
+     */
+    private void resize(){
+        int newMaxSize = maxSize << 1;
+        E[] newDeque = (E[]) new Object[newMaxSize];
+        int i;
+        if(head < tail) {
+            for(i = 1; head + i < tail; i++){
+                newDeque[i] = deque[head + i];
+            }
+        }
+        else{
+            for(i = 1; head + i < maxSize; i++){
+                newDeque[i] = deque[head + i];
+            }
+            for(int j = 0; j < tail; j++){
+                newDeque[i++] = deque[j];
+            }
+        }
+        head = 0;
+        tail = i;
+        maxSize = newMaxSize;
+        deque = newDeque;
+    }
     /**
      * Inserts the specified element at the front of this deque.
      *
@@ -21,7 +59,27 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public void addFirst(E value) {
-        throw new UnsupportedOperationException("todo: implement this");
+        if(value == null) {
+            throw new NullPointerException();
+        }
+        if(head == 0){
+            if(maxSize - 1 == tail){
+                resize();
+            }
+            deque[head] = value;
+            head = maxSize - 1;
+        }
+        else{
+            if(head - 1 == tail){
+                resize();
+                deque[head] = value;
+                head = maxSize - 1;
+            }
+            else{
+                deque[head--] = value;
+            }
+        }
+        modCount++;
     }
 
     /**
@@ -32,7 +90,12 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public E removeFirst() {
-        throw new UnsupportedOperationException("todo: implement this");
+        if(isEmpty()){
+            throw new NoSuchElementException();
+        }
+        head = (head + 1) % maxSize;
+        modCount++;
+        return deque[head];
     }
 
     /**
@@ -43,7 +106,10 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public E getFirst() {
-        throw new UnsupportedOperationException("todo: implement this");
+        if(isEmpty()){
+            throw new NoSuchElementException();
+        }
+        return deque[(head + 1)%maxSize];
     }
 
     /**
@@ -54,7 +120,15 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public void addLast(E value) {
-        throw new UnsupportedOperationException("todo: implement this");
+        if(value == null) {
+            throw new NullPointerException();
+        }
+        if(((tail + 1)%maxSize) == head){
+            resize();
+        }
+        deque[tail] = value;
+        tail = (tail + 1)%maxSize;
+        modCount++;
     }
 
     /**
@@ -65,7 +139,17 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public E removeLast() {
-        throw new UnsupportedOperationException("todo: implement this");
+        if(isEmpty()){
+            throw new NoSuchElementException();
+        }
+        if(tail == 0){
+            tail = maxSize - 1;
+        }
+        else{
+            tail--;
+        }
+        modCount++;
+        return deque[tail];
     }
 
     /**
@@ -76,7 +160,10 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public E getLast() {
-        throw new UnsupportedOperationException("todo: implement this");
+        if(isEmpty()){
+            throw new NoSuchElementException();
+        }
+        return (tail == 0) ? deque[maxSize-1] : deque[tail - 1];
     }
 
     /**
@@ -89,7 +176,32 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public boolean contains(E value) {
-        throw new UnsupportedOperationException("todo: implement this");
+        if(value == null){
+            throw new NullPointerException();
+        }
+        if(isEmpty()){
+            return false;
+        }
+        if(head < tail) {
+            for(int i = 1; head + i < tail; i++){
+                if(deque[head + i].equals(value)){
+                    return true;
+                }
+            }
+        }
+        else{
+            for(int i = 1; head + i < maxSize; i++){
+                if(deque[head + i].equals(value)){
+                    return true;
+                }
+            }
+            for(int j = 0; j < tail; j++){
+                if(deque[j].equals(value)){
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /**
@@ -99,7 +211,12 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public int size() {
-        throw new UnsupportedOperationException("todo: implement this");
+        if(head < tail){
+            return tail - head - 1;
+        }
+        else{
+            return tail + maxSize - 1 - head;
+        }
     }
 
     /**
@@ -109,7 +226,7 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public boolean isEmpty() {
-        throw new UnsupportedOperationException("todo: implement this");
+        return size() == 0;
     }
 
     /**
@@ -118,7 +235,9 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public void clear() {
-        throw new UnsupportedOperationException("todo: implement this");
+        head = 0;
+        tail = 1;
+        modCount = 0;
     }
 
     /**
@@ -129,6 +248,169 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public ListIterator<E> iterator() {
-        throw new UnsupportedOperationException("todo: implement this");
+        return new ArrayDequeSimpleIterator();
+    }
+    private class ArrayDequeSimpleIterator implements ListIterator<E> {
+        private E lastReturned;
+        private E next;
+        private int nextIndex;
+        private int expectedModCount = modCount;
+
+        ArrayDequeSimpleIterator(){
+            nextIndex = (head + 1) % maxSize;
+            next = size() == 0 ? null : deque[nextIndex];
+        }
+        @Override
+        public boolean hasNext() {
+            return nextIndex != tail;
+        }
+
+        @Override
+        public E next() {
+            checkForComodification();
+            if (!hasNext())
+                throw new NoSuchElementException();
+            lastReturned = next;
+            nextIndex = (nextIndex + 1) % maxSize;
+            next = deque[nextIndex];
+            return lastReturned;
+        }
+
+        @Override
+        public boolean hasPrevious() {
+            return nextIndex != head;
+        }
+
+        @Override
+        public E previous() {
+            checkForComodification();
+            if (!hasPrevious())
+                throw new NoSuchElementException();
+            if(nextIndex == 0)
+                nextIndex = maxSize - 1;
+            else
+                nextIndex--;
+            lastReturned = next = deque[nextIndex];
+            return lastReturned;
+        }
+
+        @Override
+        public int nextIndex() {
+            return nextIndex;
+        }
+
+        @Override
+        public int previousIndex() {
+            return nextIndex == 0 ? maxSize - 1 : nextIndex - 1;
+        }
+
+        @Override
+        public void remove() {
+            checkForComodification();
+            if (lastReturned == null)
+                throw new IllegalStateException();
+            E [] newDeque = (E[])new Object[maxSize];
+            int removedIndex;
+            if (next == lastReturned)
+                removedIndex = nextIndex;
+            else if(nextIndex == 0)
+                removedIndex = maxSize - 1;
+            else
+                removedIndex = (nextIndex - 1);
+            if(head < tail){
+                int j = 0;
+                for(int i = 0; i < maxSize; i++){
+                    if(i == removedIndex)
+                        continue;
+                    newDeque[j++] = deque[i];
+                }
+            }
+            else{
+                int j = head;
+                for(int i = head; i < maxSize; i++){
+                    if(i == removedIndex)
+                        continue;
+                    newDeque[j%maxSize] = deque[i];
+                    j++;
+                }
+                for(int i = 0; i < tail; i++){
+                    if(i == removedIndex)
+                        continue;
+                    newDeque[j%maxSize] = deque[i];
+                    j++;
+                }
+            }
+            if(tail == 0)
+                tail = maxSize - 1;
+            else
+                tail--;
+            deque = newDeque;
+            nextIndex = removedIndex;
+            next = deque[nextIndex];
+            lastReturned = null;
+            modCount++;
+            expectedModCount++;
+        }
+
+        @Override
+        public void set(E e) {
+            if (lastReturned == null)
+                throw new IllegalStateException();
+            checkForComodification();
+            if(lastReturned == next)
+                deque[nextIndex] = e;
+            else if(nextIndex == 0)
+                deque[maxSize-1] = e;
+            else
+                deque[nextIndex-1] = e;
+        }
+
+        @Override
+        public void add(E e) {
+            checkForComodification();
+            lastReturned = null;
+            if (nextIndex == tail)
+                addLast(e);
+            else{
+                if(((tail + 1)%maxSize) == head){
+                    if(nextIndex >= head)
+                        nextIndex = nextIndex - head;
+                    else
+                        nextIndex = maxSize - head + nextIndex;
+                    resize();
+                }
+                E [] newDeque = (E[]) new Object[maxSize];
+                if(head < tail){
+                    int j = 0;
+                    for(int i = 0; i < maxSize; i++){
+                        if(i == nextIndex)
+                            newDeque[j++] = e;
+                        newDeque[j++] = deque[i];
+                    }
+                }
+                else{
+                    int j = head;
+                    for(int i = head; i < maxSize; i++){
+                        if(i == nextIndex)
+                            newDeque[j++%maxSize] = e;
+                        newDeque[j++%maxSize] = deque[i];
+                    }
+                    for(int i = 0; i < tail; i++){
+                        if(i == nextIndex)
+                            newDeque[j++%maxSize] = e;
+                        newDeque[j++%maxSize] = deque[i];
+                    }
+                }
+                tail = (tail+1)%maxSize;
+                modCount++;
+            }
+            next = deque[nextIndex];
+            expectedModCount++;
+        }
+
+        final void checkForComodification() {
+            if (modCount != expectedModCount)
+                throw new ConcurrentModificationException();
+        }
     }
 }
