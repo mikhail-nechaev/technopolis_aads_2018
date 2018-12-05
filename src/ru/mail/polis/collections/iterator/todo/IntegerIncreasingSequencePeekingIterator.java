@@ -33,7 +33,8 @@ public class IntegerIncreasingSequencePeekingIterator implements IIncreasingSequ
         if(first > last || maxStep <= 0){
             throw new IllegalArgumentException();
         }
-        this.prevNextElement = first-1;
+
+        this.prevNextElement = (first == Integer.MIN_VALUE) ? first : first-1;
         this.nextElement = first;
         this.last = last;
         this.maxStep = maxStep;
@@ -50,7 +51,7 @@ public class IntegerIncreasingSequencePeekingIterator implements IIncreasingSequ
      */
     @Override
     public boolean hasNext() {
-        if(prevNextElement + minStep > last)
+        if(prevNextElement + minStep > last || prevNextElement == Integer.MAX_VALUE)
             return false;
         return true;
     }
@@ -63,13 +64,17 @@ public class IntegerIncreasingSequencePeekingIterator implements IIncreasingSequ
      */
     @Override
     public Integer next() {
-        if(prevNextElement + minStep > last){
+        if(!hasNext()){
             throw new NoSuchElementException();
         }
         prevNextElement = nextElement;
-        nextElement += random.nextInt(maxStep) + minStep;
-        if(nextElement > last){
+        long diff = random.nextInt(maxStep) + minStep;
+        long nextLong = nextElement + diff;
+        if(nextLong > Integer.MAX_VALUE || nextLong > last) {
             nextElement = last;
+        }
+        else {
+            nextElement = (int) nextLong;
         }
         return prevNextElement;
     }
@@ -82,7 +87,7 @@ public class IntegerIncreasingSequencePeekingIterator implements IIncreasingSequ
      */
     @Override
     public Integer peek() {
-        if(prevNextElement + minStep > last){
+        if(!hasNext()){
             throw new NoSuchElementException();
         }
         return nextElement;
@@ -101,6 +106,12 @@ public class IntegerIncreasingSequencePeekingIterator implements IIncreasingSequ
      */
     @Override
     public int compareTo(IPeekingIterator<Integer> other) {
+        if(!hasNext()){
+            return -1;
+        }
+        else if(!other.hasNext()) {
+            return 1;
+        }
         return this.peek() < other.peek() ? -1 : this.peek() > other.peek() ? 1 : 0;
     }
 }
