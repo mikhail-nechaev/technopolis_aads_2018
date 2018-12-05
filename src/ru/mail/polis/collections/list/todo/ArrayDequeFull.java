@@ -49,7 +49,7 @@ public class ArrayDequeFull<E> extends ArrayDequeSimple<E> implements Deque<E> {
     @Override
     public boolean removeLastOccurrence(Object o) {
         Objects.requireNonNull(o);
-        ListIterator<E> it = iterator();
+        Iterator<E> it = descendingIterator();
         while(it.hasNext()){
             if(o.equals(it.next())) {
                 it.remove();
@@ -104,7 +104,7 @@ public class ArrayDequeFull<E> extends ArrayDequeSimple<E> implements Deque<E> {
     @Override
     public boolean remove(Object o) {
         Objects.requireNonNull(o);
-        Iterator<E> it = descendingIterator();
+        ListIterator<E> it = iterator();
         while(it.hasNext()){
             if(o.equals(it.next())){
                 it.remove();
