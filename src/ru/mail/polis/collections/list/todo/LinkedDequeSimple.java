@@ -2,7 +2,7 @@ package ru.mail.polis.collections.list.todo;
 
 import ru.mail.polis.collections.list.IDeque;
 
-import java.util.ListIterator;
+import java.util.Iterator;
 
 /**
  * Linked list implementation of the {@link IDeque} interface with no capacity restrictions.
@@ -126,7 +126,7 @@ public class LinkedDequeSimple<E> implements IDeque<E> {
      * @return an iterator over the elements in this collection in proper sequence
      */
     @Override
-    public ListIterator<E> iterator() {
+    public Iterator<E> iterator() {
         throw new UnsupportedOperationException("todo: implement this");
     }
 }
