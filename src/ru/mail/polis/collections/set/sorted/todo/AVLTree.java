@@ -35,6 +35,7 @@ public class AVLTree<E extends Comparable<E>> implements ISelfBalancingSortedTre
     protected final Comparator<E> comparator;
     protected AVLNode<E> root;
     protected int size = 0;
+    protected int modCount = 0;
 
     public AVLTree() {
         this(Comparator.naturalOrder());
@@ -67,10 +68,12 @@ public class AVLTree<E extends Comparable<E>> implements ISelfBalancingSortedTre
         if (root == null) {
             root = new AVLNode<>(value);
             size++;
+            modCount++;
             return true;
         }
         try{
             root = add(root, value);
+            modCount++;
             return true;
         } catch (NodeAlreadyExistsException e) {
             return false;
@@ -134,6 +137,7 @@ public class AVLTree<E extends Comparable<E>> implements ISelfBalancingSortedTre
             balance(curr);
         }
         size--;
+        modCount++;
         return true;
     }
 
@@ -237,6 +241,7 @@ public class AVLTree<E extends Comparable<E>> implements ISelfBalancingSortedTre
     public void clear() {
         size = 0;
         root = null;
+        modCount++;
     }
 
     /**
