@@ -18,11 +18,11 @@ Before pull request make sure than relevant tests is passed.
 | 2.5    | -               | MergingPeekingIncreasingIterator + IntegerIncreasingSequencePeekingIterator | TestIntegerIncreasingSequencePeekingIterator + TestMergingPeekingIncreasingIterator 
 | 7.5    | -               | ArrayDequeFull | TestIDeque + TestFullDeque
 | 7.5    | -               | LinkedDequeFull | TestIDeque + TestFullDeque
-| 5.0    | -               | AVLTree | --
+| 5.0    | -               | AVLTree | TestBalancedSortedSet (AVL: remove = true)
 | 5.0    | +1 point        | AVLTreeIterable | --
-| 5.0    | -               | RedBlackTree (add) | --
-| 5.0    | -               | RedBlackTree (add + remove) | --
-| 5.0    | +1 point        | OpenHashTable + Student | -- |
+| 5.0    | -               | RedBlackTree (add) | TestBalancedSortedSet (RB: remove = false)
+| 5.0    | -               | RedBlackTree (add + remove) | TestBalancedSortedSet (RB: remove = true)
+| 5.0    | +1 point        | OpenHashTable + Student | TestHashTable
 | =50    | =5 | |
 
 ---
