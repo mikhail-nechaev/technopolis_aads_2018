@@ -45,4 +45,9 @@ public class AVLTreeIterable<E extends Comparable<E>> extends AVLTree<E> impleme
     public Iterator<E> descendingIterator() {
         throw new UnsupportedOperationException("todo: implement this");
     }
+
+    @Override
+    public boolean contains(Object value) {
+        return false;
+    }
 }

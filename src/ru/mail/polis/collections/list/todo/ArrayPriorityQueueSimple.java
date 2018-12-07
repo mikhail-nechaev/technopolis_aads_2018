@@ -109,7 +109,7 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
      * @throws NullPointerException if the specified element is null
      */
     @Override
-    public boolean contains(E value) {
+    public boolean contains(Object value) {
         throw new UnsupportedOperationException("todo: implement this");
     }
 

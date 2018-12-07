@@ -13,13 +13,20 @@ import java.util.NoSuchElementException;
  *
  * @param <E> the type of elements maintained by this set
  */
+@SuppressWarnings("unchecked")
 public class AVLTree<E extends Comparable<E>> implements ISelfBalancingSortedTreeSet<E> {
 
-    //todo: update it if required
-    protected static class AVLNode<E> {
-        E value;
+
+    protected static class AVLNode<E extends  Comparable<E>> {
+        private E value;
         AVLNode<E> left;
         AVLNode<E> right;
+        int height;
+
+        AVLNode(E value){
+            this.value = value;
+            this.height = 1;
+        }
     }
 
     /**
@@ -27,6 +34,177 @@ public class AVLTree<E extends Comparable<E>> implements ISelfBalancingSortedTre
      */
     protected final Comparator<E> comparator;
     protected AVLNode<E> root;
+    private int length = 0;
+
+    private int getHeight(AVLNode current){
+        if(current == null){
+            return 0;
+        }
+        return current.height;
+    }
+
+
+    private  AVLNode rightRotate(AVLNode current){
+        AVLNode b = current.left;
+        AVLNode a = b.right;
+
+        //rorate
+        b.right = current;
+        current.left = a;
+
+        //upd
+        current.height = Math.max(getHeight(current.left), getHeight(current.right)) + 1;
+        b.height = Math.max(getHeight(b.left), getHeight(b.right)) + 1;
+
+        return b;
+
+    }
+
+    private AVLNode leftRotate(AVLNode current){
+        AVLNode b = current.right;
+        AVLNode a = b.left;
+
+        //rotate
+        b.left = current;
+        current.right = a;
+
+        //upd
+        current.height = Math.max(getHeight(current.left), getHeight(current.right)) + 1;
+        b.height = Math.max(getHeight(b.left), getHeight(b.right)) + 1;
+
+        return b;
+    }
+
+
+    private void insert(E value){
+        this.root = insert(this.root, value);
+    }
+
+
+    private AVLNode insert(AVLNode current, E value){
+        if(current == null){
+           return new AVLNode(value);
+        }
+        if(current.value.compareTo(value) > 0){
+            current.left = insert(current.left,value);
+        }
+        else if(current.value.compareTo(value) < 0){
+            current.right = insert(current.right, value);
+        }
+
+        current.height = Math.max(getHeight(current.left), getHeight(current.right)) + 1;
+
+        int heightDiff = heightDiff(current);
+
+        //LL Case
+        if(heightDiff > 1 && value.compareTo((E) current.left.value) < 0){
+            return rightRotate(current);
+        }
+        //RR Case
+        //noinspection unchecked
+        if(heightDiff < -1 && value.compareTo((E) current.right.value) > 0){
+            return leftRotate(current);
+        }
+        // LR Case
+        if (heightDiff > 1 && value.compareTo((E) current.left.value) < 0) {
+            current.left = leftRotate(current.left);
+            return rightRotate(current);
+        }
+
+        // RL Case
+        if (heightDiff < -1 && value.compareTo((E) current.right.value) > 0) {
+            current.right = rightRotate(current.right);
+            return leftRotate(current);
+        }
+
+        return current;
+    }
+
+    private int heightDiff(AVLNode current){
+        if(current == null){
+            return  0;
+        }
+        return getHeight(current.left) - getHeight(current.right);
+    }
+
+    private AVLNode find(AVLNode current, E value){
+        if(current == null || current.value.equals(value)) {
+            return current;
+        }
+        if(current.value.compareTo(value) > 0){
+            return find(current.left, value);
+        }
+        else{
+            return find(current.right,value);
+        }
+    }
+
+
+    private AVLNode treeMin(AVLNode current){
+        while(current.left != null){
+            current = current.left;
+        }
+        return current;
+    }
+    private AVLNode treeMax(AVLNode current){
+        while(current.right != null){
+            current = current.right;
+        }
+        return current;
+    }
+
+
+
+    private AVLNode delete(AVLNode current){
+            if(current.left == null || current.right == null){
+                AVLNode tmp;
+
+                if(current.left != null)
+                    tmp = current.left;
+
+                else
+                    tmp = current.right;
+
+                if(tmp == null) {
+                    tmp = current;
+                    current = null;
+                }
+                else
+                    current = tmp;
+
+                tmp = null;
+            }
+            else{
+               AVLNode tmp = treeMin(current.right);
+               current.value = tmp.value;
+               current.right = delete(current.right);
+            }
+
+            current.height = Math.max(getHeight(current.left), getHeight(current.right)) + 1;
+            int balance = heightDiff(current);
+
+            if (balance > 1 && heightDiff(current.left) >= 0) {
+                return rightRotate(current);
+            }
+            // Left Right Case
+            if (balance > 1 && heightDiff(current.left) < 0) {
+                 current.left =  leftRotate(current.left);
+                 return rightRotate(current);
+            }
+
+             // Right Right Case
+            if (balance < -1 && heightDiff(current.right) <= 0) {
+                return leftRotate(current);
+            }
+             // Right Left Case
+            if (balance < -1 && heightDiff(current.right) > 0) {
+                current.right = rightRotate(current.right);
+                return leftRotate(current);
+            }
+            return current;
+    }
+
+
 
     public AVLTree() {
         this(Comparator.naturalOrder());
@@ -53,8 +231,17 @@ public class AVLTree<E extends Comparable<E>> implements ISelfBalancingSortedTre
      * @throws NullPointerException if the specified element is null
      */
     @Override
-    public boolean add(E value) {
-        throw new UnsupportedOperationException("todo: implement this");
+    public boolean add(E value) throws NullPointerException {
+        if(value == null){
+            throw  new NullPointerException();
+        }
+        if(find(root,value) == null){
+            insert(value);
+            length ++;
+            return true;
+        }else{
+            return false;
+        }
     }
 
     /**
@@ -67,8 +254,18 @@ public class AVLTree<E extends Comparable<E>> implements ISelfBalancingSortedTre
      * @throws NullPointerException if the specified element is null
      */
     @Override
-    public boolean remove(E value) {
-        throw new UnsupportedOperationException("todo: implement this");
+    public boolean remove(E value) throws NullPointerException {
+        if(value == null ){
+            throw new NullPointerException();
+        }
+        if(find(root,value) == null){
+            return false;
+        }
+        else {
+            delete(find(root,value));
+            length --;
+            return true;
+        }
     }
 
     /**
@@ -82,8 +279,16 @@ public class AVLTree<E extends Comparable<E>> implements ISelfBalancingSortedTre
      * @throws NullPointerException if the specified element is null
      */
     @Override
-    public boolean contains(E value) {
-        throw new UnsupportedOperationException("todo: implement this");
+    public boolean contains(Object value) {
+        if(value == null){
+            throw new NullPointerException();
+        }
+        if(find(root,(E) value) == null){
+            return false;
+        }
+        else{
+            return true;
+        }
     }
 
     /**
@@ -96,7 +301,11 @@ public class AVLTree<E extends Comparable<E>> implements ISelfBalancingSortedTre
      */
     @Override
     public E first() {
-        throw new UnsupportedOperationException("todo: implement this");
+        if(root == null) {
+            throw new NoSuchElementException();
+        }
+        AVLNode current = root;
+        return (E) treeMin(current).value;
     }
 
     /**
@@ -109,7 +318,11 @@ public class AVLTree<E extends Comparable<E>> implements ISelfBalancingSortedTre
      */
     @Override
     public E last() {
-        throw new UnsupportedOperationException("todo: implement this");
+        if(root == null){
+            throw new NoSuchElementException();
+        }
+        AVLNode current = root;
+        return (E) treeMax(current).value;
     }
 
     /**
@@ -119,7 +332,7 @@ public class AVLTree<E extends Comparable<E>> implements ISelfBalancingSortedTre
      */
     @Override
     public int size() {
-        throw new UnsupportedOperationException("todo: implement this");
+        return length;
     }
 
     /**
@@ -129,7 +342,7 @@ public class AVLTree<E extends Comparable<E>> implements ISelfBalancingSortedTre
      */
     @Override
     public boolean isEmpty() {
-        throw new UnsupportedOperationException("todo: implement this");
+        return  length == 0;
     }
 
     /**
@@ -138,7 +351,8 @@ public class AVLTree<E extends Comparable<E>> implements ISelfBalancingSortedTre
      */
     @Override
     public void clear() {
-        throw new UnsupportedOperationException("todo: implement this");
+        length = 0;
+        root = null;
     }
 
     /**

@@ -60,7 +60,7 @@ public class OpenHashTable<E extends IOpenHashTableEntity> implements IOpenHashT
      *                                  In other words if {@link IOpenHashTableEntity#hashCode(int, int)} specified element is incorrect.
      */
     @Override
-    public boolean contains(E value) {
+    public boolean contains(Object value) {
         throw new UnsupportedOperationException("todo: implement this");
     }
 
