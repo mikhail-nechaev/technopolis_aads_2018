@@ -45,11 +45,11 @@ public class TestIPriorityQueue {
     @Before
     @SuppressWarnings("unchecked")
     public void init() {
-        try {
-            testPQ = (IPriorityQueue<Integer>) ArrayPriorityQueueSimple.class.getConstructor(Comparator.class).newInstance(comparator);
-        } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
-            throw new AssertionError(e);
-        }
+//        try {
+            testPQ = new ArrayPriorityQueueSimple(comparator);// (IPriorityQueue<Integer>) ArrayPriorityQueueSimple.class.getConstructor(Comparator.class).newInstance(comparator);
+//        } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
+//                throw new AssertionError(e);
+//        }
     }
 
     @Test

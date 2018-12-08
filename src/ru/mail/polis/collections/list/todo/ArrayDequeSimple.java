@@ -2,7 +2,9 @@ package ru.mail.polis.collections.list.todo;
 
 import ru.mail.polis.collections.list.IDeque;
 
+import java.util.Comparator;
 import java.util.ListIterator;
+import java.util.Objects;
 
 /**
  * Resizable cyclic array implementation of the {@link IDeque} interface.
@@ -12,6 +14,18 @@ import java.util.ListIterator;
  * @param <E> the type of elements held in this deque
  */
 public class ArrayDequeSimple<E> implements IDeque<E> {
+    private static final int DEFAULT_CAPACITY = 16; /** Isn`t fixed, expandable with resize method, power of two */
+    private E[] dequeue;                            /** Array for the deque */
+    private E head;
+    private E tail;
+    private Comparator<E> comparator;
+    private int size = 0;
+
+    public ArrayDequeSimple() {
+        this(Comparator.naturalOrder());
+        E[] dequeue = (E[]) new Object[DEFAULT_CAPACITY];
+    }
+
 
     /**
      * Inserts the specified element at the front of this deque.
@@ -100,6 +114,8 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
     @Override
     public int size() {
         throw new UnsupportedOperationException("todo: implement this");
+        return (tail - head) & (dequeue.length - 1);
+
     }
 
     /**
@@ -110,6 +126,7 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
     @Override
     public boolean isEmpty() {
         throw new UnsupportedOperationException("todo: implement this");
+        return (size == 0);
     }
 
     /**
@@ -119,6 +136,7 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
     @Override
     public void clear() {
         throw new UnsupportedOperationException("todo: implement this");
+        size = 0;
     }
 
     /**
