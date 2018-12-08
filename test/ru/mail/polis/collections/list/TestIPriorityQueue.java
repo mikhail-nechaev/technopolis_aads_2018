@@ -5,10 +5,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+import ru.mail.polis.collections.TestHelper;
 import ru.mail.polis.collections.list.todo.ArrayPriorityQueueSimple;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.NoSuchElementException;
@@ -25,21 +25,15 @@ import java.util.PriorityQueue;
 @RunWith(value = Parameterized.class)
 public class TestIPriorityQueue {
 
-    private IPriorityQueue<Integer> testPQ;
-
     @Parameterized.Parameter(0)
     public Comparator<Integer> comparator;
     @Parameterized.Parameter(1)
     public String name;
+    private IPriorityQueue<Integer> testPQ;
 
     @Parameterized.Parameters(name = "{1}")
     public static Collection<Object[]> data() {
-        return Arrays.asList(new Object[][]{
-                {Comparator.naturalOrder(), "NATURAL"},
-                {Comparator.reverseOrder(), "REVERSE"},
-                {Comparator.comparingInt((Integer v) -> v % 2).thenComparingInt(v -> v), "EVEN_FIRST"},
-                {(Comparator) (v1, v2) -> 0, "ALL_EQUALS"},
-        });
+        return TestHelper.COMPARATORS;
     }
 
     @Before
@@ -120,7 +114,7 @@ public class TestIPriorityQueue {
         add(truePQ, testPQ, 6);
         while (!testPQ.isEmpty()) {
             Assert.assertTrue(element(truePQ, testPQ));
-            Assert.assertTrue(poll(truePQ, testPQ));
+            Assert.assertTrue(remove(truePQ, testPQ));
         }
         isEmpty();
     }
@@ -139,7 +133,7 @@ public class TestIPriorityQueue {
         return eq(truePQ.element(), testPQ.element());
     }
 
-    private boolean poll(PriorityQueue<Integer> truePQ, IPriorityQueue<Integer> testPQ) {
+    private boolean remove(PriorityQueue<Integer> truePQ, IPriorityQueue<Integer> testPQ) {
         return eq(truePQ.remove(), testPQ.remove());
     }
 
