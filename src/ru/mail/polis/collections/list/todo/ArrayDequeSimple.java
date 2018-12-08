@@ -13,6 +13,12 @@ import java.util.ListIterator;
  */
 public class ArrayDequeSimple<E> implements IDeque<E> {
 
+    private Object[] array;
+
+    public ArrayDequeSimple() {
+        array = new Object[10];
+    }
+
     /**
      * Inserts the specified element at the front of this deque.
      *
@@ -21,7 +27,10 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public void addFirst(E value) {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (value == null) {
+            throw new NullPointerException();
+        }
+
     }
 
     /**
