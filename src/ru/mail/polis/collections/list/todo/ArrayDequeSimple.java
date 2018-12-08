@@ -2,7 +2,9 @@ package ru.mail.polis.collections.list.todo;
 
 import ru.mail.polis.collections.list.IDeque;
 
+import java.util.ConcurrentModificationException;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 /**
  * Resizable cyclic array implementation of the {@link IDeque} interface.
@@ -14,6 +16,8 @@ import java.util.Iterator;
 public class ArrayDequeSimple<E> implements IDeque<E> {
 
     private Object[] array;
+    private int head;
+    private int tail;
 
     public ArrayDequeSimple() {
         array = new Object[10];
@@ -30,7 +34,23 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
         if (value == null) {
             throw new NullPointerException();
         }
+        head = head > 0 ? head - 1 : array.length - 1;
+        array[head] = value;
+        if (head == tail) {
+            expandArray();
+        }
+    }
 
+    private void expandArray() {
+        Object[] newArray = new Object[array.length * 2];
+        int al = array.length;
+
+        System.arraycopy(array, head, newArray, 0, al - head);
+        System.arraycopy(array, 0, newArray, al - head, head);
+
+        head = 0;
+        tail = al;
+        array = newArray;
     }
 
     /**
@@ -41,7 +61,14 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public E removeFirst() {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (array[head] == null) {
+            throw new NullPointerException();
+        }
+        @SuppressWarnings("unchecked")
+        E first = (E) array[head];
+        array[head] = null;
+        head = head < array.length - 1 ? head + 1 : 0;
+        return first;
     }
 
     /**
@@ -52,7 +79,9 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public E getFirst() {
-        throw new UnsupportedOperationException("todo: implement this");
+        @SuppressWarnings("unchecked")
+        E first = (E) array[head];
+        return first;
     }
 
     /**
@@ -63,7 +92,14 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public void addLast(E value) {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (value == null) {
+            throw new NullPointerException();
+        }
+        tail = tail < array.length - 1 ? 0 : tail + 1;
+        array[tail] = value;
+        if (head == tail) {
+            expandArray();
+        }
     }
 
     /**
@@ -74,7 +110,14 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public E removeLast() {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (array[tail] == null) {
+            throw new NullPointerException();
+        }
+        @SuppressWarnings("unchecked")
+        E last = (E) array[tail];
+        array[tail] = null;
+        tail = tail > 0 ? tail - 1 : array.length - 1;
+        return last;
     }
 
     /**
@@ -85,7 +128,9 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public E getLast() {
-        throw new UnsupportedOperationException("todo: implement this");
+        @SuppressWarnings("unchecked")
+        E last = (E) array[tail];
+        return last;
     }
 
     /**
@@ -98,7 +143,18 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public boolean contains(E value) {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (value == null) {
+            return false;
+        }
+        for (int i = head; i == tail; ) {
+            @SuppressWarnings("unchecked")
+            E check = (E) array[i];
+            if (value.equals(check)) {
+                return true;
+            }
+            i = i < array.length - 1 ? i+1 : 0;
+        }
+        return false;
     }
 
     /**
@@ -108,7 +164,7 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public int size() {
-        throw new UnsupportedOperationException("todo: implement this");
+        return head < tail ? tail - head : array.length - (head - tail);
     }
 
     /**
@@ -118,7 +174,7 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public boolean isEmpty() {
-        throw new UnsupportedOperationException("todo: implement this");
+        return head == tail;
     }
 
     /**
@@ -127,7 +183,10 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public void clear() {
-        throw new UnsupportedOperationException("todo: implement this");
+        for (int i = head; i == tail; ) {
+            array[i] = null;
+            i = i < array.length - 1 ? i+1 : 0;
+        }
     }
 
     /**
@@ -139,5 +198,37 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
     @Override
     public Iterator<E> iterator() {
         throw new UnsupportedOperationException("todo: implement this");
+    }
+
+    private class DescendingIterator implements Iterator<E> {
+
+        private int cursor = head;
+        private int end = tail;
+        private int lastReturn = -1;
+
+        @Override
+        public boolean hasNext() {
+            return cursor != end;
+        }
+
+        @Override
+        public E next() {
+            if (cursor == end) {
+                throw new NoSuchElementException();
+            }
+            cursor = cursor < array.length - 1 ? cursor + 1 : 0;
+            @SuppressWarnings("unchecked")
+            E next = (E) array[cursor];
+            if (tail != end || next == null) {
+                throw new ConcurrentModificationException();
+            }
+            lastReturn = cursor;
+            return next;
+        }
+
+        @Override
+        public void remove() {
+
+        }
     }
 }
