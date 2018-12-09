@@ -3,6 +3,7 @@ package ru.mail.polis.collections.list.todo;
 import ru.mail.polis.collections.list.IDeque;
 
 import java.util.ListIterator;
+import java.util.NoSuchElementException;
 
 /**
  * Resizable cyclic array implementation of the {@link IDeque} interface.
@@ -12,7 +13,27 @@ import java.util.ListIterator;
  * @param <E> the type of elements held in this deque
  */
 public class ArrayDequeSimple<E> implements IDeque<E> {
+    Object[] elements;
+    int head;
+    int tail;
+    private static final int MIN_INITIAL_CAPACITY = 8;
 
+
+    private void doubleCapacity() {
+        assert head == tail;
+        int p = head;
+        int n = elements.length;
+        int r = n - p; // number of elements to the right of p
+        int newCapacity = n << 1;
+        if (newCapacity < 0)
+            throw new IllegalStateException();
+        Object[] a = new Object[newCapacity];
+        System.arraycopy(elements, p, a, 0, r);
+        System.arraycopy(elements, 0, a, r, p);
+        elements = a;
+        head = 0;
+        tail = n;
+    }
     /**
      * Inserts the specified element at the front of this deque.
      *
@@ -21,7 +42,9 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public void addFirst(E value) {
-        throw new UnsupportedOperationException("todo: implement this");
+        if(value == null) throw new NullPointerException();
+        elements[head = (head - 1) & (elements.length - 1)] = value;
+        if (head == tail) doubleCapacity();
     }
 
     /**
@@ -32,7 +55,20 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public E removeFirst() {
-        throw new UnsupportedOperationException("todo: implement this");
+        E x = pollFirst();
+        if (x == null)
+            throw new NoSuchElementException();
+        return x;
+    }
+
+    public E pollFirst() {
+        int h = head;
+        E result = (E) elements[h];
+        if (result == null)
+            return null;
+        elements[h] = null;     // Must null out slot
+        head = (h + 1) & (elements.length - 1);
+        return result;
     }
 
     /**
@@ -43,7 +79,10 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public E getFirst() {
-        throw new UnsupportedOperationException("todo: implement this");
+        E result = (E) elements[head];
+        if (result == null)
+            throw new NoSuchElementException();
+        return result;
     }
 
     /**
@@ -54,7 +93,11 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public void addLast(E value) {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (value == null)
+            throw new NullPointerException();
+        elements[tail] = value;
+        if ( (tail = (tail + 1) & (elements.length - 1)) == head)
+            doubleCapacity();
     }
 
     /**
@@ -65,7 +108,22 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public E removeLast() {
-        throw new UnsupportedOperationException("todo: implement this");
+
+        E x = pollLast();
+        if (x == null)
+            throw new NoSuchElementException();
+        return x;
+    }
+
+    public E pollLast() {
+        int t = (tail - 1) & (elements.length - 1);
+        @SuppressWarnings("unchecked")
+        E result = (E) elements[t];
+        if (result == null)
+            return null;
+        elements[t] = null;
+        tail = t;
+        return result;
     }
 
     /**
@@ -76,7 +134,10 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public E getLast() {
-        throw new UnsupportedOperationException("todo: implement this");
+        E result = (E) elements[(tail - 1) & (elements.length - 1)];
+        if (result == null)
+            throw new NoSuchElementException();
+        return result;
     }
 
     /**
@@ -99,7 +160,7 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public int size() {
-        throw new UnsupportedOperationException("todo: implement this");
+        return (tail - head) & (elements.length - 1);
     }
 
     /**
@@ -109,7 +170,7 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public boolean isEmpty() {
-        throw new UnsupportedOperationException("todo: implement this");
+        return head == tail;
     }
 
     /**
