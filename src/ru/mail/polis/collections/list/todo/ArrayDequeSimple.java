@@ -2,6 +2,7 @@ package ru.mail.polis.collections.list.todo;
 
 import ru.mail.polis.collections.list.IDeque;
 
+import java.sql.SQLOutput;
 import java.util.ListIterator;
 import java.util.NoSuchElementException;
 
@@ -207,10 +208,13 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
         if (value == null) {
             throw new NullPointerException();
         }
-        for (int i = lastCursor; i != firstCursor + 1; i = cyclicInc(i)) {
-            if (deque[i].equals(value)) {
-                return true;
+        if (!isEmpty()) {
+            for (int i = lastCursor; i != cyclicInc(firstCursor); i = cyclicInc(i)) {
+                if (deque[i].equals(value)) {
+                    return true;
+                }
             }
+            return false;
         }
         return false;
     }
@@ -243,7 +247,7 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
     public void clear() {
         deque = (E[]) new Object[arraySize];
         size = 0;
-        firstCursor = arraySize;
+        firstCursor = arraySize - 1;
         lastCursor = 0;
     }
 
@@ -268,9 +272,9 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
             // next < 5 4 3 2 1 0 > previous
             private int cyclicConvert(int n) {
                 if (position <= first) {
-                    return first - position;
+                    return first - n;
                 } else {
-                    return ArrayDequeSimple.this.arraySize - position + first;
+                    return ArrayDequeSimple.this.arraySize - n + first;
                 }
             }
 
@@ -323,8 +327,10 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
                     ArrayDequeSimple.this.deque[cyclicConvert(i)] =
                             ArrayDequeSimple.this.deque[cyclicConvert(i - 1)];
                 }
+                position--;
                 size = --ArrayDequeSimple.this.size;
-                first = ArrayDequeSimple.this.cyclicDec(ArrayDequeSimple.this.firstCursor);
+                ArrayDequeSimple.this.firstCursor = ArrayDequeSimple.this.cyclicDec(ArrayDequeSimple.this.firstCursor);
+                first = ArrayDequeSimple.this.firstCursor;
             }
 
             @Override
