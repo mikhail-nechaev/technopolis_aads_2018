@@ -1,6 +1,8 @@
 package ru.mail.polis.collections.iterator.todo;
 
 import java.util.Iterator;
+import java.util.NoSuchElementException;
+
 
 /**
  * Итератор возвращающий последовательность последовательностей элементов возрастающих итераторов в порядке возрастания
@@ -15,6 +17,9 @@ import java.util.Iterator;
  */
 public class MergingPeekingIncreasingIterator implements Iterator<Integer> {
 
+    private IntegerIncreasingSequencePeekingIterator[] iterators;
+    private int numActiveIterators;
+
     /**
      * Creates a {@code MergingPeekingIncreasingIterator} containing the inside all elements of this specified iterators.
      *
@@ -23,7 +28,8 @@ public class MergingPeekingIncreasingIterator implements Iterator<Integer> {
      * @param iterators the iterators whose are to be placed into this merging peeking increasing iterator
      */
     public MergingPeekingIncreasingIterator(IntegerIncreasingSequencePeekingIterator... iterators) {
-        //todo: do some stuff with iterators
+        this.iterators = iterators;
+        numActiveIterators = iterators.length;
     }
 
     /**
@@ -37,7 +43,7 @@ public class MergingPeekingIncreasingIterator implements Iterator<Integer> {
      */
     @Override
     public boolean hasNext() {
-        throw new UnsupportedOperationException("todo: implement this");
+        return numActiveIterators > 0;
     }
 
     /**
@@ -50,6 +56,20 @@ public class MergingPeekingIncreasingIterator implements Iterator<Integer> {
      */
     @Override
     public Integer next() {
-        throw new UnsupportedOperationException("todo: implement this");
+        if(!hasNext()){
+            throw new NoSuchElementException();
+        }
+        IntegerIncreasingSequencePeekingIterator minPeekIterator = null;
+        for(IntegerIncreasingSequencePeekingIterator itr: iterators){
+            if(itr.hasNext() && (minPeekIterator == null || itr.compareTo(minPeekIterator) < 0)){
+                minPeekIterator = itr;
+            }
+        }
+
+        Integer value = minPeekIterator.next();
+        if(!minPeekIterator.hasNext()){
+            numActiveIterators--;
+        }
+        return value;
     }
 }

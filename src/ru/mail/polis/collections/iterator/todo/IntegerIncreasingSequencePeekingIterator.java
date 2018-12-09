@@ -4,12 +4,18 @@ import ru.mail.polis.collections.iterator.IIncreasingSequenceIterator;
 import ru.mail.polis.collections.iterator.IPeekingIterator;
 
 import java.util.NoSuchElementException;
+import java.util.Random;
 
 /**
  *
  */
 public class IntegerIncreasingSequencePeekingIterator implements IIncreasingSequenceIterator<Integer> {
 
+    private Integer current;
+    private int last;
+    private int maxStep;
+    private Random rnd;
+    private boolean hasElements = true;
     /**
      * minStep = 1
      *
@@ -23,7 +29,13 @@ public class IntegerIncreasingSequencePeekingIterator implements IIncreasingSequ
      * @throws IllegalArgumentException if arguments is invalid
      */
     public IntegerIncreasingSequencePeekingIterator(int first, int last, int maxStep) {
-
+        if(first > last || maxStep <= 0){
+            throw new IllegalArgumentException();
+        }
+        current = first;
+        this.last = last;
+        this.maxStep = maxStep;
+        rnd = new Random();
     }
 
 
@@ -36,7 +48,7 @@ public class IntegerIncreasingSequencePeekingIterator implements IIncreasingSequ
      */
     @Override
     public boolean hasNext() {
-        throw new UnsupportedOperationException("todo: implement this");
+        return hasElements;
     }
 
     /**
@@ -47,7 +59,17 @@ public class IntegerIncreasingSequencePeekingIterator implements IIncreasingSequ
      */
     @Override
     public Integer next() {
-        throw new UnsupportedOperationException("todo: implement this");
+       if(!hasNext()){
+           throw new NoSuchElementException();
+       }
+       Integer value = current;
+       if(value == last){
+           hasElements = false;
+       } else {
+           Integer step = rnd.nextInt(maxStep) + 1;
+           current = ((long) value + step >= last) ? last : value + step;
+       }
+       return value;
     }
 
     /**
@@ -58,7 +80,10 @@ public class IntegerIncreasingSequencePeekingIterator implements IIncreasingSequ
      */
     @Override
     public Integer peek() {
-        throw new UnsupportedOperationException("todo: implement this");
+        if(!hasNext()){
+            throw new NoSuchElementException();
+        }
+        return current;
     }
 
     /**
@@ -74,6 +99,15 @@ public class IntegerIncreasingSequencePeekingIterator implements IIncreasingSequ
      */
     @Override
     public int compareTo(IPeekingIterator<Integer> other) {
-        throw new UnsupportedOperationException("todo: implement this");
+        if(hasNext() && other.hasNext()){
+            return peek() - other.peek();
+        }
+        if(hasNext() || other.hasNext()){
+            if(hasNext()){
+                return 1;
+            }
+            return -1;
+        }
+        return 0;
     }
 }
