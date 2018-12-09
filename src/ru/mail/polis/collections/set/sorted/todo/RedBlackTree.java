@@ -7,7 +7,7 @@ import java.util.Comparator;
 import java.util.NoSuchElementException;
 
 /**
- * A Red-Black tree based {@link ru.mail.polis.collections.set.sorted.ISelfBalancingSortedTreeSet} implementation.
+ * A Red-Black tree based {@link ISelfBalancingSortedTreeSet} implementation.
  *
  * ! An implementation of red-black trees must be based on the description in
  * Introduction to Algorithms (Cormen, Leiserson, Rivest)

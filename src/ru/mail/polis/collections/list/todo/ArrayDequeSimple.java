@@ -354,5 +354,6 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
                 t2 = t;
             }
         };
+
     }
 }

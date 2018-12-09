@@ -5,6 +5,7 @@ import ru.mail.polis.collections.list.IDeque;
 import java.util.ListIterator;
 import java.util.NoSuchElementException;
 
+
 /**
  * Linked list implementation of the {@link IDeque} interface with no capacity restrictions.
  *
@@ -50,6 +51,7 @@ public class LinkedDequeSimple<E> implements IDeque<E> {
     private Node<E> first = null;
     private Node<E> last = null;
     private int size = 0;
+
 
     /**
      * Inserts the specified element at the front of this deque.

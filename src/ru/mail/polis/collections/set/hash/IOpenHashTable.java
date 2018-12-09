@@ -52,4 +52,6 @@ public interface IOpenHashTable<E extends IOpenHashTableEntity> extends ISetIter
      */
     @Override
     boolean contains(E value);
+
+    int tableSize();
 }
