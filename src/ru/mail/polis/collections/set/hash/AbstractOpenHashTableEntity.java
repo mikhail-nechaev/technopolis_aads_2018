@@ -4,7 +4,7 @@ package ru.mail.polis.collections.set.hash;
  * Created by Nechaev Mikhail
  * Since 27/11/2018.
  */
-public abstract class AbstractOpenHashTableEntity extends CheckedOpenHashTableEntity implements IOpenHashTableEntity {
+public abstract class AbstractOpenHashTableEntity implements IOpenHashTableEntity {
 
     /**
      * Second hash-function in double hashing.
