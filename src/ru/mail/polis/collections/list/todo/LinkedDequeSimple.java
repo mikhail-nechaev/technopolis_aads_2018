@@ -2,9 +2,12 @@ package ru.mail.polis.collections.list.todo;
 
 import ru.mail.polis.collections.list.IDeque;
 
+
 import java.util.ListIterator;
 import java.util.NoSuchElementException;
 import java.util.Objects;
+
+import java.util.Iterator;
 
 /**
  * Linked list implementation of the {@link IDeque} interface with no capacity restrictions.
@@ -245,7 +248,7 @@ public class LinkedDequeSimple<E> implements IDeque<E> {
      * @return an iterator over the elements in this collection in proper sequence
      */
     @Override
-    public ListIterator<E> iterator() {
+    public Iterator<E> iterator() {
         return new LinkedDequeIterator();
     }
 
@@ -254,11 +257,11 @@ public class LinkedDequeSimple<E> implements IDeque<E> {
         private Node<E> next;
         private int nextIndex;
 
-        public LinkedDequeIterator(){
+        public LinkedDequeIterator() {
             next = head;
         }
 
-        public LinkedDequeIterator(int index){
+        public LinkedDequeIterator(int index) {
             next = (index == size) ? null : getNode(index);
             nextIndex = index;
         }
@@ -270,7 +273,7 @@ public class LinkedDequeSimple<E> implements IDeque<E> {
 
         @Override
         public E next() {
-            if(!hasNext()){
+            if (!hasNext()) {
                 throw new NoSuchElementException();
             }
 
@@ -287,7 +290,7 @@ public class LinkedDequeSimple<E> implements IDeque<E> {
 
         @Override
         public E previous() {
-            if(!hasPrevious()){
+            if (!hasPrevious()) {
                 throw new NoSuchElementException();
             }
 
@@ -308,7 +311,7 @@ public class LinkedDequeSimple<E> implements IDeque<E> {
 
         @Override
         public void remove() {
-            if(lastReturned == null){
+            if (lastReturned == null) {
                 throw new IllegalStateException();
             }
 
@@ -316,8 +319,7 @@ public class LinkedDequeSimple<E> implements IDeque<E> {
             delete(lastReturned);
             if (next == lastReturned) {
                 next = lastNext;
-            }
-            else {
+            } else {
                 nextIndex--;
             }
             lastReturned = null;
@@ -325,7 +327,7 @@ public class LinkedDequeSimple<E> implements IDeque<E> {
 
         @Override
         public void set(E e) {
-            if(lastReturned == null){
+            if (lastReturned == null) {
                 throw new NoSuchElementException();
             }
             lastReturned.item = Objects.requireNonNull(e);
@@ -334,7 +336,7 @@ public class LinkedDequeSimple<E> implements IDeque<E> {
         @Override
         public void add(E e) {
             Objects.requireNonNull(e);
-            if(next == null){
+            if (next == null) {
                 addLast(e);
             } else {
                 insert(e, next);

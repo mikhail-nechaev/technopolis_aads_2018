@@ -2,10 +2,13 @@ package ru.mail.polis.collections.list.todo;
 
 import ru.mail.polis.collections.list.IDeque;
 
+
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.ListIterator;
 import java.util.NoSuchElementException;
 import java.util.Objects;
+
 
 /**
  * Resizable cyclic array implementation of the {@link IDeque} interface.
@@ -221,7 +224,7 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      * @return an iterator over the elements in this collection in proper sequence
      */
     @Override
-    public ListIterator<E> iterator() {
+    public Iterator<E> iterator() {
         return new ArrayDequeIterator();
     }
 
@@ -238,7 +241,7 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
 
         @Override
         public E next() {
-            if (!hasNext()){
+            if (!hasNext()) {
                 throw new NoSuchElementException();
             }
             E e = elements[cursor];
@@ -255,7 +258,7 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
 
         @Override
         public E previous() {
-            if(!hasPrevious()){
+            if (!hasPrevious()) {
                 throw new NoSuchElementException();
             }
             E e = elements[cursor = lastIndexReturned];
@@ -277,10 +280,10 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
 
         @Override
         public void remove() {
-            if(lastIndexReturned < 0){
+            if (lastIndexReturned < 0) {
                 throw new IllegalStateException();
             }
-            if(delete(lastIndexReturned)){
+            if (delete(lastIndexReturned)) {
                 cursor = dec(cursor);
             }
             nextIndex--;
@@ -289,7 +292,7 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
 
         @Override
         public void set(E e) {
-            if(lastIndexReturned < 0){
+            if (lastIndexReturned < 0) {
                 throw new IllegalStateException();
             }
             elements[lastIndexReturned] = e;
@@ -298,14 +301,14 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
         @Override
         public void add(E e) {
             Objects.requireNonNull(e);
-            if(cursor >= head || cursor == 0){
-                if(dec(head) == tail){
+            if (cursor >= head || cursor == 0) {
+                if (dec(head) == tail) {
                     ensureCapacity();
                 }
                 int numFrontElements = getNumElementsBetween(dec(cursor), head = dec(head));
                 System.arraycopy(elements, inc(head), elements, head, numFrontElements);
             } else {
-                if(inc(tail) == head){
+                if (inc(tail) == head) {
                     ensureCapacity();
                 }
                 int numBackElements = getNumElementsBetween(tail = inc(tail), cursor);
