@@ -8,6 +8,15 @@ import java.util.NoSuchElementException;
 import java.util.Objects;
 
 public class ArrayDequeFull<E> extends ArrayDequeSimple<E> implements Deque<E> {
+
+    public ArrayDequeFull() {
+        super();
+    }
+
+    public ArrayDequeFull(int arraySize) {
+        super(arraySize);
+    }
+
     /**
      * Inserts the specified element at the front of this deque unless it would
      * violate capacity restrictions.  When using a capacity-restricted deque,
@@ -131,6 +140,9 @@ public class ArrayDequeFull<E> extends ArrayDequeSimple<E> implements Deque<E> {
      */
     @Override
     public boolean removeFirstOccurrence(Object o) {
+        if (o == null) {
+            throw new NullPointerException();
+        }
         ListIterator<E> iterator = iterator();
         while (iterator.hasNext()) {
             if (o == iterator.next()) {
@@ -160,6 +172,9 @@ public class ArrayDequeFull<E> extends ArrayDequeSimple<E> implements Deque<E> {
      */
     @Override
     public boolean removeLastOccurrence(Object o) {
+        if (o == null) {
+            throw new NullPointerException();
+        }
         Iterator<E> iterator = descendingIterator();
         while (iterator.hasNext()) {
             if (o == iterator.next()) {
@@ -452,12 +467,7 @@ public class ArrayDequeFull<E> extends ArrayDequeSimple<E> implements Deque<E> {
     public boolean remove(Object o) {
         Iterator<E> it = iterator();
         if (o==null) {
-            while (it.hasNext()) {
-                if (it.next()==null) {
-                    it.remove();
-                    return true;
-                }
-            }
+            throw new NullPointerException();
         } else {
             while (it.hasNext()) {
                 if (o.equals(it.next())) {
@@ -513,9 +523,7 @@ public class ArrayDequeFull<E> extends ArrayDequeSimple<E> implements Deque<E> {
     public boolean contains(Object o) {
         Iterator<E> it = iterator();
         if (o==null) {
-            while (it.hasNext())
-                if (it.next()==null)
-                    return true;
+            throw new NullPointerException();
         } else {
             while (it.hasNext())
                 if (o.equals(it.next()))
@@ -625,19 +633,40 @@ public class ArrayDequeFull<E> extends ArrayDequeSimple<E> implements Deque<E> {
     @Override
     public Iterator<E> descendingIterator() {
         return new Iterator<E>() {
-            ListIterator<E> listIterator = iterator();
+            ListIterator<E> iterator = iterator();
+            boolean isFirst = true;
+
             {
-                while (hasNext()) next(); // согласен, что криво
+                if (ArrayDequeFull.super.size() > 1) {
+                    while (iterator.hasNext()) next();
+                }
             }
 
             @Override
             public boolean hasNext() {
-                return listIterator.hasPrevious();
+                if (ArrayDequeFull.super.size() > 1 && isFirst) {
+                    return true;
+                } else if (ArrayDequeFull.super.size() == 1) {
+                    return iterator.hasNext();
+                }
+                return iterator.hasPrevious();
             }
 
             @Override
             public E next() {
-                return listIterator.previous();
+                if (ArrayDequeFull.super.size() > 1 && isFirst) {
+                    isFirst = false;
+                    iterator.previous();
+                    return iterator.next();
+                } else if (ArrayDequeFull.super.size() == 1) {
+                    return iterator.next();
+                }
+                return iterator.previous();
+            }
+
+            @Override
+            public void remove() {
+                iterator.remove();
             }
         };
     }
