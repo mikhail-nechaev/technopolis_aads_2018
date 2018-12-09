@@ -8,6 +8,8 @@ import ru.mail.polis.collections.list.TestFullDeque;
 import ru.mail.polis.collections.list.TestIDeque;
 import ru.mail.polis.collections.list.TestIDequeRemove;
 import ru.mail.polis.collections.list.TestIPriorityQueue;
+import ru.mail.polis.collections.set.hash.TestHashTable;
+import ru.mail.polis.collections.set.sorted.TestBalancedSortedSet;
 
 /*
  * Created by Nechaev Mikhail
@@ -20,7 +22,9 @@ import ru.mail.polis.collections.list.TestIPriorityQueue;
         TestFullDeque.class,
         TestIPriorityQueue.class,
         TestIntegerIncreasingSequencePeekingIterator.class,
-        TestMergingPeekingIncreasingIterator.class
+        TestMergingPeekingIncreasingIterator.class,
+        TestHashTable.class,
+        TestBalancedSortedSet.class
 })
 public class MainTest {
     //Run this from IntelliJ IDEA
