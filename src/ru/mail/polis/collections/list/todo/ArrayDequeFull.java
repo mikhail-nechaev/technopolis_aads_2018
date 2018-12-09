@@ -5,11 +5,7 @@ import java.util.*;
 
 public class ArrayDequeFull<E> extends ArrayDequeSimple<E> implements Deque<E> {
 
-    private Object[] array;
-    private int head;
-    private int tail;
-
-    public ArrayDequeFull(Object[] array) {
+    public ArrayDequeFull() {
         super();
     }
 

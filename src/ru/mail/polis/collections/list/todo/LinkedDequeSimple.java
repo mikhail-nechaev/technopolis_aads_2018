@@ -3,6 +3,9 @@ package ru.mail.polis.collections.list.todo;
 import ru.mail.polis.collections.list.IDeque;
 
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.NoSuchElementException;
+import java.util.concurrent.LinkedBlockingDeque;
 
 /**
  * Linked list implementation of the {@link IDeque} interface with no capacity restrictions.
@@ -10,6 +13,21 @@ import java.util.Iterator;
  * @param <E> the type of elements held in this deque
  */
 public class LinkedDequeSimple<E> implements IDeque<E> {
+
+    class Node<E> {
+
+        E elem;
+        Node<E> prev;
+        Node<E> next;
+
+        Node(E elem) {
+            this.elem = elem;
+        }
+    }
+
+    Node<E> head;
+    Node<E> tail;
+    int size;
 
     /**
      * Inserts the specified element at the front of this deque.
@@ -19,7 +37,22 @@ public class LinkedDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public void addFirst(E value) {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (value == null) {
+            throw new NullPointerException();
+        }
+        Node<E> node = new Node<>(value);
+        if (head == null && tail == null) {
+            head = tail = node;
+        } else if (head == tail) {
+            node.next = tail;
+            tail.prev = node;
+            head = node;
+        } else {
+            node.next = head;
+            head.prev = node;
+            head = node;
+        }
+        size++;
     }
 
     /**
@@ -30,7 +63,19 @@ public class LinkedDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public E removeFirst() {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (head == null && tail == null) {
+            throw new NoSuchElementException();
+        }
+        E first = head.elem;
+        if (head == tail) {
+            head = null;
+            tail = null;
+        } else {
+            head = head.next;
+            head.prev = null;
+        }
+        size--;
+        return first;
     }
 
     /**
@@ -41,7 +86,10 @@ public class LinkedDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public E getFirst() {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (head == null && tail == null) {
+            throw new NoSuchElementException();
+        }
+        return head.elem;
     }
 
     /**
@@ -52,7 +100,22 @@ public class LinkedDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public void addLast(E value) {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (value == null) {
+            throw new NullPointerException();
+        }
+        Node<E> node = new Node<>(value);
+        if (head == null && tail == null) {
+            head = tail = node;
+        } else if (head == tail) {
+            node.prev = head;
+            head.next = node;
+            tail = node;
+        } else {
+            node.prev = tail;
+            tail.next = node;
+            tail = node;
+        }
+        size++;
     }
 
     /**
@@ -63,7 +126,19 @@ public class LinkedDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public E removeLast() {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (head == null && tail == null) {
+            throw new NoSuchElementException();
+        }
+        E last = tail.elem;
+        if (head == tail) {
+            head = null;
+            tail = null;
+        } else {
+            tail = tail.prev;
+            tail.next = null;
+        }
+        size--;
+        return last;
     }
 
     /**
@@ -74,7 +149,10 @@ public class LinkedDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public E getLast() {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (head == null && tail == null) {
+            throw new NoSuchElementException();
+        }
+        return tail.elem;
     }
 
     /**
@@ -87,7 +165,14 @@ public class LinkedDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public boolean contains(E value) {
-        throw new UnsupportedOperationException("todo: implement this");
+        Iterator<E> iter = this.iterator();
+        while (iter.hasNext()) {
+            E check = iter.next();
+            if (check.equals(value)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -97,7 +182,7 @@ public class LinkedDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public int size() {
-        throw new UnsupportedOperationException("todo: implement this");
+        return size;
     }
 
     /**
@@ -107,7 +192,7 @@ public class LinkedDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public boolean isEmpty() {
-        throw new UnsupportedOperationException("todo: implement this");
+        return size == 0;
     }
 
     /**
@@ -116,7 +201,8 @@ public class LinkedDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public void clear() {
-        throw new UnsupportedOperationException("todo: implement this");
+        head = tail = null;
+        size = 0;
     }
 
     /**
@@ -127,6 +213,43 @@ public class LinkedDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public Iterator<E> iterator() {
-        throw new UnsupportedOperationException("todo: implement this");
+        return new LinkedIterator<>();
+    }
+
+    private class LinkedIterator<T extends E> implements Iterator<E> {
+
+        private Node<E> lastReturned;
+        private Node<E> nextElem = head;
+
+        @Override
+        public boolean hasNext() {
+            return nextElem != null;
+        }
+
+        @Override
+        public E next() {
+            if (!hasNext()) {
+                throw new NoSuchElementException();
+            }
+            lastReturned = nextElem;
+            nextElem = nextElem.next;
+            return lastReturned.elem;
+        }
+
+        @Override
+        public void remove() {
+            if (lastReturned == null) {
+                throw new IllegalStateException();
+            }
+            if (lastReturned == tail) {
+                removeLast();
+            } else if (lastReturned == head) {
+                removeFirst();
+            } else {
+                lastReturned.prev.next = lastReturned.next;
+                lastReturned.next.prev = lastReturned.prev;
+                size--;
+            }
+        }
     }
 }

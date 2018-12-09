@@ -15,9 +15,10 @@ import java.util.NoSuchElementException;
  */
 public class ArrayDequeSimple<E> implements IDeque<E> {
 
-    private Object[] array;
-    private int head;
-    private int tail;
+    Object[] array;
+    int head;
+    int tail;
+    int size;
 
     public ArrayDequeSimple() {
         array = new Object[10];
@@ -34,9 +35,14 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
         if (value == null) {
             throw new NullPointerException();
         }
-        head = head > 0 ? head - 1 : array.length - 1;
+        if (isEmpty()) {
+
+        } else {
+            head = head == 0 ? array.length - 1 : head - 1;
+        }
         array[head] = value;
-        if (head == tail) {
+        size++;
+        if (head == tail && size > 1) {
             expandArray();
         }
     }
@@ -61,13 +67,14 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public E removeFirst() {
-        if (array[head] == null) {
-            throw new NullPointerException();
+        if (isEmpty()) {
+            throw new NoSuchElementException();
         }
         @SuppressWarnings("unchecked")
         E first = (E) array[head];
         array[head] = null;
-        head = head < array.length - 1 ? head + 1 : 0;
+        head = head == array.length - 1 ? 0: head + 1;
+        size--;
         return first;
     }
 
@@ -79,6 +86,9 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public E getFirst() {
+        if (isEmpty()) {
+            throw new NoSuchElementException();
+        }
         @SuppressWarnings("unchecked")
         E first = (E) array[head];
         return first;
@@ -95,9 +105,14 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
         if (value == null) {
             throw new NullPointerException();
         }
-        tail = tail < array.length - 1 ? 0 : tail + 1;
+        if (isEmpty()) {
+
+        } else {
+            tail = tail == array.length - 1 ? 0 : tail + 1;
+        }
         array[tail] = value;
-        if (head == tail) {
+        size++;
+        if (head == tail && size > 1) {
             expandArray();
         }
     }
@@ -110,13 +125,14 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public E removeLast() {
-        if (array[tail] == null) {
-            throw new NullPointerException();
+        if (isEmpty()) {
+            throw new NoSuchElementException();
         }
         @SuppressWarnings("unchecked")
         E last = (E) array[tail];
         array[tail] = null;
-        tail = tail > 0 ? tail - 1 : array.length - 1;
+        tail = tail == 0 ? array.length - 1 : tail - 1;
+        size--;
         return last;
     }
 
@@ -128,6 +144,9 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public E getLast() {
+        if (isEmpty()) {
+            throw new NoSuchElementException();
+        }
         @SuppressWarnings("unchecked")
         E last = (E) array[tail];
         return last;
@@ -144,7 +163,7 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
     @Override
     public boolean contains(E value) {
         if (value == null) {
-            return false;
+            throw new NullPointerException();
         }
         for (int i = head; i == tail; ) {
             @SuppressWarnings("unchecked")
@@ -152,7 +171,7 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
             if (value.equals(check)) {
                 return true;
             }
-            i = i < array.length - 1 ? i+1 : 0;
+            i = i == array.length - 1 ? 0 : i+1;
         }
         return false;
     }
@@ -164,7 +183,7 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public int size() {
-        return head < tail ? tail - head : array.length - (head - tail);
+        return size;
     }
 
     /**
@@ -174,7 +193,7 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public boolean isEmpty() {
-        return head == tail;
+        return size == 0;
     }
 
     /**
@@ -197,38 +216,81 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public Iterator<E> iterator() {
-        throw new UnsupportedOperationException("todo: implement this");
+        return new ArrayIterator();
     }
 
-    private class DescendingIterator implements Iterator<E> {
+    private class ArrayIterator implements Iterator<E> {
 
-        private int cursor = head;
-        private int end = tail;
-        private int lastReturn = -1;
+        int lastIndex = -1, lastRealIndex = head - 1;
+        int nextIndex = 0, nextRealIndex = head;
+        int size = ArrayDequeSimple.this.size;
+        private boolean canRemove = false;
 
         @Override
         public boolean hasNext() {
-            return cursor != end;
+            return nextIndex < size;
         }
 
         @Override
         public E next() {
-            if (cursor == end) {
+            if (!hasNext()) {
                 throw new NoSuchElementException();
             }
-            cursor = cursor < array.length - 1 ? cursor + 1 : 0;
-            @SuppressWarnings("unchecked")
-            E next = (E) array[cursor];
-            if (tail != end || next == null) {
-                throw new ConcurrentModificationException();
-            }
-            lastReturn = cursor;
-            return next;
+
+            canRemove = true;
+            lastIndex = nextIndex;
+            lastRealIndex = nextRealIndex;
+            nextIndex++;
+            nextRealIndex = ++nextRealIndex % array.length;
+            return (E) ArrayDequeSimple.this.array[lastRealIndex];
         }
+
 
         @Override
         public void remove() {
 
+            if (!canRemove) {
+                throw new IllegalStateException();
+            }
+            canRemove = false;
+            //ArrayDequeSimple.this.delete(lastRealIndex);
         }
+//        private int cursor = head;
+//        private int end = tail;
+//        private int lastReturn = -1;
+//
+//        @Override
+//        public boolean hasNext() {
+//            return cursor != end;
+//        }
+//
+//        @Override
+//        public E next() {
+//            if (cursor == end) {
+//                throw new NoSuchElementException();
+//            }
+//            cursor = cursor == array.length - 1 ? 0 : cursor + 1;
+//            @SuppressWarnings("unchecked")
+//            E next = (E) array[cursor];
+//            if (tail != end || next == null) {
+//                throw new ConcurrentModificationException();
+//            }
+//            lastReturn = cursor;
+//            return next;
+//        }
+//
+//        @Override
+//        public void remove() {
+//
+//            if (lastReturn == tail) {
+//                removeLast();
+//            } else if (lastReturn == head) {
+//                removeFirst();
+//            } else {
+//                lastReturn.prev.next = lastReturn.next;
+//                lastReturn.next.prev = lastReturn.prev;
+//                size--;
+//            }
+//        }
     }
 }
