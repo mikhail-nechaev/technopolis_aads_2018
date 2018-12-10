@@ -3,6 +3,7 @@ package ru.mail.polis.collections.list.todo;
 import ru.mail.polis.collections.list.IDeque;
 
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 /**
  * Resizable cyclic array implementation of the {@link IDeque} interface.
@@ -12,6 +13,33 @@ import java.util.Iterator;
  * @param <E> the type of elements held in this deque
  */
 public class ArrayDequeSimple<E> implements IDeque<E> {
+
+    /**
+     * Elements of deque
+     */
+    private Object[] deque = new Object[16];
+
+    /**
+     * Numbers of elements
+     */
+
+    private int N = 0;
+
+    /**
+     * The index of start deque
+     */
+
+    private int first = 0;
+
+    /**
+     * The index of end deque
+     */
+
+    private int last = 0;
+
+    public static void main(String[] args) {
+        new ArrayDequeSimple<Integer>().clear();
+    }
 
     /**
      * Inserts the specified element at the front of this deque.
@@ -32,7 +60,11 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public E removeFirst() {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (N == 0) {
+            throw new UnsupportedOperationException("todo: implement this");
+        }
+        N--;
+        return (E) deque[first++];
     }
 
     /**
@@ -43,7 +75,10 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public E getFirst() {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (N == 0) {
+            throw new UnsupportedOperationException("todo: implement this");
+        }
+        return (E) deque[first];
     }
 
     /**
@@ -65,7 +100,17 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public E removeLast() {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (N == 0) {
+            throw new NoSuchElementException("Deque is empty");
+        }
+        if (last == 0) {
+            N--;
+            last = first + N - 1;
+            return (E) deque[0];
+        } else {
+            N--;
+            return (E) deque[last--];
+        }
     }
 
     /**
@@ -76,7 +121,11 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public E getLast() {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (N == 0) {
+            throw new NoSuchElementException("Deque is empty");
+        }
+
+        return (E) deque[last];
     }
 
     /**
@@ -89,7 +138,32 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public boolean contains(E value) {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (value == null) {
+            throw new NullPointerException("Specified element is null");
+        }
+
+        final Object[] res = deque;
+
+        if (last >= first) {
+            for (int i = first; i < last; i++) {
+                if (value.equals(res[i])) {
+                    return true;
+                }
+            }
+        } else {
+            for (int i = first; i < first + N - last - 1; i++) {
+                if (value.equals(res[i])) {
+                    return true;
+                }
+            }
+            for (int i = 0; i < last + 1; i++) {
+                if (value.equals(res[i])) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -99,7 +173,7 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public int size() {
-        throw new UnsupportedOperationException("todo: implement this");
+        return this.N;
     }
 
     /**
@@ -109,7 +183,7 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public boolean isEmpty() {
-        throw new UnsupportedOperationException("todo: implement this");
+        return N > 0;
     }
 
     /**
@@ -118,7 +192,7 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public void clear() {
-        throw new UnsupportedOperationException("todo: implement this");
+        N = 0;
     }
 
     /**
