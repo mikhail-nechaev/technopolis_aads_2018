@@ -27,14 +27,6 @@ public class AVLTree<E extends Comparable<E>> implements ISelfBalancingSortedTre
             this.value = value;
         }
 
-        void clear(){
-            value = null;
-            left = null;
-            right = null;
-            parent = null;
-            height = 0;
-        }
-
     }
 
     private int getHeight(final AVLNode<E> node){
@@ -112,16 +104,16 @@ public class AVLTree<E extends Comparable<E>> implements ISelfBalancingSortedTre
         }
 
         AVLNode<E> parent = null;
-        AVLNode<E> r = root;
+        AVLNode<E> n = root;
 
-        while (r != null && comparator.compare(node.value, r.value) != 0){
-            parent = r;
-            r = (comparator.compare(node.value, r.value) < 0)
-                    ? r.left
-                    : r.right;
+        while (n != null && comparator.compare(node.value, n.value) != 0){
+            parent = n;
+            n = (comparator.compare(node.value, n.value) < 0)
+                    ? n.left
+                    : n.right;
         }
 
-        if(r == null){
+        if(n == null){
             node.parent = parent;
             if (comparator.compare(node.value, parent.value) < 0) {
                 parent.left = node;
@@ -160,17 +152,17 @@ public class AVLTree<E extends Comparable<E>> implements ISelfBalancingSortedTre
         return node;
     }
 
-    private AVLNode<E> findMinimum(AVLNode<E> node){
+    private AVLNode<E> findInorderSuccessor(AVLNode<E> node){
         if(node == null){
             return null;
         }
 
-        AVLNode<E> temp = node;
-        while (temp.left != null){
-            temp = temp.left;
+        AVLNode<E> n = node;
+        while (n.left != null){
+            n = n.left;
         }
 
-        return temp;
+        return n;
     }
 
 
@@ -235,7 +227,7 @@ public class AVLTree<E extends Comparable<E>> implements ISelfBalancingSortedTre
         }
 
         AVLNode<E> nodeBalanced;
-        AVLNode<E> minRight = findMinimum(removedNode.right);
+        AVLNode<E> minRight = findInorderSuccessor(removedNode.right);
         minRight = (minRight != null) ? minRight : removedNode.left;
 
         // if min == null then removal root or leaf
@@ -278,15 +270,6 @@ public class AVLTree<E extends Comparable<E>> implements ISelfBalancingSortedTre
         return true;
     }
 
-    private void clearAVLTree(AVLNode<E> node){
-        if(node != null){
-            clearAVLTree(node.left);
-            clearAVLTree(node.right);
-            node.clear();
-        }
-        size = 0;
-    }
-
     /**
      * Returns {@code true} if this collection contains the specified element.
      * aka collection contains element el such that {@code Objects.equals(el, value) == true}
@@ -305,14 +288,14 @@ public class AVLTree<E extends Comparable<E>> implements ISelfBalancingSortedTre
             return false;
         }
 
-        AVLNode<E> r = root;
-        while (r != null && comparator.compare(value, r.value) != 0){
-            r = (comparator.compare(value, r.value) < 0)
-                    ? r.left
-                    : r.right;
+        AVLNode<E> node = root;
+        while (node != null && comparator.compare(value, node.value) != 0){
+            node = (comparator.compare(value, node.value) < 0)
+                    ? node.left
+                    : node.right;
         }
 
-        return r != null;
+        return node != null;
     }
 
     /**
@@ -329,7 +312,7 @@ public class AVLTree<E extends Comparable<E>> implements ISelfBalancingSortedTre
             throw new NoSuchElementException();
         }
 
-        return findMinimum(root).value;
+        return findInorderSuccessor(root).value;
     }
 
     /**
@@ -346,11 +329,11 @@ public class AVLTree<E extends Comparable<E>> implements ISelfBalancingSortedTre
             throw new NoSuchElementException();
         }
 
-        AVLNode<E> r = root;
-        while (r.right != null){
-            r = r.right;
+        AVLNode<E> node = root;
+        while (node.right != null){
+            node = node.right;
         }
-        return r.value;
+        return node.value;
     }
 
     /**
@@ -379,7 +362,8 @@ public class AVLTree<E extends Comparable<E>> implements ISelfBalancingSortedTre
      */
     @Override
     public void clear() {
-        clearAVLTree(root);
+       size = 0;
+       root = null;
     }
 
     /**
