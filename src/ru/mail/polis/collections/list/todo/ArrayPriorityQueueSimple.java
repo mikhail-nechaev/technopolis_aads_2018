@@ -264,6 +264,5 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
             throw new NoSuchElementException();
         }
 
-
     }
 }
