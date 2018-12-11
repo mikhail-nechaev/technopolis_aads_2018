@@ -29,7 +29,7 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
 
     /**
      * Creates a {@code IPriorityQueue} containing the elements in the specified collection.
-     * <p>
+     *
      * Complexity = O(n)
      *
      * @param collection the collection whose elements are to be placed into this priority queue
@@ -56,8 +56,8 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
 
     /**
      * Creates a {@code IPriorityQueue} containing the elements in the specified collection
-     * that orders its elements according to the specified comparator.
-     * <p>
+     *  that orders its elements according to the specified comparator.
+     *
      * Complexity = O(n)
      *
      * @param collection the collection whose elements are to be placed into this priority queue
@@ -139,7 +139,7 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
 
     /**
      * Inserts the specified element into this priority queue.
-     * <p>
+     *
      * Complexity = O(log(n))
      *
      * @param value the element to add
@@ -165,7 +165,7 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
 
     /**
      * Retrieves and removes the head of this queue.
-     * <p>
+     *
      * Complexity = O(log(n))
      *
      * @return the head of this queue
@@ -195,7 +195,7 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
 
     /**
      * Retrieves, but does not remove, the head of this queue.
-     * <p>
+     *
      * Complexity = O(1)
      *
      * @return the head of this queue
@@ -212,7 +212,7 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
     /**
      * Returns {@code true} if this collection contains the specified element.
      * aka collection contains element el such that {@code Objects.equals(el, value) == true}
-     * <p>
+     *
      * Complexity = O(n)
      *
      * @param value element whose presence in this collection is to be tested
@@ -276,7 +276,6 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
      *
      * @return an iterator over the elements in this queue
      */
-    @SuppressWarnings("unchecked")
     @Override
     public Iterator<E> iterator() {
         return new Iterator<E>() {

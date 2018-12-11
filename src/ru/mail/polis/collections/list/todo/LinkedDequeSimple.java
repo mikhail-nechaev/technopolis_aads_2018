@@ -122,7 +122,7 @@ public class LinkedDequeSimple<E> implements IDeque<E> {
     }
 
     /**
-     * Retrieves and removes the size element of this deque.
+     * Retrieves and removes the last element of this deque.
      *
      * @return the tail of this deque
      * @throws java.util.NoSuchElementException if this deque is empty
@@ -146,7 +146,7 @@ public class LinkedDequeSimple<E> implements IDeque<E> {
     }
 
     /**
-     * Retrieves, but does not remove, the size element of this deque.
+     * Retrieves, but does not remove, the last element of this deque.
      *
      * @return the tail of this deque
      * @throws java.util.NoSuchElementException if this deque is empty
@@ -158,7 +158,6 @@ public class LinkedDequeSimple<E> implements IDeque<E> {
         }
         return tail.data;
     }
-
 
     /**
      * Returns {@code true} if this collection contains the specified element.
@@ -252,7 +251,7 @@ public class LinkedDequeSimple<E> implements IDeque<E> {
 
     /**
      * Returns an iterator over the elements in this collection in proper sequence.
-     * The elements will be returned in order from first (head) to size (tail).
+     * The elements will be returned in order from first (head) to last (tail).
      *
      * @return an iterator over the elements in this collection in proper sequence
      */

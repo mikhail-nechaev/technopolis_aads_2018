@@ -22,7 +22,7 @@ public class TestIDequeRemove {
     @Parameterized.Parameters(name = "{0}")
     public static Collection<Class<?>> data() {
         return Arrays.asList(
-               ArrayDequeSimple.class,
+                ArrayDequeSimple.class,
                 LinkedDequeSimple.class
         );
     }

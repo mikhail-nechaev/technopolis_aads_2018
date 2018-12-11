@@ -97,14 +97,12 @@ public class TestIntegerIncreasingSequencePeekingIterator {
             it2.next();
         }
         for (int i = 10; i <= 20; i++) {
-            System.out.print(i + " ");
             Assert.assertTrue(it1.hasNext());
             Assert.assertTrue(it2.hasNext());
             Assert.assertTrue("" + i, it1.compareTo(it2) == 0);
-            System.out.println(it1.next());
+            it1.next();
             it2.next();
         }
-
         for (int i = 21; i <= 30; i++) {
             Assert.assertTrue(it2.hasNext());
             Assert.assertTrue("" + i, it2.compareTo(it1) > 0);
@@ -141,10 +139,7 @@ public class TestIntegerIncreasingSequencePeekingIterator {
 
     private void checkIncrease(IIncreasingSequenceIterator<Integer> iterator, int lastCurrent, int last, int step) {
         int current;
-        int i = 0;
         while (iterator.hasNext()) {
-           if(i % 100000000 == 0) System.out.println( i++ );
-
             Assert.assertTrue(lastCurrent != last);
             current = iterator.peek();
             checkStep(iterator, lastCurrent, current, step);

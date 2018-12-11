@@ -3,42 +3,41 @@
 Homework for Algorithms and Data structures on Java for students [Technopolis](https://polis.mail.ru/pages/index/) in [Peter the Great St.Petersburg Polytechnic University](https://english.spbstu.ru).
 
 ---
+**Deadline 18.12.2018**
 
-**2.5 point on every task = 10**
+In all classes need implement all required methods.
 
-1) ArrayDequeSimple
+Before pull request make sure than relevant tests is passed.
 
-2) LinkedDequeSimple
+---
+| Points | Iterator remove | Class | Test |
+| ------ |-----------------| ----- | ---- |
+| 2.5    | +1 point TestIDequeRemove | ArrayDequeSimple | TestIDeque
+| 2.5    | +1 point TestIDequeRemove | LinkedDequeSimple | TestIDeque
+| 2.5    | +1 point        | ArrayPriorityQueueSimple | TestIPriorityQueue
+| 2.5    | -               | MergingPeekingIncreasingIterator + IntegerIncreasingSequencePeekingIterator | TestIntegerIncreasingSequencePeekingIterator + TestMergingPeekingIncreasingIterator 
+| 7.5    | -               | ArrayDequeFull | TestIDeque + TestFullDeque
+| 7.5    | -               | LinkedDequeFull | TestIDeque + TestFullDeque
+| 5.0    | -               | AVLTree | TestBalancedSortedSet (AVL: remove = true)
+| 5.0    | +1 point        | AVLTreeIterable | --
+| 5.0    | -               | RedBlackTree (add) | TestBalancedSortedSet (RB: remove = false)
+| 5.0    | -               | RedBlackTree (add + remove) | TestBalancedSortedSet (RB: remove = true)
+| 5.0    | +1 point        | OpenHashTable + Student | TestHashTable
+| =50    | =5 | |
 
-3) ArrayPriorityQueueSimple
+---
+**How to pull changes from master inside your fork**
 
-4) MergingPeekingIncreasingIterator + IntegerIncreasingSequencePeekingIterator
+Make once:
 
+`git remote add base https://github.com/mikhail-nechaev/technopolis_aads_2018.git`
 
-**7.5 point on every task = 15**
+or
 
-5) ArrayDequeFull
+`git remote add base git@github.com:mikhail-nechaev/technopolis_aads_2018.git`
+ 
+and then
 
-6) LinkedDequeFull
+`git pull base master`
 
-**5 point on every task = 25**
-
-7) AVLTree
-
-8) AVLTreeIterable
-
-9) RedBlackTree: add
-
-10) RedBlackTree: add + remove
-
-11) OpenHashTable + Student
-
-**+1 point for every iterator with remove in ... = 5**
-
-* ArrayDequeSimple
-* LinkedDequeSimple
-* ArrayPriorityQueueSimple
-* AVLTreeIterable (ascending + descending)
-* OpenHashTable
-
-**max points = 55**
+for more information [see 2.5 Git Basics - Working with Remotes](https://git-scm.com/book/en/v2/Git-Basics-Working-with-Remotes)

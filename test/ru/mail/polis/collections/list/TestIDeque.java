@@ -3,6 +3,7 @@ package ru.mail.polis.collections.list;
 import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+import ru.mail.polis.collections.TestHelper;
 import ru.mail.polis.collections.list.todo.ArrayDequeFull;
 import ru.mail.polis.collections.list.todo.ArrayDequeSimple;
 import ru.mail.polis.collections.list.todo.LinkedDequeFull;
@@ -33,6 +34,8 @@ public class TestIDeque extends AbstractIDequeTest {
     @Parameterized.Parameters(name = "{0}")
     public static Collection<Class<?>> data() {
         return Arrays.asList(
+                TestHelper.CorrectIDeque.class
+                ,
                 ArrayDequeSimple.class
                 ,
                 LinkedDequeSimple.class

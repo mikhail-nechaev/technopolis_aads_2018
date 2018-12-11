@@ -3,7 +3,6 @@ package ru.mail.polis.collections.list;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
-
 import ru.mail.polis.collections.list.todo.ArrayDequeFull;
 import ru.mail.polis.collections.list.todo.ArrayDequeSimple;
 import ru.mail.polis.collections.list.todo.LinkedDequeFull;
@@ -115,7 +114,6 @@ public abstract class AbstractIDequeTest extends AbstractIQueueTest {
         deque.addLast("L2");
         deque.addFirst("F1");
         deque.addFirst("F2");
-
         Assert.assertTrue(deque.contains("L1"));
         Assert.assertTrue(deque.contains("L2"));
         Assert.assertTrue(deque.contains("F1"));

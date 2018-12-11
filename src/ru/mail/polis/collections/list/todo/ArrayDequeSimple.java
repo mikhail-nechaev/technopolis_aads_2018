@@ -4,7 +4,7 @@ import ru.mail.polis.collections.list.IDeque;
 
 import java.util.Arrays;
 import java.util.Iterator;
-import java.util.ListIterator;
+import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 /**
@@ -125,7 +125,7 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      * Retrieves and removes the first element of this queue.
      *
      * @return the head of this queue
-     * @throws NoSuchElementException if this deque is empty
+     * @throws java.util.NoSuchElementException if this deque is empty
      */
     @Override
     public E removeFirst() {
@@ -148,7 +148,7 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      * Retrieves, but does not remove, the first element of this queue.
      *
      * @return the head of this queue
-     * @throws NoSuchElementException if this queue is empty
+     * @throws java.util.NoSuchElementException if this queue is empty
      */
     @Override
     public E getFirst() {
@@ -182,10 +182,10 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
     }
 
     /**
-     * Retrieves and removes the size element of this deque.
+     * Retrieves and removes the last element of this deque.
      *
      * @return the tail of this deque
-     * @throws NoSuchElementException if this deque is empty
+     * @throws java.util.NoSuchElementException if this deque is empty
      */
     @Override
     public E removeLast() {
@@ -205,10 +205,10 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
     }
 
     /**
-     * Retrieves, but does not remove, the size element of this deque.
+     * Retrieves, but does not remove, the last element of this deque.
      *
      * @return the tail of this deque
-     * @throws NoSuchElementException if this deque is empty
+     * @throws java.util.NoSuchElementException if this deque is empty
      */
     @Override
     public E getLast() {
@@ -328,7 +328,7 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
 
     /**
      * Returns an iterator over the elements in this collection in proper sequence.
-     * The elements will be returned in order from first (head) to size (tail).
+     * The elements will be returned in order from first (head) to last (tail).
      *
      * @return an iterator over the elements in this collection in proper sequence
      */
