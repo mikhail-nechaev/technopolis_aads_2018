@@ -302,10 +302,10 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public Iterator<E> iterator() {
-        return new DequeIterator();
+        return new ArrayDequeIterator();
     }
 
-    private class DequeIterator implements Iterator<E> {
+    private class ArrayDequeIterator implements Iterator<E> {
 
         private int i = N;
 
