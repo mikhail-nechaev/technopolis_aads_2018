@@ -17,7 +17,7 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
     /**
      * Elements of deque
      */
-    private Object[] deque = new Object[16];
+    private Object[] deque = new Object[0];
 
     /**
      * Numbers of elements
@@ -29,17 +29,55 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      * The index of start deque
      */
 
-    private int first = 0;
+    private int head = 0;
 
     /**
      * The index of end deque
      */
 
-    private int last = 0;
+    private int tail = -1;
 
     public static void main(String[] args) {
         new ArrayDequeSimple<Integer>().clear();
     }
+
+    /**
+     * @param startIndex The index of start deque's elements in array
+     */
+
+    private void extendArray(int startIndex) {
+        int newLength = (N == 0) ? 4 : (N + N / 2);
+
+        Object[] newArray = new Object[newLength];
+
+        if (N > 0) {
+            int targetInd = startIndex;
+
+            if (tail < head) {
+                for (int i = head; head < deque.length; i++) {
+                    newArray[targetInd] = deque[i];
+                    targetInd++;
+                }
+                for (int i = 0; i <= tail; i++) {
+                    newArray[targetInd] = deque[i];
+                    targetInd++;
+                }
+            } else {
+                for (int i = head; head <= tail; i++) {
+                    newArray[targetInd] = deque[i];
+                    targetInd++;
+                }
+            }
+            head = startIndex;
+            tail = targetInd - 1;
+        } else {
+            head = 0;
+            tail = -1;
+        }
+
+        deque = newArray;
+    }
+
 
     /**
      * Inserts the specified element at the front of this deque.
@@ -49,11 +87,30 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public void addFirst(E value) {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (value == null) {
+            throw new NullPointerException("Specified element is null");
+        }
+
+        if (N == deque.length) {
+            extendArray(1);
+        }
+
+        if (head > 0) {
+            head--;
+        } else {
+            head = deque.length - 1;
+        }
+
+        deque[head] = value;
+        N++;
+
+        if (N == 1) {
+            tail = head;
+        }
     }
 
     /**
-     * Retrieves and removes the first element of this queue.
+     * Retrieves and removes the head element of this queue.
      *
      * @return the head of this queue
      * @throws java.util.NoSuchElementException if this deque is empty
@@ -61,24 +118,37 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
     @Override
     public E removeFirst() {
         if (N == 0) {
-            throw new UnsupportedOperationException("todo: implement this");
+            throw new UnsupportedOperationException("Deque is empty");
         }
+
+        Object value = deque[head];
+
+        if (head == deque.length - 1) {
+            head = 0;
+        } else {
+            head++;
+        }
+
         N--;
-        return (E) deque[first++];
+
+        return (E)value;
     }
 
     /**
-     * Retrieves, but does not remove, the first element of this queue.
+     * Retrieves, but does not remove, the head element of this queue.
      *
      * @return the head of this queue
      * @throws java.util.NoSuchElementException if this queue is empty
      */
     @Override
-    public E getFirst() {
+    public E getHead() {
         if (N == 0) {
-            throw new UnsupportedOperationException("todo: implement this");
+            throw new UnsupportedOperationException("queue is empty");
         }
-        return (E) deque[first];
+
+        Object value = deque[head];
+
+        return (E) value;
     }
 
     /**
@@ -89,11 +159,30 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public void addLast(E value) {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (value == null) {
+            throw new NullPointerException("Specfied element is null");
+        }
+
+        if (N == deque.length) {
+            extendArray(0);
+        }
+
+        if (tail == deque.length - 1) {
+            tail = 0;
+        } else {
+            tail++;
+        }
+
+        deque[tail] = value;
+        N++;
+
+        if (N == 1) {
+            head = tail;
+        }
     }
 
     /**
-     * Retrieves and removes the last element of this deque.
+     * Retrieves and removes the tail element of this deque.
      *
      * @return the tail of this deque
      * @throws java.util.NoSuchElementException if this deque is empty
@@ -103,18 +192,22 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
         if (N == 0) {
             throw new NoSuchElementException("Deque is empty");
         }
-        if (last == 0) {
-            N--;
-            last = first + N - 1;
-            return (E) deque[0];
+
+        Object value = deque[tail];
+
+        if (tail == 0) {
+            tail = deque.length - 1;
         } else {
-            N--;
-            return (E) deque[last--];
+            tail--;
         }
+
+        N--;
+
+        return (E) value;
     }
 
     /**
-     * Retrieves, but does not remove, the last element of this deque.
+     * Retrieves, but does not remove, the tail element of this deque.
      *
      * @return the tail of this deque
      * @throws java.util.NoSuchElementException if this deque is empty
@@ -125,7 +218,9 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
             throw new NoSuchElementException("Deque is empty");
         }
 
-        return (E) deque[last];
+        Object value = deque[tail];
+
+        return (E) value;
     }
 
     /**
@@ -142,22 +237,20 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
             throw new NullPointerException("Specified element is null");
         }
 
-        final Object[] res = deque;
-
-        if (last >= first) {
-            for (int i = first; i < last; i++) {
-                if (value.equals(res[i])) {
+        if (tail < head) {
+            for (int i = head; head < deque.length; i++) {
+               if (value.equals(deque[i])) {
+                   return true;
+               }
+            }
+            for (int i = 0; i <= tail; i++) {
+                if (value.equals(deque[i])) {
                     return true;
                 }
             }
         } else {
-            for (int i = first; i < first + N - last - 1; i++) {
-                if (value.equals(res[i])) {
-                    return true;
-                }
-            }
-            for (int i = 0; i < last + 1; i++) {
-                if (value.equals(res[i])) {
+            for (int i = head; i <= tail; i++) {
+                if (value.equals(deque[i])) {
                     return true;
                 }
             }
@@ -173,7 +266,7 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public int size() {
-        return this.N;
+        return N;
     }
 
     /**
@@ -193,16 +286,47 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
     @Override
     public void clear() {
         N = 0;
+        head = 0;
+        tail = -1;
     }
 
     /**
      * Returns an iterator over the elements in this collection in proper sequence.
-     * The elements will be returned in order from first (head) to last (tail).
+     * The elements will be returned in order from head (head) to tail (tail).
      *
      * @return an iterator over the elements in this collection in proper sequence
      */
     @Override
     public Iterator<E> iterator() {
-        throw new UnsupportedOperationException("todo: implement this");
+        return new DequeIterator();
+    }
+
+    private class DequeIterator implements Iterator<E> {
+
+        private int i = N;
+
+        private int target = head;
+
+        @Override
+        public boolean hasNext() {
+            return i > 0;
+        }
+
+        @Override
+        public E next() {
+            if (hasNext()){
+                Object value = deque[target++];
+
+                i--;
+
+                if (target == deque.length) {
+                    target = 0;
+                }
+
+                return (E) value;
+            } else {
+                throw new NoSuchElementException("Deque is empty");
+            }
+        }
     }
 }
