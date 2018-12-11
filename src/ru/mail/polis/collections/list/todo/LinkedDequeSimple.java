@@ -52,7 +52,6 @@ public class LinkedDequeSimple<E> implements IDeque<E> {
     private Node<E> last = null;
     private int size = 0;
 
-
     /**
      * Inserts the specified element at the front of this deque.
      *
@@ -65,10 +64,12 @@ public class LinkedDequeSimple<E> implements IDeque<E> {
             throw new NullPointerException();
         }
         if (size == 0) {
-            first = last = new Node<>(value);
+            first = new Node<>(value);
+            last = first;
             size++;
         } else {
             first.setNext(new Node<>(value));
+            first.getNext().setPrevious(first);
             first = first.getNext();
             size++;
         }
@@ -87,7 +88,7 @@ public class LinkedDequeSimple<E> implements IDeque<E> {
         }
         E e = first.getValue();
         first = first.getPrevious();
-        first.setNext(null);
+        //first.setNext(null);
         size--;
         return e;
     }
@@ -122,6 +123,7 @@ public class LinkedDequeSimple<E> implements IDeque<E> {
             size++;
         } else {
             last.setPrevious(new Node<>(value));
+            last.getPrevious().setNext(last);
             last = last.getPrevious();
             size++;
         }
@@ -138,9 +140,9 @@ public class LinkedDequeSimple<E> implements IDeque<E> {
         if (isEmpty()) {
             throw new NoSuchElementException();
         }
-        E e = first.getValue();
-        first = first.getNext();
-        first.setPrevious(null);
+        E e = last.getValue();
+        last = last.getNext();
+        //first.setPrevious(null);
         size--;
         return e;    }
 
@@ -173,7 +175,7 @@ public class LinkedDequeSimple<E> implements IDeque<E> {
         }
         ListIterator<E> iterator = iterator();
         while (iterator.hasNext()) {
-            if (iterator.next() == value) {
+            if (iterator.next().equals(value)) {
                 return true;
             }
         }
@@ -222,7 +224,7 @@ public class LinkedDequeSimple<E> implements IDeque<E> {
         return new ListIterator<E>() {
             Node<E> position = first;
             boolean isStart = true;
-            int size = size();
+            //int size = size();
             int cursor = 0;
 
             // set(), add(), remove() => true
@@ -233,8 +235,10 @@ public class LinkedDequeSimple<E> implements IDeque<E> {
             //prev  ... next
             @Override
             public boolean hasNext() {
-                if (isStart) {
-                    return position != null;
+                if (isEmpty()) {
+                    return !isEmpty();
+                } else if (isStart) {
+                    return true;
                 }
                 return position.getPrevious() != null;
             }
@@ -246,6 +250,7 @@ public class LinkedDequeSimple<E> implements IDeque<E> {
                 }
                 if (isStart) {
                     isStart = false;
+
                 } else {
                     position = position.getPrevious();
                 }
@@ -282,14 +287,31 @@ public class LinkedDequeSimple<E> implements IDeque<E> {
 
             @Override
             public void remove() {
-                position.previous.setNext(position.next);
-                position.next.setPrevious(position.previous);
-                size--;
+                if (doOperation) {
+                    throw new IllegalStateException();
+                }
                 doOperation = true;
-                Node<E> node = position.next;
-                position.next = null;
-                position.previous = null;
-                position = node;
+                if (size == 1) {
+                    clear();
+                } else {
+                    if (!hasNext()) {
+                        previous();
+                        position.next = null;
+                        size--;
+                    } else if (!hasPrevious()) {
+                        next();
+                        isStart = true;
+                        first = position;
+                        position.next.previous = null;
+                        position.next = null;
+                        size--;
+                    } else {
+                        previous();
+                        position.previous = position.previous.previous;
+                        position.previous.next = position;
+                        size--;
+                    }
+                }
             }
 
             @Override
