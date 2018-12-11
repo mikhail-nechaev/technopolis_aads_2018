@@ -118,7 +118,7 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
     @Override
     public E removeFirst() {
         if (N == 0) {
-            throw new UnsupportedOperationException("Deque is empty");
+            throw new NoSuchElementException("Deque is empty");
         }
 
         Object value = deque[head];
@@ -131,7 +131,7 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
 
         N--;
 
-        return (E)value;
+        return (E) value;
     }
 
     /**
@@ -141,9 +141,9 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      * @throws java.util.NoSuchElementException if this queue is empty
      */
     @Override
-    public E getHead() {
+    public E getFirst() {
         if (N == 0) {
-            throw new UnsupportedOperationException("queue is empty");
+            throw new NoSuchElementException("queue is empty");
         }
 
         Object value = deque[head];
@@ -174,7 +174,7 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
         }
 
         deque[tail] = value;
-        N++;
+        ++N;
 
         if (N == 1) {
             head = tail;
@@ -201,7 +201,7 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
             tail--;
         }
 
-        N--;
+        --N;
 
         return (E) value;
     }
@@ -237,11 +237,15 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
             throw new NullPointerException("Specified element is null");
         }
 
+        if (N == 0) {
+            return false;
+        }
+
         if (tail < head) {
-            for (int i = head; head < deque.length; i++) {
-               if (value.equals(deque[i])) {
-                   return true;
-               }
+            for (int i = head; i < deque.length; i++) {
+                if (value.equals(deque[i])) {
+                    return true;
+                }
             }
             for (int i = 0; i <= tail; i++) {
                 if (value.equals(deque[i])) {
@@ -276,7 +280,7 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public boolean isEmpty() {
-        return N > 0;
+        return N == 0;
     }
 
     /**
@@ -314,7 +318,7 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
 
         @Override
         public E next() {
-            if (hasNext()){
+            if (hasNext()) {
                 Object value = deque[target++];
 
                 i--;
