@@ -1,8 +1,9 @@
 package ru.mail.polis.collections.list.todo;
 
-import ru.mail.polis.collections.list.IDeque;
-
 import java.util.ListIterator;
+import java.util.NoSuchElementException;
+
+import ru.mail.polis.collections.list.IDeque;
 
 /**
  * Resizable cyclic array implementation of the {@link IDeque} interface.
@@ -12,6 +13,11 @@ import java.util.ListIterator;
  * @param <E> the type of elements held in this deque
  */
 public class ArrayDequeSimple<E> implements IDeque<E> {
+    private static final int DEFAULT_SIZE = 16;
+    private E[] array = (E[]) new Object[DEFAULT_SIZE];
+    private int startPointer = 0;
+    private int endPointer = 0;
+    private int size = 0;
 
     /**
      * Inserts the specified element at the front of this deque.
@@ -21,7 +27,40 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public void addFirst(E value) {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (value == null) {
+            throw new NullPointerException("Element is null.");
+        }
+        if (size == array.length) {
+            increaseArray();
+        }
+        if (size == 0) {
+            array[startPointer] = value;
+        } else if (startPointer == 0) {
+            startPointer = array.length - 1;
+            array[startPointer] = value;
+        } else {
+            startPointer--;
+            array[startPointer] = value;
+        }
+        size++;
+    }
+
+    private void increaseArray() {
+        E[] newArray = (E[]) new Object[size * 2];
+        int i = 0;
+        while (startPointer != endPointer) {
+            newArray[i] = array[startPointer];
+            if (startPointer == array.length - 1) {
+                startPointer = 0;
+            } else {
+                startPointer++;
+            }
+            i++;
+        }
+        newArray[i] = array[startPointer];
+        array = newArray;
+        startPointer = 0;
+        endPointer = size - 1;
     }
 
     /**
@@ -32,7 +71,20 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public E removeFirst() {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (size == 0) {
+            throw new NoSuchElementException("Deque is empty.");
+        }
+        E element = array[startPointer];
+        array[startPointer] = null;
+        if (startPointer != endPointer) {
+            if (startPointer == array.length - 1) {
+                startPointer = 0;
+            } else {
+                startPointer++;
+            }
+        }
+        size--;
+        return element;
     }
 
     /**
@@ -43,7 +95,10 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public E getFirst() {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (size == 0) {
+            throw new NoSuchElementException("Deque is empty.");
+        }
+        return array[startPointer];
     }
 
     /**
@@ -54,7 +109,22 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public void addLast(E value) {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (value == null) {
+            throw new NullPointerException("Element is null.");
+        }
+        if (size == array.length) {
+            increaseArray();
+        }
+        if (size == 0) {
+            array[endPointer] = value;
+        } else if (endPointer == array.length - 1) {
+            endPointer = 0;
+            array[endPointer] = value;
+        } else {
+            endPointer++;
+            array[endPointer] = value;
+        }
+        size++;
     }
 
     /**
@@ -65,7 +135,20 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public E removeLast() {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (size == 0) {
+            throw new NoSuchElementException("Deque is empty.");
+        }
+        E element = array[endPointer];
+        array[endPointer] = null;
+        if (startPointer != endPointer) {
+            if (endPointer == 0) {
+                endPointer = array.length - 1;
+            } else {
+                endPointer--;
+            }
+        }
+        size--;
+        return element;
     }
 
     /**
@@ -76,7 +159,10 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public E getLast() {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (size == 0) {
+            throw new NoSuchElementException("Deque is empty.");
+        }
+        return array[endPointer];
     }
 
     /**
@@ -89,7 +175,12 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public boolean contains(E value) {
-        throw new UnsupportedOperationException("todo: implement this");
+        for (E i : this) {
+            if (i.equals(value)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -99,7 +190,7 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public int size() {
-        throw new UnsupportedOperationException("todo: implement this");
+        return size;
     }
 
     /**
@@ -109,7 +200,7 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public boolean isEmpty() {
-        throw new UnsupportedOperationException("todo: implement this");
+        return size == 0;
     }
 
     /**
@@ -118,7 +209,10 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public void clear() {
-        throw new UnsupportedOperationException("todo: implement this");
+        array = (E[]) new Object[DEFAULT_SIZE];
+        startPointer = 0;
+        endPointer = 0;
+        size = 0;
     }
 
     /**
@@ -129,6 +223,82 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public ListIterator<E> iterator() {
-        throw new UnsupportedOperationException("todo: implement this");
+        return new ListIterator<>() {
+            int pointer = -1;
+
+            @Override
+            public boolean hasNext() {
+                if (size == 0) {
+                    return false;
+                }
+                return pointer != endPointer;
+            }
+
+            @Override
+            public E next() {
+                pointer = nextIndex();
+                return array[pointer];
+            }
+
+            @Override
+            public boolean hasPrevious() {
+                return pointer != -1 && pointer != startPointer;
+            }
+
+            @Override
+            public E previous() {
+                pointer = previousIndex();
+                return array[pointer];
+            }
+
+            @Override
+            public int nextIndex() {
+                if (pointer == -1) {
+                    return startPointer;
+                }
+                if (!hasNext()) {
+                    return size;
+                }
+                int nextPointer = pointer;
+                if (pointer == array.length - 1) {
+                    nextPointer = 0;
+                } else {
+                    nextPointer++;
+                }
+                return nextPointer;
+            }
+
+            @Override
+            public int previousIndex() {
+                if (!hasPrevious()) {
+                    return -1;
+                }
+                int previousPointer = pointer;
+                if (pointer == 0) {
+                    previousPointer = array.length - 1;
+                } else {
+                    previousPointer--;
+                }
+                return previousPointer;
+            }
+
+            @Override
+            public void remove() {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public void set(E e) {
+                if (pointer == -1) {
+                    throw new IllegalStateException();
+                }
+                array[pointer] = e;
+            }
+
+            @Override
+            public void add(E e) {
+                throw new UnsupportedOperationException();
+            }
+        };
     }
 }
