@@ -107,46 +107,52 @@ public class AVLTree<E extends Comparable<E>> implements ISelfBalancingSortedTre
     public boolean remove(E value) {
         Objects.requireNonNull(value);
         if (root == null) return false;
-        AVLNode<E> parent = root;
-        AVLNode<E> curr = root;
-        int cmp;
-        while ((cmp = compare(curr.value, value)) != 0) {
-            parent = curr;
-            if (cmp > 0) curr = curr.left;
-            else curr = curr.right;
-            if (curr == null) return false; // ничего не нашли
+        try {
+            root = remove(root, value);
+            size--;
+            modCount++;
+            return true;
+        } catch (NoSuchElementException e) {
+            return false;
         }
-        if (curr.left != null && curr.right != null) {
-            AVLNode<E> next = curr.right;
-            AVLNode<E> pNext = curr;
-            while (next.left != null) {
-                pNext = next;
-                next = next.left;
-            } //next = наименьший из больших
-            curr.value = next.value;
-            next.value = null;
-            //у правого поддерева нет левых потомков
-            if (pNext == curr) curr.right = next.right;
-            else pNext.left = next.right;
-            next.right = null;
-            balance(next);
-        } else {
-            if (curr.left != null) reLink(parent, curr, curr.left);
-            else if (curr.right != null) reLink(parent, curr, curr.right);
-            else reLink(parent, curr, null);
-            balance(curr);
-        }
-        size--;
-        modCount++;
-        return true;
     }
 
-    private void reLink(AVLNode<E> parent, AVLNode<E> curr, AVLNode<E> child) {
-        if (parent == curr) root = child;
-        else if (parent.left == curr) parent.left = child;
-        else parent.right = child;
-        curr.value = null;
+    private AVLNode<E> remove(AVLNode<E> v, E value) throws NoSuchElementException {
+        if (v == null)
+            throw new NoSuchElementException();
+        if (compare(value, v.value) < 0) {
+            v.left = remove(v.left, value);
+        } else if(compare(value, v.value) > 0) {
+            v.right = remove(v.right, value);
+        } else {
+            AVLNode<E> left = v.left;
+            AVLNode<E> right = v.right;
+            v.value = null;
+            v = null;
+            if (right == null) return left;
+            AVLNode<E> min = findMin(right);
+            min.right = removeMin(right);
+            min.left = left;
+            return balance(min);
+        }
+        return balance(v);
     }
+    //Поиск минимального потомка узла v
+    private AVLNode<E> findMin(AVLNode<E> v) {
+        AVLNode<E> curr = v;
+        while (curr.left != null) {
+            curr = curr.left;
+        }
+        return curr;
+    }
+    //Удаление минимального потомка узла v
+    private AVLNode<E> removeMin(AVLNode<E> v) {
+        if (v.left == null)
+            return v.right;
+        v.left = removeMin(v.left);
+        return balance(v);
+    }
+
 
     /**
      * Returns {@code true} if this collection contains the specified element.
