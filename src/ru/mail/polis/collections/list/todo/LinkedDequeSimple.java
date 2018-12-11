@@ -267,7 +267,7 @@ public class LinkedDequeSimple<E> implements IDeque<E> {
             @Override
             public E next() {
                 if (!hasNext()) {
-                    throw new IllegalStateException();
+                    throw new NoSuchElementException();
                 }
                 lastReturned = nextElem;
                 nextElem = nextElem.right;
