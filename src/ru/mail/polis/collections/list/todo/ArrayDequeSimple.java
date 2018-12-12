@@ -312,6 +312,32 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
         private int target = head;
 
         @Override
+        public void remove() {
+
+            if (N == 0) {
+                throw new IllegalStateException();
+            }
+
+            int targetInd = target == 0 ? deque.length - 1 : target - 1;
+
+            if (head > tail && targetInd < tail) {
+                int j;
+                for (j = targetInd; j < tail; j++) {
+                    deque[j] = deque[j + 1];
+                }
+                tail = j - 1;
+            } else {
+                int j;
+                for (j = targetInd; j > head; j--) {
+                    deque[j] = deque[j - 1];
+                }
+                head = j + 1;
+            }
+            N--;
+
+        }
+
+        @Override
         public boolean hasNext() {
             return i > 0;
         }
