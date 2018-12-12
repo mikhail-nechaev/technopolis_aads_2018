@@ -7,7 +7,7 @@ import java.util.Comparator;
 import java.util.NoSuchElementException;
 
 /**
- * A AVL tree based {@link ru.mail.polis.collections.set.sorted.ISelfBalancingSortedTreeSet} implementation.
+ * A AVL tree based {@link ISelfBalancingSortedTreeSet} implementation.
  *
  * <a href="https://en.wikipedia.org/wiki/AVL_tree>AVL_tree</a>
  *

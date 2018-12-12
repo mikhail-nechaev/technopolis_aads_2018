@@ -102,4 +102,9 @@ public class OpenHashTable<E extends IOpenHashTableEntity> implements IOpenHashT
     public Iterator<E> iterator() {
         throw new UnsupportedOperationException("todo: implement this");
     }
+
+    @Override
+    public int tableSize() {
+        throw new UnsupportedOperationException("todo: return dataArray.length");
+    }
 }
