@@ -1,8 +1,12 @@
 package ru.mail.polis.collections.list.todo;
 
-import ru.mail.polis.collections.list.IDeque;
-
+import java.util.ConcurrentModificationException;
 import java.util.Iterator;
+import java.util.ListIterator;
+import java.util.NoSuchElementException;
+import java.util.Objects;
+
+import ru.mail.polis.collections.list.IDeque;
 
 /**
  * Resizable cyclic array implementation of the {@link IDeque} interface.
@@ -13,6 +17,38 @@ import java.util.Iterator;
  */
 public class ArrayDequeSimple<E> implements IDeque<E> {
 
+    Object elements[]; //array that contains elements
+
+    int headIndex; //index of head
+
+    int tailIndex; //index of tail
+
+    int modCount;
+
+    private static final int MIN_CAPACITY = 8; //must be a power of two
+
+    public ArrayDequeSimple() {
+        this.elements = new Object[MIN_CAPACITY];
+        this.headIndex = 0;
+        this.tailIndex = 0;
+        modCount = 0;
+    }
+
+    protected void increaseCapacity() {
+        int oldHeadIndex = headIndex;
+        int numRight = elements.length - oldHeadIndex;
+        int newCap = elements.length * 2;
+        if (newCap < 0) {
+            throw new IllegalStateException("New capacity is too big");
+        }
+        Object[] newElements = new Object[newCap];
+        System.arraycopy(this.elements, oldHeadIndex, newElements, 0, numRight);
+        System.arraycopy(this.elements, 0, newElements, numRight, oldHeadIndex);
+        this.elements = newElements;
+        headIndex = 0;
+        tailIndex = numRight + oldHeadIndex - 1;
+    }
+
     /**
      * Inserts the specified element at the front of this deque.
      *
@@ -21,7 +57,19 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public void addFirst(E value) {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (value == null) {
+            throw new NullPointerException("Value must be not null");
+        }
+        if (elements[headIndex] == null) {
+            elements[headIndex] = value;
+        } else {
+            headIndex = (headIndex - 1) & (elements.length - 1);
+            elements[headIndex] = value;
+        }
+        if (((headIndex - 1) & (elements.length - 1)) == tailIndex) {
+            increaseCapacity();
+        }
+        modCount++;
     }
 
     /**
@@ -32,7 +80,16 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public E removeFirst() {
-        throw new UnsupportedOperationException("todo: implement this");
+        E value = (E) elements[headIndex];
+        if (value == null) {
+            throw new NoSuchElementException("Deque is empty");
+        }
+        elements[headIndex] = null;
+        if (headIndex != tailIndex) {
+            headIndex = (headIndex + 1) & (elements.length - 1);
+        }
+        modCount++;
+        return value;
     }
 
     /**
@@ -43,7 +100,11 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public E getFirst() {
-        throw new UnsupportedOperationException("todo: implement this");
+        E value = (E) elements[headIndex];
+        if (value == null) {
+            throw new NoSuchElementException("Deque is empty");
+        }
+        return value;
     }
 
     /**
@@ -54,7 +115,19 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public void addLast(E value) {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (value == null) {
+            throw new NullPointerException("Value must be not null");
+        }
+        if (elements[tailIndex] == null) {
+            elements[tailIndex] = value;
+        } else {
+            tailIndex = (tailIndex + 1) & (elements.length - 1);
+            elements[tailIndex] = value;
+        }
+        if (((headIndex - 1) & (elements.length - 1)) == tailIndex) {
+            increaseCapacity();
+        }
+        modCount++;
     }
 
     /**
@@ -65,7 +138,16 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public E removeLast() {
-        throw new UnsupportedOperationException("todo: implement this");
+        E value = (E) elements[tailIndex];
+        if (value == null) {
+            throw new NoSuchElementException("Deque is empty");
+        }
+        elements[tailIndex] = null;
+        if (headIndex != tailIndex) {
+            tailIndex = (tailIndex - 1) & (elements.length - 1);
+        }
+        modCount++;
+        return value;
     }
 
     /**
@@ -76,7 +158,12 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public E getLast() {
-        throw new UnsupportedOperationException("todo: implement this");
+        E value = (E) elements[tailIndex];
+        if (value == null) {
+            throw new NoSuchElementException("Deque is empty");
+        } else {
+            return value;
+        }
     }
 
     /**
@@ -89,7 +176,16 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public boolean contains(E value) {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (value == null) {
+            throw new NullPointerException("Value must be not null");
+        } else {
+            for (int i = headIndex; elements[i] != null; i = (i + 1) & (elements.length - 1)) {
+                if (Objects.equals(value, elements[i])) {
+                    return true;
+                }
+            }
+            return false;
+        }
     }
 
     /**
@@ -99,7 +195,16 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public int size() {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (tailIndex == headIndex) {
+            if (elements[headIndex] == null) {
+                return 0;
+            } else {
+                return 1;
+            }
+        } else {
+            int size = (tailIndex - headIndex + 1) & (elements.length - 1);
+            return size;
+        }
     }
 
     /**
@@ -109,7 +214,7 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public boolean isEmpty() {
-        throw new UnsupportedOperationException("todo: implement this");
+        return size() == 0;
     }
 
     /**
@@ -118,7 +223,12 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public void clear() {
-        throw new UnsupportedOperationException("todo: implement this");
+        for (int i = headIndex; elements[i] != null; i = (i + 1) & (elements.length - 1)) {
+            elements[i] = null;
+        }
+        headIndex = 0;
+        tailIndex = 0;
+        modCount++;
     }
 
     /**
@@ -129,6 +239,128 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public Iterator<E> iterator() {
-        throw new UnsupportedOperationException("todo: implement this");
+
+        ListIterator<E> listIterator = new ListIterator<E>() {
+
+            private int nextIndex = headIndex;
+            private int expModCount = modCount;
+            private int lastReturnIndex = -1;
+
+            final void checkComod() {
+                if (modCount != expModCount) {
+                    throw new ConcurrentModificationException();
+                }
+            }
+
+            @Override
+            public boolean hasNext() {
+                if (elements[nextIndex] != null) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+
+            @Override
+            public E next() {
+                checkComod();
+                if (hasNext()) {
+                    lastReturnIndex = nextIndex;
+                    nextIndex = (nextIndex + 1) & (elements.length - 1);
+                    return (E) elements[lastReturnIndex];
+                } else {
+                    throw new NoSuchElementException("There is no more elements");
+                }
+            }
+
+            @Override
+            public boolean hasPrevious() {
+                if (elements[(nextIndex - 1) & (elements.length - 1)] != null) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+
+            @Override
+            public E previous() {
+                checkComod();
+                if (hasPrevious()) {
+                    lastReturnIndex = (nextIndex - 1) & (elements.length - 1);
+                    nextIndex = lastReturnIndex;
+                    return (E) elements[lastReturnIndex];
+                } else {
+                    throw new NoSuchElementException("There is no more elements");
+                }
+            }
+
+            @Override
+            public int nextIndex() {
+                if (hasNext()) {
+                    return (nextIndex);
+                } else {
+                    return size();
+                }
+            }
+
+            @Override
+            public int previousIndex() {
+                if (hasPrevious()) {
+                    return (nextIndex - 1) & (elements.length - 1);
+                } else {
+                    return -1;
+                }
+            }
+
+            @Override
+            public void remove() {
+                checkComod();
+                if (lastReturnIndex == -1) {
+                    throw new IllegalStateException();
+                }
+                for (int i = lastReturnIndex; i != tailIndex; i = (i + 1) & (elements.length - 1)) {
+                    elements[i] = elements[(i + 1) & (elements.length - 1)];
+                }
+                elements[tailIndex] = null;
+                lastReturnIndex = -1;
+                if (headIndex != tailIndex) {
+                    tailIndex = (tailIndex - 1) & (elements.length - 1);
+                }
+                nextIndex = (nextIndex - 1) & (elements.length - 1);
+            }
+
+            @Override
+            public void set(E e) {
+                checkComod();
+                if (lastReturnIndex == -1) {
+                    throw new IllegalStateException();
+                }
+                if (e == null) {
+                    throw new NullPointerException("Value must be not null");
+                }
+                elements[lastReturnIndex] = e;
+            }
+
+            @Override
+            public void add(E e) {
+                checkComod();
+                lastReturnIndex = -1;
+                for (int i = tailIndex; i != (nextIndex - 1); i = (i - 1) & (elements.length - 1)) {
+                    elements[(i + 1) & (elements.length - 1)] = elements[i];
+                }
+                elements[nextIndex] = e;
+                tailIndex = (tailIndex + 1) & (elements.length - 1);
+                nextIndex = (nextIndex + 1) & (elements.length - 1);
+                if (((headIndex - 1) & (elements.length - 1)) == tailIndex) {
+                    int oldHeadIndex = headIndex;
+                    int oldLength = elements.length;
+                    increaseCapacity();
+                    nextIndex = (nextIndex - oldHeadIndex) & (oldLength - 1);
+                }
+            }
+        };
+
+        return listIterator;
+
     }
 }
