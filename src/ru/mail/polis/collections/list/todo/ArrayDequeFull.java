@@ -134,7 +134,7 @@ public class ArrayDequeFull<E> extends ArrayDequeSimple<E> implements Deque<E> {
         Iterator<E> iter = iterator();
         while (iter.hasNext()) {
             if (o.equals(iter.next())) {
-                remove();
+                iter.remove();
                 return true;
             }
         }
@@ -166,7 +166,7 @@ public class ArrayDequeFull<E> extends ArrayDequeSimple<E> implements Deque<E> {
         Iterator<E> iter = descendingIterator();
         while (iter.hasNext()) {
             if (o.equals(iter.next())) {
-                remove();
+                iter.remove();
                 return true;
             }
         }

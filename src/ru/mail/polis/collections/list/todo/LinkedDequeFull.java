@@ -135,7 +135,7 @@ public class LinkedDequeFull<E> extends LinkedDequeSimple<E> implements Deque<E>
         Iterator<E> iter = iterator();
         while (iter.hasNext()) {
             if (iter.next() == o) {
-                remove();
+                iter.remove();
                 return true;
             }
         }
@@ -167,7 +167,7 @@ public class LinkedDequeFull<E> extends LinkedDequeSimple<E> implements Deque<E>
         Iterator<E> iter = descendingIterator();
         while (iter.hasNext()) {
             if (iter.next() == o) {
-                remove();
+                iter.remove();
                 return true;
             }
         }
