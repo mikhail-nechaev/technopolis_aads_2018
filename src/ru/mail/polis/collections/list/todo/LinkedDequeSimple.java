@@ -12,6 +12,7 @@ import java.util.NoSuchElementException;
  */
 public class LinkedDequeSimple<E> implements IDeque<E> {
 
+
     private Node head;
 
     private Node tail;
@@ -170,7 +171,7 @@ public class LinkedDequeSimple<E> implements IDeque<E> {
         Node target = head;
 
         while (target != null) {
-            if (value.equals(target.value)){
+            if (value.equals(target.value)) {
                 return true;
             }
 
@@ -226,6 +227,26 @@ public class LinkedDequeSimple<E> implements IDeque<E> {
 
 
         private Node target = head;
+        private Node previousTargetForRemove;
+
+        @Override
+        public void remove() {
+            if (N > 0) {
+                if (head == tail) {
+                    clear();
+                } else if (previousTargetForRemove.previous == null) {
+                    removeFirst();
+                } else if (previousTargetForRemove.next == null) {
+                    removeLast();
+                } else {
+                    previousTargetForRemove.previous.next = previousTargetForRemove.next;
+                    previousTargetForRemove.next.previous = previousTargetForRemove.previous;
+                    N--;
+                }
+            } else {
+                throw new IllegalStateException("Deque is empty");
+            }
+        }
 
         @Override
         public boolean hasNext() {
@@ -236,6 +257,7 @@ public class LinkedDequeSimple<E> implements IDeque<E> {
         public E next() {
             if (hasNext()) {
                 E tmp = target.value;
+                previousTargetForRemove = new Node(target);
                 target = target.next;
                 return tmp;
             } else {
@@ -254,6 +276,12 @@ public class LinkedDequeSimple<E> implements IDeque<E> {
 
         Node(E value) {
             this.value = value;
+        }
+
+        Node(Node clone) {
+            this.value = clone.value;
+            this.previous = clone.previous;
+            this.next = clone.next;
         }
     }
 }
