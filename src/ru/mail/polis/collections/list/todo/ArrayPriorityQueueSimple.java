@@ -74,7 +74,8 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
         this.comparator = Objects.requireNonNull(comparator, "comparator");
         this.size = collection.size();
         this.capacity = size;
-        System.arraycopy(collection, 0, array, 0, size);
+        this.array = new Object[capacity];
+        System.arraycopy(collection.toArray(), 0, array, 0, size);
         for (int i = size / 2 - 1; i >= 0; i--) {
             siftDown(i);
         }
@@ -255,6 +256,9 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
 
             @Override
             public E next() {
+                if(!hasNext()){
+                    throw new NoSuchElementException();
+                }
                 lastNextIndex = nextIndex++;
                 return (E) array[lastNextIndex];
             }
