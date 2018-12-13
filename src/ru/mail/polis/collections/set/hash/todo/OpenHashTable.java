@@ -182,6 +182,7 @@ public class OpenHashTable<E extends IOpenHashTableEntity> implements IOpenHashT
        return new OpenHashTableIterator();
     }
     private class OpenHashTableIterator implements Iterator<E> {
+        private int prevIndex;
         private int nextIndex;
         private int restSize;
         private E next;
@@ -210,12 +211,24 @@ public class OpenHashTable<E extends IOpenHashTableEntity> implements IOpenHashT
             if (!hasNext())
                 throw new NoSuchElementException();
             lastReturned = next;
+            prevIndex = nextIndex;
             do {
                 nextIndex++;
-            } while(table[nextIndex] == null || deleted[nextIndex]);
+            } while(nextIndex < tableSize() && (table[nextIndex] == null || deleted[nextIndex]));
             next = table[nextIndex];
             restSize--;
             return lastReturned;
+        }
+
+        @Override
+        public void remove() {
+            checkForComodification();
+            if (lastReturned == null)
+                throw new IllegalStateException();
+            table[prevIndex] = null;
+            deleted[prevIndex] = true;
+            modCount++;
+            expectedModCount++;
         }
 
         private void checkForComodification() {
