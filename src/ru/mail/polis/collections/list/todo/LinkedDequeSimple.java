@@ -261,6 +261,9 @@ public class LinkedDequeSimple<E> implements IDeque<E> {
 
             @Override
             public boolean hasPrevious() {
+                if (isEmpty()) {
+                    return !isEmpty();
+                }
                 return position.getNext() != null;
             }
 
