@@ -4,7 +4,6 @@ import ru.mail.polis.collections.list.IPriorityQueue;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
@@ -32,7 +31,7 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
 
     @SuppressWarnings("unchecked")
     private void heapify(){
-        for(int i = size << 1 + 1; i <= 0; i++){
+        for(int i = (size >> 1) - 1; i >= 0; i--){
             siftDown(i, (E) queue[i]);
         }
     }

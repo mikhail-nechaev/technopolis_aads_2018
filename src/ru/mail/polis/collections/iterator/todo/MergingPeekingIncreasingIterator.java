@@ -1,7 +1,10 @@
 package ru.mail.polis.collections.iterator.todo;
 
 import java.util.Iterator;
-import java.util.NoSuchElementException;
+import java.util.List;
+
+import ru.mail.polis.collections.iterator.IPeekingIterator;
+import ru.mail.polis.collections.list.todo.ArrayPriorityQueueSimple;
 
 
 /**
@@ -17,8 +20,7 @@ import java.util.NoSuchElementException;
  */
 public class MergingPeekingIncreasingIterator implements Iterator<Integer> {
 
-    private IntegerIncreasingSequencePeekingIterator[] iterators;
-    private int numActiveIterators;
+    private ArrayPriorityQueueSimple<IPeekingIterator<Integer>> queue;
 
     /**
      * Creates a {@code MergingPeekingIncreasingIterator} containing the inside all elements of this specified iterators.
@@ -28,8 +30,7 @@ public class MergingPeekingIncreasingIterator implements Iterator<Integer> {
      * @param iterators the iterators whose are to be placed into this merging peeking increasing iterator
      */
     public MergingPeekingIncreasingIterator(IntegerIncreasingSequencePeekingIterator... iterators) {
-        this.iterators = iterators;
-        numActiveIterators = iterators.length;
+        queue = new ArrayPriorityQueueSimple<>(List.of(iterators));
     }
 
     /**
@@ -43,7 +44,7 @@ public class MergingPeekingIncreasingIterator implements Iterator<Integer> {
      */
     @Override
     public boolean hasNext() {
-        return numActiveIterators > 0;
+        return !queue.isEmpty();
     }
 
     /**
@@ -56,19 +57,10 @@ public class MergingPeekingIncreasingIterator implements Iterator<Integer> {
      */
     @Override
     public Integer next() {
-        if(!hasNext()){
-            throw new NoSuchElementException();
-        }
-        IntegerIncreasingSequencePeekingIterator minPeekIterator = null;
-        for(IntegerIncreasingSequencePeekingIterator itr: iterators){
-            if(itr.hasNext() && (minPeekIterator == null || itr.compareTo(minPeekIterator) < 0)){
-                minPeekIterator = itr;
-            }
-        }
-
-        Integer value = minPeekIterator.next();
-        if(!minPeekIterator.hasNext()){
-            numActiveIterators--;
+        IPeekingIterator<Integer> itr = queue.remove();
+        Integer value = itr.next();
+        if(itr.hasNext()) {
+            queue.add(itr);
         }
         return value;
     }
