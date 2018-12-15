@@ -2,6 +2,7 @@ package ru.mail.polis.collections.iterator.todo;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import ru.mail.polis.collections.iterator.IPeekingIterator;
 import ru.mail.polis.collections.list.todo.ArrayPriorityQueueSimple;
@@ -57,6 +58,9 @@ public class MergingPeekingIncreasingIterator implements Iterator<Integer> {
      */
     @Override
     public Integer next() {
+        if(!hasNext()){
+            throw new NoSuchElementException();
+        }
         IPeekingIterator<Integer> itr = queue.remove();
         Integer value = itr.next();
         if(itr.hasNext()) {
