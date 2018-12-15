@@ -23,43 +23,45 @@ public class ArrayDequeFull<E> extends ArrayDequeSimple<E> implements Deque<E> {
 
     @Override
     public E pollFirst() {
-        @SuppressWarnings("unchecked")
-        E first = (E) array[head];
-        removeFirst();
-        return first;
+        if (isEmpty()) {
+            return null;
+        }
+        return removeFirst();
     }
 
     @Override
     public E pollLast() {
-        @SuppressWarnings("unchecked")
-        E last = (E) array[tail];
-        removeLast();
-        return last;
+        if (isEmpty()) {
+            return null;
+        }
+        return removeLast();
     }
 
     @Override
     public E peekFirst() {
+        if (isEmpty()) {
+            return null;
+        }
         return getFirst();
     }
 
     @Override
     public E peekLast() {
+        if (isEmpty()) {
+            return null;
+        }
         return getLast();
     }
 
     @Override
     public boolean removeFirstOccurrence(Object o) {
         if (o == null) {
-            return false;
+            throw new NullPointerException();
         }
-        for (int i = head; i == tail; ) {
-            @SuppressWarnings("unchecked")
-            Object check = array[i];
-            if (o.equals(check)) {
-                remove(o);
-                return true;
-            }
-            i = i < array.length - 1 ? i+1 : 0;
+        if (contains(o)) {
+            int index = indexOf(o);
+            delete(index);
+            return true;
         }
         return false;
     }
@@ -67,24 +69,25 @@ public class ArrayDequeFull<E> extends ArrayDequeSimple<E> implements Deque<E> {
     @Override
     public boolean removeLastOccurrence(Object o) {
         if (o == null) {
-            return false;
+            throw new NullPointerException();
         }
-        for (int i = tail; i == head; ) {
+        int exit = head == 0 ? array.length - 1 : head - 1;
+        for (int i = tail; ; ) {
             @SuppressWarnings("unchecked")
             Object check = array[i];
             if (o.equals(check)) {
-                remove(o);
+                delete(i);
                 return true;
             }
             i = i > 0 ? i-1 : array.length - 1;
+            if (i == exit) break;
         }
         return false;
     }
 
     @Override
     public boolean add(E e) {
-        addLast(e);
-        return true;
+        return offerLast(e);
     }
 
     @Override
@@ -147,17 +150,23 @@ public class ArrayDequeFull<E> extends ArrayDequeSimple<E> implements Deque<E> {
 
     @Override
     public boolean removeAll(Collection<?> c) {
-        for (Object o : c) {
-            remove(o);
+        Iterator<E> iterator = iterator();
+        int count = 0;
+        for (E elem = iterator.next(); iterator.hasNext(); elem = iterator.next()) {
+            if (c.contains(elem)) {
+                iterator.remove();
+                count++;
+            }
         }
-        return true;
+        return count >= c.size();
     }
 
     @Override
     public boolean retainAll(Collection<?> c) {
-        for (Object o : c) {
-            if (!contains(o)) {
-                remove(o);
+        Iterator<E> iterator = iterator();
+        for (E elem = iterator.next(); iterator.hasNext(); elem = iterator.next()) {
+            if (!c.contains(elem)) {
+                iterator.remove();
             }
         }
         return true;
@@ -166,15 +175,32 @@ public class ArrayDequeFull<E> extends ArrayDequeSimple<E> implements Deque<E> {
     @Override
     public boolean contains(Object o) {
         if (o == null) {
-            return false;
+            throw new NullPointerException();
         }
-        for (int i = head; i == tail; ) {
+        int exit = tail == array.length - 1 ? 0 : tail + 1;
+        for (int i = head; ; ) {
             if (o.equals(array[i])) {
                 return true;
             }
-            i = i < array.length - 1 ? i+1 : 0;
+            i = i == array.length - 1 ? 0 : i+1;
+            if (i == exit) break;
         }
         return false;
+    }
+
+    public int indexOf(Object o) {
+        if (o == null) {
+            return -1;
+        }
+        int exit = tail == array.length - 1 ? 0 : tail + 1;
+        for (int i = head; ; ) {
+            if (o.equals(array[i])) {
+                return i;
+            }
+            i = i == array.length - 1 ? 0 : i+1;
+            if (i == exit) break;
+        }
+        return -1;
     }
 
     @Override
@@ -202,7 +228,7 @@ public class ArrayDequeFull<E> extends ArrayDequeSimple<E> implements Deque<E> {
     public Iterator<E> descendingIterator() {
         return new DescendingIterator();
     }
-    //todo: remove <abstract> modifier and implement
+
     private class DescendingIterator implements Iterator<E> {
 
         private int cursor = tail;
@@ -234,7 +260,7 @@ public class ArrayDequeFull<E> extends ArrayDequeSimple<E> implements Deque<E> {
             if (lastReturn < 0) {
                 throw new IllegalStateException();
             }
-            if (!ArrayDequeFull.this.remove(lastReturn)) {
+            if (!ArrayDequeFull.this.remove(array[lastReturn])) {
                 cursor = cursor < array.length - 1 ? cursor + 1 : 0;
             }
             lastReturn = -1;

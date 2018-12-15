@@ -243,8 +243,10 @@ public class LinkedDequeSimple<E> implements IDeque<E> {
             }
             if (lastReturned == tail) {
                 removeLast();
+                lastReturned = null;
             } else if (lastReturned == head) {
                 removeFirst();
+                lastReturned = null;
             } else {
                 lastReturned.prev.next = lastReturned.next;
                 lastReturned.next.prev = lastReturned.prev;

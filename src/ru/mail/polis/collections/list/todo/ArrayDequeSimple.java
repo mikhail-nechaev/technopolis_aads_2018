@@ -47,7 +47,7 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
         }
     }
 
-    private void expandArray() {
+    protected void expandArray() {
         Object[] newArray = new Object[array.length * 2];
         int al = array.length;
 
@@ -165,13 +165,15 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
         if (value == null) {
             throw new NullPointerException();
         }
-        for (int i = head; i == tail; ) {
+        int exit = tail == array.length - 1 ? 0 : tail + 1;
+        for (int i = head; ; ) {
             @SuppressWarnings("unchecked")
             E check = (E) array[i];
             if (value.equals(check)) {
                 return true;
             }
             i = i == array.length - 1 ? 0 : i+1;
+            if (i == exit) break;
         }
         return false;
     }
@@ -184,6 +186,39 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
     @Override
     public int size() {
         return size;
+    }
+
+    protected void delete(int index) {
+        if (head == index) {
+            removeFirst();
+        } else if (tail == index) {
+            removeLast();
+        } else if (head <= tail) {
+            if (index > tail || index < head) {
+                throw new IllegalArgumentException();
+            }
+            System.arraycopy(array, index + 1, array, index, tail - index);
+            tail--;
+            tail = tail == 0 ? array.length - 1 : tail - 1;
+
+            size--;
+        } else {
+            if (index > head) {
+                System.arraycopy(array, head, array, head + 1, index - head);
+                head = (head + 1) % array.length;
+            } else if (index < tail) {
+                System.arraycopy(array, index + 1, array, index, tail - index);
+                tail--;
+                tail = tail == 0 ? array.length - 1 : tail - 1;
+            } else {
+                throw new IllegalArgumentException();
+            }
+
+            size--;
+        }
+        if (size == array.length) {
+            expandArray();
+        }
     }
 
     /**
@@ -202,10 +237,13 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public void clear() {
-        for (int i = head; i == tail; ) {
+        int exit = tail == array.length - 1 ? 0 : tail + 1;
+        for (int i = head; ; ) {
             array[i] = null;
-            i = i < array.length - 1 ? i+1 : 0;
+            i = i == array.length - 1 ? 0 : i+1;
+            if (i == exit) break;
         }
+        size = 0;
     }
 
     /**
@@ -253,7 +291,7 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
                 throw new IllegalStateException();
             }
             canRemove = false;
-            //ArrayDequeSimple.this.delete(lastRealIndex);
+            ArrayDequeSimple.this.delete(lastRealIndex);
         }
 //        private int cursor = head;
 //        private int end = tail;
