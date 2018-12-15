@@ -242,7 +242,7 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
      */
     @Override
     public Iterator<E> iterator() {
-        throw new UnsupportedOperationException("todo: implement this");
+        return new PriorityQueueIterator();
     }
 
     private class PriorityQueueIterator implements Iterator<E>{

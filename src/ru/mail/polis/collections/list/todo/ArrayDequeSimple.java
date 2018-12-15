@@ -232,7 +232,7 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
         int cursor = head;
         int remaining = size();
         int nextIndex;
-        int lastIndexReturned = -1;
+        int lastReturnedIndex = -1;
 
         @Override
         public boolean hasNext() {
@@ -245,7 +245,7 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
                 throw new NoSuchElementException();
             }
             E e = elements[cursor];
-            cursor = inc(lastIndexReturned = cursor);
+            cursor = inc(lastReturnedIndex = cursor);
             remaining--;
             nextIndex++;
             return e;
@@ -261,8 +261,8 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
             if (!hasPrevious()) {
                 throw new NoSuchElementException();
             }
-            E e = elements[cursor = lastIndexReturned];
-            lastIndexReturned = (lastIndexReturned == head) ? -1 : dec(lastIndexReturned);
+            E e = elements[cursor = lastReturnedIndex];
+            lastReturnedIndex = (lastReturnedIndex == head) ? -1 : dec(lastReturnedIndex);
             remaining++;
             nextIndex--;
             return e;
@@ -280,22 +280,22 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
 
         @Override
         public void remove() {
-            if (lastIndexReturned < 0) {
+            if (lastReturnedIndex < 0) {
                 throw new IllegalStateException();
             }
-            if (delete(lastIndexReturned)) {
+            if (delete(lastReturnedIndex)) {
                 cursor = dec(cursor);
             }
             nextIndex--;
-            lastIndexReturned = -1;
+            lastReturnedIndex = -1;
         }
 
         @Override
         public void set(E e) {
-            if (lastIndexReturned < 0) {
+            if (lastReturnedIndex < 0) {
                 throw new IllegalStateException();
             }
-            elements[lastIndexReturned] = e;
+            elements[lastReturnedIndex] = e;
         }
 
         @Override
@@ -316,7 +316,7 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
             }
             elements[dec(cursor)] = e;
             nextIndex++;
-            lastIndexReturned = -1;
+            lastReturnedIndex = -1;
         }
     }
 }
