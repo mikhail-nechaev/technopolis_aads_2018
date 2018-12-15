@@ -2,9 +2,11 @@ package ru.mail.polis.collections.list.todo;
 
 import ru.mail.polis.collections.list.IPriorityQueue;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 
 /**
@@ -14,136 +16,172 @@ import java.util.Objects;
  *
  * @param <E> the type of elements maintained by this priority queue
  */
+@SuppressWarnings("unchecked")
 public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPriorityQueue<E> {
 
     private final Comparator<E> comparator;
+
+    private E [] arrayPriorityQueue;
+
+    private int arrayLength;
+
+    private static final int MIN_INITIAL_CAPACITY = 8;
+
+    private static final float LOAD_FACTOR = (float) 0.8;
+
+    private void doubleCapacity(){
+        arrayPriorityQueue = Arrays.copyOf(arrayPriorityQueue, arrayPriorityQueue.length << 1);
+    }
+
 
     public ArrayPriorityQueueSimple() {
         this(Comparator.naturalOrder());
     }
 
-    /**
-     * Creates a {@code IPriorityQueue} containing the elements in the specified collection.
-     *
-     * You may consider that all elements in collection is not a null.
-     *
-     * Complexity = O(n)
-     *
-     * @param collection the collection whose elements are to be placed into this priority queue
-     * @throws NullPointerException if the specified collection is null
-     */
+
     public ArrayPriorityQueueSimple(Collection<E> collection) {
         this(collection, Comparator.naturalOrder());
     }
 
-    /**
-     * Creates a {@code IPriorityQueue} that orders its elements according to the specified comparator.
-     *
-     * @param comparator comparator the comparator that will be used to order this priority queue.
-     * @throws NullPointerException if the specified comparator is null
-     */
+
     public ArrayPriorityQueueSimple(Comparator<E> comparator) {
+        if (comparator == null) {
+            throw new NullPointerException();
+        }
         this.comparator = Objects.requireNonNull(comparator, "comparator");
+        arrayPriorityQueue = (E[]) new Comparable[MIN_INITIAL_CAPACITY];
+        arrayLength = 0;
     }
 
-    /**
-     * Creates a {@code IPriorityQueue} containing the elements in the specified collection
-     *  that orders its elements according to the specified comparator.
-     *
-     * You may consider that all elements in collection is not a null.
-     *
-     * Complexity = O(n)
-     *
-     * @param collection the collection whose elements are to be placed into this priority queue
-     * @param comparator comparator the comparator that will be used to order this priority queue.
-     * @throws NullPointerException if the specified collection or comparator is null
-     */
+
     public ArrayPriorityQueueSimple(Collection<E> collection, Comparator<E> comparator) {
+        if (comparator == null || collection == null) {
+            throw new NullPointerException();
+        }
         this.comparator = Objects.requireNonNull(comparator, "comparator");
-        //todo: do some stuff with collection
+        arrayPriorityQueue = (E[]) new Comparable[MIN_INITIAL_CAPACITY];
+        arrayLength = 0;
+        for (E e : collection) {
+            add(e);
+        }
     }
 
-    /**
-     * Inserts the specified element into this priority queue.
-     *
-     * Complexity = O(log(n))
-     *
-     * @param value the element to add
-     * @throws NullPointerException if the specified element is null
-     */
+
     @Override
-    public void add(E value) {
-        throw new UnsupportedOperationException("todo: implement this");
+    public void add(E value) throws NullPointerException {
+        if(value == null){
+            throw new NullPointerException();
+        }
+        float occupancy = (float) arrayLength / (float) arrayPriorityQueue.length;
+
+        if(occupancy >= LOAD_FACTOR){
+            doubleCapacity();
+        }
+        arrayLength++;
+        arrayPriorityQueue[arrayLength - 1] = value;
+        for (int i = (arrayLength / 2)-1; i >= 0; --i) // вызываем heapfy для родителя
+        {
+            heapfy(i);
+        }
     }
 
-    /**
-     * Retrieves and removes the head of this queue.
-     *
-     * Complexity = O(log(n))
-     *
-     * @return the head of this queue
-     * @throws java.util.NoSuchElementException if this queue is empty
-     */
+
+
+    private void heapfy(int index) {
+        int left = 2 * index + 1;
+        int right = 2 * index + 2;
+        //Ищем меньшего сына, если такой есть
+        int smallest = index;
+        if(arrayPriorityQueue[left] != null &&left < arrayPriorityQueue.length && comparator.compare(arrayPriorityQueue[left], arrayPriorityQueue[index]) < 0)// сравниваем левый с текущим
+        {
+            smallest = left; // если левый меньше, то меньший - левый
+        }
+        if(arrayPriorityQueue[right] != null && right < arrayPriorityQueue.length && comparator.compare(arrayPriorityQueue[right], arrayPriorityQueue[index]) < 0) // сравниваем правый с текущим
+        {
+            smallest = right; // если правый меньше, то меньший - правый
+        }
+        //если меньший != текущий, то меняем местами с текущим (проталкиваем) и вызываем heapfy уже для него
+        if(smallest != index)
+        {
+            E c = arrayPriorityQueue[index];
+            arrayPriorityQueue[index] =  arrayPriorityQueue[smallest];
+            arrayPriorityQueue[smallest] = c;
+            heapfy(index);
+        }
+    }
+
+
     @Override
-    public E remove() {
-        throw new UnsupportedOperationException("todo: implement this");
+    public E remove() throws NoSuchElementException {
+        if (arrayLength <= 0){
+            throw new NoSuchElementException();
+        }
+        assert(arrayPriorityQueue.length != 0);
+        //запоминаем значение корня
+
+        E tmp = arrayPriorityQueue[0];
+        arrayPriorityQueue[0] = arrayPriorityQueue[arrayLength-1];
+        arrayPriorityQueue[arrayLength - 1] = null;
+        if(arrayLength != 0)
+        {
+            heapfy(0); // heapfy с головы
+        }
+        arrayLength--;
+        return tmp;
     }
 
-    /**
-     * Retrieves, but does not remove, the head of this queue.
-     *
-     * Complexity = O(1)
-     *
-     * @return the head of this queue
-     * @throws java.util.NoSuchElementException if this queue is empty
-     */
+
     @Override
-    public E element() {
-        throw new UnsupportedOperationException("todo: implement this");
+    public E element()throws NoSuchElementException{
+        if(arrayLength == 0){
+            throw new NoSuchElementException();
+        }
+        return arrayPriorityQueue[0];
     }
 
-    /**
-     * Returns {@code true} if this collection contains the specified element.
-     * aka collection contains element el such that {@code Objects.equals(el, value) == true}
-     *
-     * Complexity = O(n)
-     *
-     * @param value element whose presence in this collection is to be tested
-     * @return {@code true} if this collection contains the specified element
-     * @throws NullPointerException if the specified element is null
-     */
+
     @Override
-    public boolean contains(Object value) {
-        throw new UnsupportedOperationException("todo: implement this");
+    public boolean contains(Object value) throws NullPointerException {
+        if(value == null){
+            throw new NullPointerException();
+        }
+        for (E anArrayPriorityQueue : arrayPriorityQueue) {
+            if (comparator.compare((E) value,anArrayPriorityQueue) == 0) {
+                return true;
+            }
+        }
+        return false;
     }
 
-    /**
-     * Returns the number of elements in this collection.
-     *
-     * @return the number of elements in this collection
-     */
+
     @Override
     public int size() {
-        throw new UnsupportedOperationException("todo: implement this");
+        return arrayLength;
     }
 
-    /**
-     * Returns {@code true} if this collection contains no elements.
-     *
-     * @return {@code true} if this collection contains no elements
-     */
+
     @Override
     public boolean isEmpty() {
-        throw new UnsupportedOperationException("todo: implement this");
+        return arrayLength == 0;
     }
 
-    /**
-     * Removes all of the elements from this collection.
-     * The collection will be empty after this method returns.
-     */
+
     @Override
     public void clear() {
-        throw new UnsupportedOperationException("todo: implement this");
+        for (int i = 0; i < arrayLength; i++){
+            arrayPriorityQueue[i] = null;
+        }
+    }
+
+
+    private void delete(int index){
+        arrayPriorityQueue[0] = arrayPriorityQueue[index];
+        arrayPriorityQueue[index] = null;
+        if(arrayLength != 0)
+        {
+            heapfy(0);
+        }
+        arrayLength--;
     }
 
     /**
@@ -154,6 +192,36 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
      */
     @Override
     public Iterator<E> iterator() {
-        throw new UnsupportedOperationException("todo: implement this");
+
+        return new Iterator<E>() {
+
+            private int index;
+            private int cursor = -1;
+            private int size = arrayLength;
+
+            @Override
+            public boolean hasNext() {
+                return index < size;
+            }
+
+            @Override
+            public E next() throws NoSuchElementException  {
+                if(!hasNext()){
+                    throw new NoSuchElementException();
+                }
+                index = index + 1;
+                cursor = index;
+                return arrayPriorityQueue[cursor];
+            }
+
+            @Override
+            public void remove() throws IllegalStateException{
+                if(cursor == -1 ){
+                    throw new IllegalStateException();
+                }
+                delete(cursor);
+                cursor = -1;
+            }
+        };
     }
 }

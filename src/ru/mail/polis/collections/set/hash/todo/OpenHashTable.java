@@ -17,7 +17,46 @@ import java.util.Iterator;
  *
  * @param <E> the type of elements maintained by this hash table
  */
-public class OpenHashTable<E extends IOpenHashTableEntity> implements IOpenHashTable<E> {
+@SuppressWarnings("unchecked")
+public class OpenHashTable<E extends IOpenHashTableEntity>  implements IOpenHashTable<E> {
+
+    private static final double LOAD_FACTOR = 0.5;
+    private static final Object Integer = 0;
+    private static final Object Double = 1;
+    private static final Object Float = 2;
+    private E [] arrayHash;
+    private int length;
+    private final Class<E> typeParameterClass;
+
+    private boolean isNil(E value){
+        return value  == null;// || value == nil;
+    }
+
+    private Integer hashFunctionInteger(Integer key){
+        return key % arrayHash.length;
+    }
+
+    private Integer hashFunctionInteger2(Integer key){
+        return 1 - key % 7;
+    }
+
+
+
+    public OpenHashTable(Class<E> typeParameterClass){
+        this.typeParameterClass = typeParameterClass;
+        arrayHash = (E[]) new Object[29];
+    }
+
+
+    private void doubleCapacity(){
+        int newCapacity = arrayHash.length << 1;
+        if(newCapacity < 0){
+            throw new IllegalStateException("Sorry, size of Table too big");
+        }
+        E [] a = (E[]) new Object[newCapacity];
+        System.arraycopy(arrayHash, 0, a, 0,arrayHash.length);
+        arrayHash = a;
+    }
 
 
     /**
@@ -31,8 +70,26 @@ public class OpenHashTable<E extends IOpenHashTableEntity> implements IOpenHashT
      *                                  In other words if {@link IOpenHashTableEntity#hashCode(int, int)} specified element is incorrect.
      */
     @Override
-    public boolean add(E value) {
-        throw new UnsupportedOperationException("todo: implement this");
+    public boolean add(E value){
+        float occupancy = (float) length / (float) arrayHash.length;
+        boolean isComplete = false;
+        /*if(typeParameterClass.equals(Integer) || typeParameterClass.equals(Double) || typeParameterClass.equals(Float)) {
+            for(int i = 0; i < arrayHash.length; i++) {
+                int j = (hashFunctionInteger(value) + i * hashFunctionInteger2(value)) % arrayHash.length;
+                if(isNil(arrayHash[j])){
+                    if(occupancy >= LOAD_FACTOR){
+                        doubleCapacity();
+                    }
+                    arrayHash[j] = value;
+                    isComplete = true;
+                    length ++;
+                    break;
+                }
+            }
+        }*/
+
+
+        return isComplete;
     }
 
     /**
@@ -61,7 +118,17 @@ public class OpenHashTable<E extends IOpenHashTableEntity> implements IOpenHashT
      */
     @Override
     public boolean contains(Object value) {
-        throw new UnsupportedOperationException("todo: implement this");
+       /* for(int i=0; i < arrayHash.length; i++){
+            //выполняя i - пробу, мы считаем индекс в массиве
+            int j = hashFunction(i);
+            if(isNil(arrayHash[j])){ // если там null или специальное значение
+                continue; // то продолжим
+            }
+            if(arrayHash[j] == value){
+                return true;
+            }
+        }*/
+        return false;
     }
 
     /**
@@ -71,7 +138,7 @@ public class OpenHashTable<E extends IOpenHashTableEntity> implements IOpenHashT
      */
     @Override
     public int size() {
-        throw new UnsupportedOperationException("todo: implement this");
+        return length;
     }
 
     /**
@@ -81,7 +148,7 @@ public class OpenHashTable<E extends IOpenHashTableEntity> implements IOpenHashT
      */
     @Override
     public boolean isEmpty() {
-        throw new UnsupportedOperationException("todo: implement this");
+        return length == 0;
     }
 
     /**
@@ -100,11 +167,21 @@ public class OpenHashTable<E extends IOpenHashTableEntity> implements IOpenHashT
      */
     @Override
     public Iterator<E> iterator() {
-        throw new UnsupportedOperationException("todo: implement this");
+        return new Iterator<E>() {
+            @Override
+            public boolean hasNext() {
+                return false;
+            }
+
+            @Override
+            public E next() {
+                return null;
+            }
+        };
     }
 
     @Override
     public int tableSize() {
-        throw new UnsupportedOperationException("todo: return dataArray.length");
+        return arrayHash.length;
     }
 }

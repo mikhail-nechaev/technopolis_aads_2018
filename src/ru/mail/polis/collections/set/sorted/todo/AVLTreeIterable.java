@@ -16,13 +16,8 @@ public class AVLTreeIterable<E extends Comparable<E>> extends AVLTree<E> impleme
         super();
     }
 
-    /**
-     * Creates a {@code ISelfBalancingSortedTreeSet} that orders its elements according to the specified comparator.
-     *
-     * @param comparator comparator the comparator that will be used to order this priority queue.
-     * @throws NullPointerException if the specified comparator is null
-     */
-    public AVLTreeIterable(Comparator<E> comparator) {
+
+    public AVLTreeIterable(Comparator<E> comparator) throws NullPointerException {
         super(comparator);
     }
 
@@ -33,7 +28,17 @@ public class AVLTreeIterable<E extends Comparable<E>> extends AVLTree<E> impleme
      */
     @Override
     public Iterator<E> iterator() {
-        throw new UnsupportedOperationException("todo: implement this");
+        return new Iterator<E>() {
+            @Override
+            public boolean hasNext() {
+                return false;
+            }
+
+            @Override
+            public E next() {
+                return null;
+            }
+        };
     }
 
     /**
@@ -43,11 +48,16 @@ public class AVLTreeIterable<E extends Comparable<E>> extends AVLTree<E> impleme
      */
     @Override
     public Iterator<E> descendingIterator() {
-        throw new UnsupportedOperationException("todo: implement this");
-    }
+        return new Iterator<E>() {
+            @Override
+            public boolean hasNext() {
+                return false;
+            }
 
-    @Override
-    public boolean contains(Object value) {
-        return false;
+            @Override
+            public E next() {
+                return null;
+            }
+        };
     }
 }

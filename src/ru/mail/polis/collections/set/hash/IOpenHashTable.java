@@ -51,7 +51,7 @@ public interface IOpenHashTable<E extends IOpenHashTableEntity> extends ISetIter
      *  In other words if {@link IOpenHashTableEntity#hashCode(int,int)} specified element is incorrect.
      */
     @Override
-    boolean contains(E value);
+    boolean contains(Object value);
 
     int tableSize();
 }

@@ -3,6 +3,7 @@ package ru.mail.polis.collections;
 import ru.mail.polis.collections.list.IDeque;
 
 import java.util.ArrayDeque;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Set;
@@ -13,7 +14,7 @@ import java.util.Set;
  */
 public class TestHelper {
 
-    public static final Collection<Object[]> COMPARATORS = Set.of(new Object[][]{
+    public static final Collection<Object[]> COMPARATORS = Arrays.asList(new Object[][]{
             {Comparator.naturalOrder(), "NATURAL"},
             {Comparator.reverseOrder(), "REVERSE"},
             {Comparator.comparingInt((Integer v) -> v % 2).thenComparingInt(v -> v), "EVEN_FIRST"},

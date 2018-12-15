@@ -2,7 +2,10 @@ package ru.mail.polis.collections.list.todo;
 
 import ru.mail.polis.collections.list.IDeque;
 
+import java.util.ConcurrentModificationException;
 import java.util.Iterator;
+import java.util.ListIterator;
+import java.util.NoSuchElementException;
 
 /**
  * Resizable cyclic array implementation of the {@link IDeque} interface.
@@ -11,17 +14,117 @@ import java.util.Iterator;
  *
  * @param <E> the type of elements held in this deque
  */
+@SuppressWarnings("unchecked")
 public class ArrayDequeSimple<E> implements IDeque<E> {
 
-    /**
-     * Inserts the specified element at the front of this deque.
-     *
-     * @param value the element to add
-     * @throws NullPointerException if the specified element is null
-     */
+
+    protected E [] arrayDeque;
+    protected int head;
+    protected int tail;
+    protected static final int MIN_INITIAL_CAPACITY = 8;
+
+
+    public ArrayDequeSimple(){
+        arrayDeque = (E[])new Object[16];
+    }
+
+    public ArrayDequeSimple(int numElements){
+        allocateElements(numElements);
+    }
+
+    private void checkInvariants() {
+        assert arrayDeque[tail] == null;
+        assert head == tail ? arrayDeque[head] == null :
+                (arrayDeque[head] != null &&
+                        arrayDeque[(tail - 1) & (arrayDeque.length - 1)] != null);
+        assert arrayDeque[(head - 1) & (arrayDeque.length - 1)] == null;
+    }
+
+
+    protected boolean delete(int i) {
+        checkInvariants();
+        final Object[] elements = this.arrayDeque;
+        final int mask = elements.length - 1;
+        final int h = head;
+        final int t = tail;
+        final int front = (i - h) & mask;
+        final int back  = (t - i) & mask;
+
+
+        if (front >= ((t - h) & mask))
+            throw new ConcurrentModificationException();
+
+
+        if (front < back) {
+            if (h <= i) {
+                System.arraycopy(elements, h, elements, h + 1, front);
+            } else {
+                System.arraycopy(elements, 0, elements, 1, i);
+                elements[0] = elements[mask];
+                System.arraycopy(elements, h, elements, h + 1, mask - h);
+            }
+            elements[h] = null;
+            head = (h + 1) & mask;
+            return false;
+        } else {
+            if (i < t) {
+                System.arraycopy(elements, i + 1, elements, i, back);
+                tail = t - 1;
+            } else {
+                System.arraycopy(elements, i + 1, elements, i, mask - i);
+                elements[mask] = elements[0];
+                System.arraycopy(elements, 1, elements, 0, t);
+                tail = (t - 1) & mask;
+            }
+            return true;
+        }
+    }
+
+
+    private static int calculateSize(int numElements){
+        int initialCapacity =  MIN_INITIAL_CAPACITY;
+        if(numElements >= initialCapacity){
+            initialCapacity = numElements;
+            initialCapacity = initialCapacity | (initialCapacity >>> 1);
+            initialCapacity = initialCapacity | (initialCapacity >>> 2);
+            initialCapacity = initialCapacity | (initialCapacity >>> 4);
+            initialCapacity = initialCapacity | (initialCapacity >>> 8);
+            initialCapacity = initialCapacity | (initialCapacity >>> 16);
+            initialCapacity++;
+        }
+        return initialCapacity;
+    }
+
+    private void allocateElements(int numElements){
+        arrayDeque = (E[]) new Object[calculateSize(numElements)];
+    }
+    private void doubleCapacity(){
+        assert head == tail;
+        int p = head;
+        int n = arrayDeque.length;
+        int r = n-p;
+        int newCapacity = n << 1;
+        if(newCapacity < 0){
+            throw new IllegalStateException("Sorry, deque too big");
+        }
+        E[] a = (E[]) new Object[newCapacity];
+        System.arraycopy(arrayDeque, p, a, 0, r); // скопировали в массив a, начиная с p(head) в 0 позицию массива назначения
+        //длинной r(head - tail)
+        System.arraycopy(arrayDeque, 0, a, r, p);
+        arrayDeque = a;
+        head = 0;
+        tail = n;
+    }
+
     @Override
-    public void addFirst(E value) {
-        throw new UnsupportedOperationException("todo: implement this");
+    public void addFirst(E value) throws NullPointerException {
+        if(value == null){
+            throw new NullPointerException();
+        }
+        arrayDeque[head = (head - 1) & (arrayDeque.length - 1)] = value;
+        if(head == tail){
+            doubleCapacity();
+        }
     }
 
     /**
@@ -31,8 +134,15 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      * @throws java.util.NoSuchElementException if this deque is empty
      */
     @Override
-    public E removeFirst() {
-        throw new UnsupportedOperationException("todo: implement this");
+    public E removeFirst() throws NoSuchElementException{
+        int h = head;
+        E res = arrayDeque[h];
+        if(res == null){
+            throw new NoSuchElementException();
+        }
+        arrayDeque[h] = null;
+        head = (h + 1) & (arrayDeque.length - 1);
+        return res;
     }
 
     /**
@@ -42,8 +152,11 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      * @throws java.util.NoSuchElementException if this queue is empty
      */
     @Override
-    public E getFirst() {
-        throw new UnsupportedOperationException("todo: implement this");
+    public E getFirst() throws NoSuchElementException{
+        if (arrayDeque[head] == null) {
+            throw new NoSuchElementException();
+        }
+        return arrayDeque[head];
     }
 
     /**
@@ -53,8 +166,13 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      * @throws NullPointerException if the specified element is null
      */
     @Override
-    public void addLast(E value) {
-        throw new UnsupportedOperationException("todo: implement this");
+    public void addLast(E value) throws NullPointerException{
+        if (value == null) {
+            throw new NullPointerException();
+        }
+        arrayDeque[tail] = value;
+        if ((tail = (tail + 1) & (arrayDeque.length - 1)) == head)
+            doubleCapacity();
     }
 
     /**
@@ -64,8 +182,17 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      * @throws java.util.NoSuchElementException if this deque is empty
      */
     @Override
-    public E removeLast() {
-        throw new UnsupportedOperationException("todo: implement this");
+    public E removeLast() throws NoSuchElementException{
+        if(isEmpty()){
+            throw new NoSuchElementException();
+        }
+        int t = (tail - 1) & (arrayDeque.length - 1);
+        E result = arrayDeque[t];
+        if (result == null)
+            return null;
+        arrayDeque[t] = null;
+        tail = t;
+        return result;
     }
 
     /**
@@ -75,8 +202,11 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      * @throws java.util.NoSuchElementException if this deque is empty
      */
     @Override
-    public E getLast() {
-        throw new UnsupportedOperationException("todo: implement this");
+    public E getLast() throws NoSuchElementException {
+        E result = arrayDeque[(tail - 1) & (arrayDeque.length - 1)];
+        if (result == null)
+            throw new NoSuchElementException();
+        return result;
     }
 
     /**
@@ -88,8 +218,19 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      * @throws NullPointerException if the specified element is null
      */
     @Override
-    public boolean contains(E value) {
-        throw new UnsupportedOperationException("todo: implement this");
+    public boolean contains(Object value) throws NullPointerException {
+        if(value == null){
+            throw new NullPointerException();
+        }
+        int mask = arrayDeque.length - 1;
+        int i = head;
+        Object x;
+        while ( (x = arrayDeque[i]) != null) {
+            if (value.equals(x))
+                return true;
+            i = (i + 1) & mask;
+        }
+        return false;
     }
 
     /**
@@ -99,7 +240,7 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public int size() {
-        throw new UnsupportedOperationException("todo: implement this");
+        return (tail - head) & (arrayDeque.length - 1);
     }
 
     /**
@@ -109,7 +250,7 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public boolean isEmpty() {
-        throw new UnsupportedOperationException("todo: implement this");
+        return ((tail - head) & (arrayDeque.length - 1)) == 0;
     }
 
     /**
@@ -118,7 +259,17 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public void clear() {
-        throw new UnsupportedOperationException("todo: implement this");
+        int h = head;
+        int t = tail;
+        if (h != t) {
+            head = tail = 0;
+            int i = h;
+            int mask = arrayDeque.length - 1;
+            do {
+                arrayDeque[i] = null;
+                i = (i + 1) & mask;
+            } while (i != t);
+        }
     }
 
     /**
@@ -129,6 +280,39 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public Iterator<E> iterator() {
-        throw new UnsupportedOperationException("todo: implement this");
-    }
+        return new Iterator<E>() {
+            private int index = head;
+            private int cursor = -1;
+            private int tailIterator = tail;
+
+            @Override
+            public boolean hasNext() {
+                return index != tailIterator;
+            }
+
+            @Override
+            public E next() throws ConcurrentModificationException, NoSuchElementException {
+                if (index == tailIterator) {
+                    throw new NoSuchElementException();
+                }
+                E result = arrayDeque[index];
+                if (tailIterator != tail || result == null) {
+                    throw new ConcurrentModificationException();
+                }
+                cursor = index;
+                index = (index + 1) & (arrayDeque.length - 1);
+                return result;
+            }
+            @Override
+            public void remove(){
+                if (cursor < 0)
+                    throw new IllegalStateException();
+                if (delete(cursor)) {
+                    cursor = (cursor - 1) & (arrayDeque.length - 1);
+                    tailIterator = tail;
+                }
+                cursor = -1;
+            }
+        };
+    };
 }

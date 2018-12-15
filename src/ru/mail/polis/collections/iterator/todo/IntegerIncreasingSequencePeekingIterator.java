@@ -10,6 +10,18 @@ import java.util.NoSuchElementException;
  */
 public class IntegerIncreasingSequencePeekingIterator implements IIncreasingSequenceIterator<Integer> {
 
+
+    private int first;
+    private int last;
+    private int maxStep;
+    private int index;
+
+
+    private void increment(){
+        index ++;
+    }
+
+
     /**
      * minStep = 1
      *
@@ -22,7 +34,14 @@ public class IntegerIncreasingSequencePeekingIterator implements IIncreasingSequ
      * @param maxStep — max diff between adjacent values
      * @throws IllegalArgumentException if arguments is invalid
      */
-    public IntegerIncreasingSequencePeekingIterator(int first, int last, int maxStep) {
+    public IntegerIncreasingSequencePeekingIterator(int first, int last, int maxStep) throws IllegalStateException {
+        this.first = first;
+        this.last = last;
+        this.maxStep = maxStep;
+        this.index = this.first;
+        if(maxStep < 1 || first > last){
+            throw new IllegalStateException();
+        }
 
     }
 
@@ -36,7 +55,7 @@ public class IntegerIncreasingSequencePeekingIterator implements IIncreasingSequ
      */
     @Override
     public boolean hasNext() {
-        throw new UnsupportedOperationException("todo: implement this");
+        return index < last;
     }
 
     /**
@@ -47,7 +66,12 @@ public class IntegerIncreasingSequencePeekingIterator implements IIncreasingSequ
      */
     @Override
     public Integer next() {
-        throw new UnsupportedOperationException("todo: implement this");
+        if(!hasNext()){
+            throw new NoSuchElementException();
+        }
+        int stp;
+        /**/
+        return 1;
     }
 
     /**

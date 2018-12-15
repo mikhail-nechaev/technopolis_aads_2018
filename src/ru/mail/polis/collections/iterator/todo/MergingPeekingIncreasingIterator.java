@@ -2,6 +2,9 @@ package ru.mail.polis.collections.iterator.todo;
 
 import java.util.Iterator;
 
+import ru.mail.polis.collections.iterator.IPeekingIterator;
+import ru.mail.polis.collections.list.todo.ArrayPriorityQueueSimple;
+
 /**
  * Итератор возвращающий последовательность последовательностей элементов возрастающих итераторов в порядке возрастания
  * <p>
@@ -14,6 +17,7 @@ import java.util.Iterator;
  * k — суммарное количество элементов
  */
 public class MergingPeekingIncreasingIterator implements Iterator<Integer> {
+    ArrayPriorityQueueSimple<IPeekingIterator<Integer>> arrayPriorityQueueSimple = new ArrayPriorityQueueSimple<>();
 
     /**
      * Creates a {@code MergingPeekingIncreasingIterator} containing the inside all elements of this specified iterators.
