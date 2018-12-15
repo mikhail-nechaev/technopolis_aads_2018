@@ -323,8 +323,8 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
 
             if (targetInd > tail){
                 int j;
-                for (j = head; j < targetInd; j++){
-                    deque[j + 1] = deque[j];
+                for (j = targetInd; j > head; j--){
+                    deque[j] = deque[j - 1];
                 }
                 head = head == j ? j + 1 : j;
             } else {
