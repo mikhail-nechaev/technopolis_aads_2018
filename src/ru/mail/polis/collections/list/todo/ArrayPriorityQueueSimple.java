@@ -243,7 +243,6 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
 
             @Override
             public boolean hasNext() {
-                canRemove = false;
                 return index < size();
             }
 
