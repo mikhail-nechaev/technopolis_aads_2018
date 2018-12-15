@@ -14,9 +14,9 @@ import ru.mail.polis.collections.list.IDeque;
  */
 public class ArrayDequeSimple<E> implements IDeque<E> {
     private static final int DEFAULT_SIZE = 16;
-    private E[] array = (E[]) new Object[DEFAULT_SIZE];
-    private int startPointer = 0;
-    private int endPointer = 0;
+    protected E[] array = (E[]) new Object[DEFAULT_SIZE];
+    protected int startPointer = 0;
+    protected int endPointer = 0;
     private int size = 0;
 
     /**
@@ -224,75 +224,118 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
     @Override
     public ListIterator<E> iterator() {
         return new ListIterator<>() {
-            int pointer = -1;
+            int nextPointer = startPointer;
+            int previousPointer = -1;
+            boolean hasCurrent = false;
 
             @Override
             public boolean hasNext() {
                 if (size == 0) {
                     return false;
                 }
-                return pointer != endPointer;
+                return nextPointer != -1;
+            }
+
+            private int shiftNext(int index) {
+                return (index == array.length - 1) ? 0 : index + 1;
             }
 
             @Override
             public E next() {
-                pointer = nextIndex();
-                return array[pointer];
+                E elem = array[nextPointer];
+                if (elem == null) {
+                    throw new NoSuchElementException();
+                }
+                if (nextPointer != startPointer) {
+                    previousPointer = (previousPointer == -1) ? startPointer : shiftNext(previousPointer);
+                }
+                nextPointer = (nextPointer == endPointer) ? -1 : shiftNext(nextPointer);
+                hasCurrent = true;
+                return elem;
             }
 
             @Override
             public boolean hasPrevious() {
-                return pointer != -1 && pointer != startPointer;
+                if (size == 0) {
+                    return false;
+                }
+                return previousPointer != -1;
+            }
+
+            private int shiftPrevious(int index) {
+                return (index == 0) ? array.length - 1 : index - 1;
             }
 
             @Override
             public E previous() {
-                pointer = previousIndex();
-                return array[pointer];
+                E elem = array[previousPointer];
+                if (elem == null) {
+                    throw new NoSuchElementException();
+                }
+                nextPointer = (nextPointer == -1) ? endPointer : shiftPrevious(nextPointer);
+                previousPointer = (previousPointer == startPointer) ? -1 : shiftPrevious(previousPointer);
+                hasCurrent = true;
+                return elem;
+            }
+
+            private int findIndexByPointer(int pointer) {
+                if (pointer < startPointer) {
+                    return array.length - startPointer + pointer;
+                } else {
+                    return pointer - startPointer;
+                }
             }
 
             @Override
             public int nextIndex() {
-                if (pointer == -1) {
-                    return startPointer;
-                }
-                if (!hasNext()) {
-                    return size;
-                }
-                int nextPointer = pointer;
-                if (pointer == array.length - 1) {
-                    nextPointer = 0;
-                } else {
-                    nextPointer++;
-                }
-                return nextPointer;
+                return (nextPointer == -1) ? size : findIndexByPointer(nextPointer);
             }
 
             @Override
             public int previousIndex() {
-                if (!hasPrevious()) {
-                    return -1;
-                }
-                int previousPointer = pointer;
-                if (pointer == 0) {
-                    previousPointer = array.length - 1;
-                } else {
-                    previousPointer--;
-                }
-                return previousPointer;
+                return (previousPointer == -1) ? -1 : findIndexByPointer(previousPointer);
             }
 
             @Override
             public void remove() {
-                throw new UnsupportedOperationException();
+                if (!hasCurrent) {
+                    throw new IllegalStateException();
+                }
+                int oldNextPointer = nextPointer;
+                int oldPreviousPointer = previousPointer;
+                if (nextPointer != -1) {
+                    while (nextPointer != endPointer) {
+                        array[shiftPrevious(nextPointer)] = array[nextPointer];
+                        next();
+                    }
+                    array[shiftPrevious(nextPointer)] = array[nextPointer];
+                    array[nextPointer] = null;
+                    previousPointer = oldPreviousPointer;
+                    nextPointer = shiftPrevious(oldNextPointer);
+                    endPointer = shiftPrevious(endPointer);
+                } else if (previousPointer != -1) {
+                    array[shiftNext(previousPointer)] = null;
+                    endPointer = shiftPrevious(endPointer);
+                } else if (size == 1) {
+                    array[startPointer] = null;
+                } else {
+                    throw new IllegalStateException();
+                }
+                hasCurrent = false;
+                size--;
             }
 
             @Override
             public void set(E e) {
-                if (pointer == -1) {
+                if (nextPointer != -1) {
+                    array[shiftPrevious(nextPointer)] = e;
+                } else if (previousPointer != -1) {
+                    array[shiftNext(previousPointer)] = e;
+                } else if (size == 1) {
+                    array[startPointer] = e;
+                } else {
                     throw new IllegalStateException();
                 }
-                array[pointer] = e;
             }
 
             @Override
