@@ -11,12 +11,7 @@ import ru.mail.polis.collections.set.hash.todo.OpenHashTable;
 import ru.mail.polis.collections.set.hash.todo.Student;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.stream.IntStream;
 
 /**
@@ -26,7 +21,7 @@ import java.util.stream.IntStream;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestHashTable extends AbstractSetTest {
 
-    private final List<IOpenHashTableEntity> entities = List.of(
+    private IOpenHashTableEntity[] kek = {
             //uniq
             new Student(0, "A", "CDCD", Student.Gender.MALE, LocalDate.of(1990, 1, 1), 1000),
             new Student(0, "AA", "CCDD", Student.Gender.FEMALE, LocalDate.of(1993, 2, 2), 1001),
@@ -51,7 +46,8 @@ public class TestHashTable extends AbstractSetTest {
             new Student(0, "AB", "D", Student.Gender.MALE, LocalDate.of(1993, 1, 1), 1004),
             new Student(0, "BBBB", "DDD", Student.Gender.FEMALE, LocalDate.of(1997, 1, 4), 1003),
             new Student(0, "AAA", "CD", Student.Gender.FEMALE, LocalDate.of(1997, 3, 1), 1002)
-    );
+    };
+    private final List<IOpenHashTableEntity> entities = Arrays.asList(kek);
 
     private Set<IOpenHashTableEntity> validSet;
     private IOpenHashTable<IOpenHashTableEntity> testSet;

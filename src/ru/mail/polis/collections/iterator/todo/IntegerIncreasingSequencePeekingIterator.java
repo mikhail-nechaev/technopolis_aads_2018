@@ -22,8 +22,18 @@ public class IntegerIncreasingSequencePeekingIterator implements IIncreasingSequ
      * @param maxStep — max diff between adjacent values
      * @throws IllegalArgumentException if arguments is invalid
      */
-    public IntegerIncreasingSequencePeekingIterator(int first, int last, int maxStep) {
 
+    Integer current;
+    Integer last;
+    Integer maxStep;
+
+    public IntegerIncreasingSequencePeekingIterator(int first, int last, int maxStep) {
+        if (last <= first || maxStep < 1){
+            throw new IllegalArgumentException();
+        }
+        this.current = first;
+        this.last = last;
+        this.maxStep = maxStep;
     }
 
 
@@ -36,7 +46,7 @@ public class IntegerIncreasingSequencePeekingIterator implements IIncreasingSequ
      */
     @Override
     public boolean hasNext() {
-        throw new UnsupportedOperationException("todo: implement this");
+        return !((current + 1 > last) || (current + maxStep < 0 && last > 0 && current > 0));
     }
 
     /**
@@ -47,7 +57,18 @@ public class IntegerIncreasingSequencePeekingIterator implements IIncreasingSequ
      */
     @Override
     public Integer next() {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (!hasNext())
+            throw new NoSuchElementException();
+        int temp = current;
+        current = goToNext();
+        return temp;
+    }
+
+    private int goToNext() {
+        if (current + maxStep > last)
+            return last;
+        else
+            return current + maxStep;
     }
 
     /**
@@ -58,7 +79,9 @@ public class IntegerIncreasingSequencePeekingIterator implements IIncreasingSequ
      */
     @Override
     public Integer peek() {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (!hasNext())
+            throw new NoSuchElementException();
+        return current;
     }
 
     /**
@@ -74,6 +97,8 @@ public class IntegerIncreasingSequencePeekingIterator implements IIncreasingSequ
      */
     @Override
     public int compareTo(IPeekingIterator<Integer> other) {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (other == null)
+            throw new NullPointerException();
+        return Integer.compare(peek(), other.peek());
     }
 }
