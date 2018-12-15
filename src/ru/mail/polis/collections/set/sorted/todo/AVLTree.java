@@ -166,9 +166,13 @@ public class AVLTree<E extends Comparable<E>> implements ISelfBalancingSortedTre
             if(rightChild == null){
                 return leftChild;
             }
+            if(leftChild == null){
+                return rightChild;
+            }
             AVLNode<E> min = findMin(rightChild);
             min.right = removeMin(rightChild);
             min.left = leftChild;
+
             return balance(min);
         }
         return balance(cur);
