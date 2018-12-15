@@ -17,25 +17,25 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
     /**
      * Elements of deque
      */
-    private Object[] deque = new Object[0];
+    protected Object[] deque = new Object[0];
 
     /**
      * Numbers of elements
      */
 
-    private int N = 0;
+    int N = 0;
 
     /**
      * The index of start deque
      */
 
-    private int head = 0;
+    int head = 0;
 
     /**
      * The index of end deque
      */
 
-    private int tail = -1;
+    int tail = -1;
 
     public static void main(String[] args) {
         new ArrayDequeSimple<Integer>().clear();
@@ -54,7 +54,7 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
             int targetInd = startIndex;
 
             if (tail < head) {
-                for (int i = head; head < deque.length; i++) {
+                for (int i = head; i < deque.length; i++) {
                     newArray[targetInd] = deque[i];
                     targetInd++;
                 }
@@ -63,7 +63,7 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
                     targetInd++;
                 }
             } else {
-                for (int i = head; head <= tail; i++) {
+                for (int i = head; i <= tail; i++) {
                     newArray[targetInd] = deque[i];
                     targetInd++;
                 }
@@ -305,34 +305,37 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
         return new ArrayDequeIterator();
     }
 
-    private class ArrayDequeIterator implements Iterator<E> {
+    protected class ArrayDequeIterator implements Iterator<E> {
 
         private int i = N;
 
         private int target = head;
+        private int previousTarget;
 
         @Override
         public void remove() {
 
-            if (N == 0) {
+            if (target == head || N == 0) {
                 throw new IllegalStateException();
             }
 
-            int targetInd = target == 0 ? deque.length - 1 : target - 1;
+            int targetInd = previousTarget;
 
-            if (head > tail && targetInd < tail) {
+            if (targetInd > tail){
+                int j;
+                for (j = head; j < targetInd; j++){
+                    deque[j + 1] = deque[j];
+                }
+                head = head == j ? j + 1 : j;
+            } else {
                 int j;
                 for (j = targetInd; j < tail; j++) {
                     deque[j] = deque[j + 1];
                 }
                 tail = j - 1;
-            } else {
-                int j;
-                for (j = targetInd; j > head; j--) {
-                    deque[j] = deque[j - 1];
-                }
-                head = j + 1;
+                target--;
             }
+
             N--;
 
         }
@@ -345,6 +348,7 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
         @Override
         public E next() {
             if (hasNext()) {
+                previousTarget = target;
                 Object value = deque[target++];
 
                 i--;
@@ -359,4 +363,5 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
             }
         }
     }
+
 }
