@@ -22,7 +22,7 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
 
     private static final int DEFAULT_LENGTH = 10;
     private Object[] values = new Object[DEFAULT_LENGTH];
-    private int lenght = 0;
+    private int length = 0;
 
     public ArrayPriorityQueueSimple() {
         this(Comparator.naturalOrder());
@@ -86,9 +86,9 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
         if (value == null) {
             throw new NullPointerException();
         }
-        values[lenght] = value;
-        shiftUp(lenght);
-        lenght++;
+        values[length] = value;
+        shiftUp(length);
+        length++;
         checkCapacity();
     }
 
@@ -106,7 +106,7 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
 
     private void shiftDown(int children) {
         int index = children;
-        while (index * 2 + 1 < lenght) {
+        while (index * 2 + 1 < length) {
             if (index * 2 + 2 < values.length && comparator.compare((E) values[index * 2 + 2], (E) values[index * 2 + 1]) < 0) {
                 E copy = (E) values[index];
                 values[index] = values[index * 2 + 2];
@@ -145,18 +145,18 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
             throw new NoSuchElementException();
         }
         E result = (E) values[0];
-        values[0] = values[lenght - 1];
-        lenght--;
+        values[0] = values[length - 1];
+        length--;
         shiftDown(0);
         checkCapacity();
         return result;
     }
 
     private void checkCapacity() {
-        if (lenght + 1 >= values.length) {
+        if (length + 1 >= values.length) {
             updateArraySize(values.length * 2);
         }
-        if (lenght * 2 <= values.length - 1) {
+        if (length * 2 <= values.length - 1) {
             updateArraySize(values.length / 2);
         }
     }
@@ -192,7 +192,7 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
         if (value == null) {
             throw new NullPointerException();
         }
-        for (int i = 0; i < lenght; i++) {
+        for (int i = 0; i < length; i++) {
             if (comparator.compare((E) values[i], value) == 0) {
                 return true;
             }
@@ -207,7 +207,7 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
      */
     @Override
     public int size() {
-        return lenght;
+        return length;
     }
 
     /**
@@ -217,7 +217,7 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
      */
     @Override
     public boolean isEmpty() {
-        return lenght == 0;
+        return length == 0;
     }
 
     /**
@@ -226,7 +226,7 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
      */
     @Override
     public void clear() {
-        lenght = 0;
+        length = 0;
     }
 
     /**
@@ -263,7 +263,7 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
                 }
                 values[index - 1] = values[size() - 1];
                 shiftDown(index - 1);
-                lenght--;
+                length--;
                 canRemove = false;
             }
         };
