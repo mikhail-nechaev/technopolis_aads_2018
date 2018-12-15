@@ -4,6 +4,7 @@ import ru.mail.polis.collections.iterator.IIncreasingSequenceIterator;
 import ru.mail.polis.collections.iterator.IPeekingIterator;
 
 import java.util.NoSuchElementException;
+import java.util.Random;
 
 /**
  *
@@ -23,15 +24,19 @@ public class IntegerIncreasingSequencePeekingIterator implements IIncreasingSequ
      * @throws IllegalArgumentException if arguments is invalid
      */
 
-    Integer current;
-    Integer last;
-    Integer maxStep;
+    protected static final int MIN_STEP = 1;
+    int first;
+    int last;
+    int maxStep;
+    int step = 0;
+    private int current;
+    private Random random = new Random();
 
     public IntegerIncreasingSequencePeekingIterator(int first, int last, int maxStep) {
-        if (last <= first || maxStep < 1){
+        if (last < first || maxStep < 1){
             throw new IllegalArgumentException();
         }
-        this.current = first;
+        this.current = this.first = first;
         this.last = last;
         this.maxStep = maxStep;
     }
@@ -46,7 +51,10 @@ public class IntegerIncreasingSequencePeekingIterator implements IIncreasingSequ
      */
     @Override
     public boolean hasNext() {
-        return !((current + 1 > last) || (current + maxStep < 0 && last > 0 && current > 0));
+        if (last - (long) current < MIN_STEP)
+            return step == 0;
+        else
+            return true;
     }
 
     /**
@@ -59,16 +67,15 @@ public class IntegerIncreasingSequencePeekingIterator implements IIncreasingSequ
     public Integer next() {
         if (!hasNext())
             throw new NoSuchElementException();
-        int temp = current;
-        current = goToNext();
-        return temp;
-    }
-
-    private int goToNext() {
-        if (current + maxStep > last)
-            return last;
-        else
-            return current + maxStep;
+        if (step == 0)
+            step = random.nextInt(maxStep) + MIN_STEP;
+        else if (last - (long) current < step)
+            current = last;
+        else {
+            current += step;
+            step = random.nextInt(maxStep) + MIN_STEP;
+        }
+        return current;
     }
 
     /**
@@ -79,9 +86,17 @@ public class IntegerIncreasingSequencePeekingIterator implements IIncreasingSequ
      */
     @Override
     public Integer peek() {
-        if (!hasNext())
+
+        if (step == 0)
+            return current;
+        else if (hasNext()) {
+            if (last - (long) current < step)
+                return last;
+            else
+                return current + step;
+        } else
             throw new NoSuchElementException();
-        return current;
+
     }
 
     /**
@@ -97,8 +112,12 @@ public class IntegerIncreasingSequencePeekingIterator implements IIncreasingSequ
      */
     @Override
     public int compareTo(IPeekingIterator<Integer> other) {
-        if (other == null)
-            throw new NullPointerException();
+        if (other.hasNext() && hasNext())
+            return Integer.compare(peek(), other.peek());
+        if (other.hasNext())
+            return -1;
+        if (hasNext())
+            return 1;
         return Integer.compare(peek(), other.peek());
     }
 }

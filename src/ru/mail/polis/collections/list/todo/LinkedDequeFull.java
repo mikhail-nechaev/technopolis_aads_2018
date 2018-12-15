@@ -76,6 +76,21 @@ public class LinkedDequeFull<E> extends LinkedDequeSimple<E> implements Deque<E>
     }
 
     @Override
+    public boolean addAll(Collection<? extends E> c) {
+        return false;
+    }
+
+    @Override
+    public boolean removeAll(Collection<?> c) {
+        return false;
+    }
+
+    @Override
+    public boolean retainAll(Collection<?> c) {
+        return false;
+    }
+
+    @Override
     public void push(E e) {
 
     }
@@ -92,21 +107,6 @@ public class LinkedDequeFull<E> extends LinkedDequeSimple<E> implements Deque<E>
 
     @Override
     public boolean containsAll(Collection<?> c) {
-        return false;
-    }
-
-    @Override
-    public boolean addAll(Collection<? extends E> c) {
-        return false;
-    }
-
-    @Override
-    public boolean removeAll(Collection<?> c) {
-        return false;
-    }
-
-    @Override
-    public boolean retainAll(Collection<?> c) {
         return false;
     }
 
@@ -129,5 +129,5 @@ public class LinkedDequeFull<E> extends LinkedDequeSimple<E> implements Deque<E>
     public Iterator<E> descendingIterator() {
         return null;
     }
-    //todo: remove <abstract> modifier and implement
+
 }
