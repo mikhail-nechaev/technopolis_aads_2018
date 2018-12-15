@@ -1,19 +1,12 @@
 package ru.mail.polis.collections.list.todo;
 
-import java.lang.ref.PhantomReference;
-import java.lang.ref.WeakReference;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.ConcurrentModificationException;
 import java.util.Deque;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.ListIterator;
 import java.util.NoSuchElementException;
-import java.util.Spliterator;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
-import java.util.stream.Stream;
+
 @SuppressWarnings("unchecked")
 public class ArrayDequeFull<E> extends ArrayDequeSimple<E> implements Deque<E> {
 
@@ -155,28 +148,42 @@ public class ArrayDequeFull<E> extends ArrayDequeSimple<E> implements Deque<E> {
 
     @Override
     public boolean removeFirstOccurrence(Object o) throws NullPointerException {
-        if(o == null){
+        if (o == null) {
             throw new NullPointerException();
         }
-        Iterator iterator = iterator();
-        while (iterator.hasNext()){
-            if(iterator.next() == o){
+        int wall = arrayDeque.length - 1;
+        int i = head;
+        Object x;
+        while (true) {
+            if ((x = arrayDeque[i]) == null) {
+                break;
+            }
+            if (o.equals(x)) {
+                delete(i);
                 return true;
             }
+            i = (i + 1) & wall;
         }
         return false;
     }
 
     @Override
     public boolean removeLastOccurrence(Object o) throws NullPointerException {
-        if(o == null){
+        if (o == null) {
             throw new NullPointerException();
         }
-        Iterator iterator = descendingIterator();
-        while (iterator.hasNext()){
-            if(iterator.next() == o){
+        int wall = arrayDeque.length - 1;
+        int i = (tail - 1) & wall;
+        Object x;
+        while (true) {
+            if ((x = arrayDeque[i]) == null) {
+                break;
+            }
+            if (o.equals(x)) {
+                delete(i);
                 return true;
             }
+            i = (i - 1) & wall;
         }
         return false;
     }
@@ -236,35 +243,40 @@ public class ArrayDequeFull<E> extends ArrayDequeSimple<E> implements Deque<E> {
 
     @Override
     public Iterator<E> descendingIterator() {
-        return new Iterator<E>() {
+        return new Iterator<E> () {
 
+            private int index = tail;
+            private int wall = head;
+            private int cursor = -1;
 
-
-            @Override
-            public void remove() {
-
-            }
-
-            @Override
             public boolean hasNext() {
-                return false;
+                return index != wall;
             }
 
-            @Override
             public E next() {
-                return null;
+                if (index == wall)
+                    throw new NoSuchElementException();
+                index = (index - 1) & (arrayDeque.length - 1);
+                E result = arrayDeque[index];
+                if (head != wall || result == null)
+                    throw new ConcurrentModificationException();
+                cursor = index;
+                return result;
             }
+
+            public void remove() {
+                if (cursor < 0)
+                    throw new IllegalStateException();
+                if (!delete(cursor)) {
+                    index = (index + 1) & (arrayDeque.length - 1);
+                    wall = head;
+                }
+                cursor = -1;
+            }
+
         };
     }
 
-    /**
-     * Returns an iterator over the elements in this deque in reverse
-     * sequential order.  The elements will be returned in order from
-     * last (tail) to first (head).
-     *
-     * @return an iterator over the elements in this deque in reverse
-     * sequence
-     */
 
 
     @Override

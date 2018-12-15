@@ -7,13 +7,7 @@ import java.util.Iterator;
 import java.util.ListIterator;
 import java.util.NoSuchElementException;
 
-/**
- * Resizable cyclic array implementation of the {@link IDeque} interface.
- * - no capacity restrictions
- * - grow as necessary to support
- *
- * @param <E> the type of elements held in this deque
- */
+
 @SuppressWarnings("unchecked")
 public class ArrayDequeSimple<E> implements IDeque<E> {
 
@@ -127,12 +121,6 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
         }
     }
 
-    /**
-     * Retrieves and removes the first element of this queue.
-     *
-     * @return the head of this queue
-     * @throws java.util.NoSuchElementException if this deque is empty
-     */
     @Override
     public E removeFirst() throws NoSuchElementException{
         int h = head;
@@ -145,12 +133,7 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
         return res;
     }
 
-    /**
-     * Retrieves, but does not remove, the first element of this queue.
-     *
-     * @return the head of this queue
-     * @throws java.util.NoSuchElementException if this queue is empty
-     */
+
     @Override
     public E getFirst() throws NoSuchElementException{
         if (arrayDeque[head] == null) {
@@ -159,12 +142,7 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
         return arrayDeque[head];
     }
 
-    /**
-     * Inserts the specified element at the tail of this queue
-     *
-     * @param value the element to add
-     * @throws NullPointerException if the specified element is null
-     */
+
     @Override
     public void addLast(E value) throws NullPointerException{
         if (value == null) {
@@ -175,12 +153,7 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
             doubleCapacity();
     }
 
-    /**
-     * Retrieves and removes the last element of this deque.
-     *
-     * @return the tail of this deque
-     * @throws java.util.NoSuchElementException if this deque is empty
-     */
+
     @Override
     public E removeLast() throws NoSuchElementException{
         if(isEmpty()){
@@ -195,12 +168,7 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
         return result;
     }
 
-    /**
-     * Retrieves, but does not remove, the last element of this deque.
-     *
-     * @return the tail of this deque
-     * @throws java.util.NoSuchElementException if this deque is empty
-     */
+
     @Override
     public E getLast() throws NoSuchElementException {
         E result = arrayDeque[(tail - 1) & (arrayDeque.length - 1)];
@@ -209,14 +177,7 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
         return result;
     }
 
-    /**
-     * Returns {@code true} if this collection contains the specified element.
-     * aka collection contains element el such that {@code Objects.equals(el, value) == true}
-     *
-     * @param value element whose presence in this collection is to be tested
-     * @return {@code true} if this collection contains the specified element
-     * @throws NullPointerException if the specified element is null
-     */
+
     @Override
     public boolean contains(Object value) throws NullPointerException {
         if(value == null){
@@ -233,30 +194,18 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
         return false;
     }
 
-    /**
-     * Returns the number of elements in this collection.
-     *
-     * @return the number of elements in this collection
-     */
+
     @Override
     public int size() {
         return (tail - head) & (arrayDeque.length - 1);
     }
 
-    /**
-     * Returns {@code true} if this collection contains no elements.
-     *
-     * @return {@code true} if this collection contains no elements
-     */
     @Override
     public boolean isEmpty() {
         return ((tail - head) & (arrayDeque.length - 1)) == 0;
     }
 
-    /**
-     * Removes all of the elements from this collection.
-     * The collection will be empty after this method returns.
-     */
+
     @Override
     public void clear() {
         int h = head;
@@ -272,12 +221,7 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
         }
     }
 
-    /**
-     * Returns an iterator over the elements in this collection in proper sequence.
-     * The elements will be returned in order from first (head) to last (tail).
-     *
-     * @return an iterator over the elements in this collection in proper sequence
-     */
+
     @Override
     public Iterator<E> iterator() {
         return new Iterator<E>() {

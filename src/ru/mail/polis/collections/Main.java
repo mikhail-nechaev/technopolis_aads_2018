@@ -18,7 +18,8 @@ public class Main {
 
 
 
-        RedBlackTree redBlackTree = new RedBlackTree();
+
+       /* RedBlackTree redBlackTree = new RedBlackTree();
         try {
             redBlackTree.add(1);
             redBlackTree.add(2);
