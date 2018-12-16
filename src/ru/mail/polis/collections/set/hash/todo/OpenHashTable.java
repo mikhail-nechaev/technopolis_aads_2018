@@ -6,19 +6,29 @@ import ru.mail.polis.collections.set.hash.IOpenHashTableEntity;
 import java.util.Iterator;
 
 /**
- *
  * Implementation open addressed hash table with double hashing
  *
  * <a href="https://en.wikipedia.org/wiki/Double_hashing">Double_hashing</a>
- *
- * Use {@link IOpenHashTableEntity#hashCode(int,int)} for hash code calculating
- *
+ * <p>
+ * Use {@link IOpenHashTableEntity#hashCode(int, int)} for hash code calculating
+ * <p>
  * Use loadFactor = from 0.5f to 0.75f included
  *
  * @param <E> the type of elements maintained by this hash table
  */
 public class OpenHashTable<E extends IOpenHashTableEntity> implements IOpenHashTable<E> {
+    private Student[] hashArray;
+    private static final int DEFAULT_SIZE = 1000000;
+    private int size, modCount;
 
+    public OpenHashTable() {
+        this(DEFAULT_SIZE);
+    }
+
+    public OpenHashTable(int size) {
+        hashArray = new Student[size];
+        this.size = modCount = 0;
+    }
 
     /**
      * Adds the specified element to this set if it is not already present.
@@ -32,7 +42,27 @@ public class OpenHashTable<E extends IOpenHashTableEntity> implements IOpenHashT
      */
     @Override
     public boolean add(E value) {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (value == null) {
+            throw new NullPointerException();
+        }
+        if (!(value instanceof Student)) {
+            throw new IllegalArgumentException();
+        }
+
+        Student student = (Student) value;
+        int count = 0;
+        int hashVal = student.hashCode(tableSize(), count);
+        while (hashArray[hashVal] != null && !hashArray[hashVal].isDeleted()) {
+            count++;
+            hashVal = student.hashCode(tableSize(), count);
+            if (count >= size) {
+                return false;
+            }
+        }
+        hashArray[hashVal] = student;
+        size++;
+        modCount++;
+        return true;
     }
 
     /**
@@ -46,7 +76,32 @@ public class OpenHashTable<E extends IOpenHashTableEntity> implements IOpenHashT
      */
     @Override
     public boolean remove(E value) {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (value == null) {
+            throw new NullPointerException();
+        }
+        if (!(value instanceof Student)) {
+            throw new IllegalArgumentException();
+        }
+
+        Student student = (Student) value;
+        int count = 0;
+        int hashVal = student.hashCode(tableSize(), count);
+        while (hashArray[hashVal] != null && !hashArray[hashVal].isDeleted()) {
+            if (hashArray[hashVal].equals(student)) {
+                hashArray[hashVal].setDeleted(true);
+                break;
+            }
+            hashVal = student.hashCode(tableSize(), count);
+            count++;
+            if (count >= size) {
+                return false;
+            }
+        }
+        hashArray[hashVal] = student;
+        size--;
+        modCount++;
+        return true;
+
     }
 
     /**
@@ -61,7 +116,26 @@ public class OpenHashTable<E extends IOpenHashTableEntity> implements IOpenHashT
      */
     @Override
     public boolean contains(E value) {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (value == null) {
+            throw new NullPointerException();
+        }
+        if (!(value instanceof Student)) {
+            throw new IllegalArgumentException();
+        }
+
+        Student student = (Student) value;
+
+        int count = 0;
+        int hashVal = student.hashCode(tableSize(), count);
+        while (hashArray[hashVal] != null && !hashArray[hashVal].isDeleted() && !hashArray[hashVal].equals(student)) {
+            count++;
+            hashVal = student.hashCode(tableSize(), count);
+            if (count >= size) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -71,7 +145,7 @@ public class OpenHashTable<E extends IOpenHashTableEntity> implements IOpenHashT
      */
     @Override
     public int size() {
-        throw new UnsupportedOperationException("todo: implement this");
+        return size;
     }
 
     /**
@@ -81,7 +155,7 @@ public class OpenHashTable<E extends IOpenHashTableEntity> implements IOpenHashT
      */
     @Override
     public boolean isEmpty() {
-        throw new UnsupportedOperationException("todo: implement this");
+        return size == 0;
     }
 
     /**
@@ -90,7 +164,8 @@ public class OpenHashTable<E extends IOpenHashTableEntity> implements IOpenHashT
      */
     @Override
     public void clear() {
-        throw new UnsupportedOperationException("todo: implement this");
+        hashArray = new Student[DEFAULT_SIZE];
+        size = 0;
     }
 
     /**
@@ -98,13 +173,37 @@ public class OpenHashTable<E extends IOpenHashTableEntity> implements IOpenHashT
      *
      * @return an {@code Iterator} over the elements in this collection
      */
+    @SuppressWarnings("unchecked")
     @Override
     public Iterator<E> iterator() {
-        throw new UnsupportedOperationException("todo: implement this");
+        return new Iterator<E>() {
+            int count = size;
+            int index = 0, realIndex = -1;
+
+            @Override
+            public boolean hasNext() {
+                return index < count;
+            }
+
+            @Override
+            public E next() {
+
+                for (int i = realIndex + 1; i < tableSize(); i++) {
+                    if (hashArray[i] != null && !hashArray[i].isDeleted()) {
+                        realIndex = i;
+                        index++;
+                        return (E) hashArray[realIndex];
+                    }
+                }
+
+                return null;
+            }
+        };
+
     }
 
     @Override
     public int tableSize() {
-        throw new UnsupportedOperationException("todo: return dataArray.length");
+        return hashArray.length;
     }
 }

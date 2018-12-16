@@ -32,9 +32,10 @@ public class TestBalancedSortedSet extends AbstractSetTest {
     private static final Random RANDOM = new Random();
 
     private static final Object[][] classes = new Object[][]{
-            {AVLTree.class, Boolean.TRUE},
-            {RedBlackTree.class, Boolean.FALSE},
-            {RedBlackTree.class, Boolean.TRUE},
+           {AVLTree.class, Boolean.TRUE},
+           {AVLTree.class, Boolean.FALSE},
+         //  {RedBlackTree.class, Boolean.FALSE},
+       //     {RedBlackTree.class, Boolean.TRUE},
     };
 
     @Parameterized.Parameter()

@@ -3,11 +3,8 @@ package ru.mail.polis.collections.set.sorted.todo;
 import ru.mail.polis.collections.set.sorted.ISelfBalancingSortedTreeSet;
 import ru.mail.polis.collections.set.sorted.UnbalancedTreeException;
 
-import java.util.ArrayDeque;
 import java.util.Comparator;
-import java.util.LinkedList;
 import java.util.NoSuchElementException;
-import java.util.Queue;
 
 /**
  * A AVL tree based {@link ISelfBalancingSortedTreeSet} implementation.
@@ -16,25 +13,29 @@ import java.util.Queue;
  *
  * @param <E> the type of elements maintained by this set
  */
+@SuppressWarnings({"ALL", "unchecked"})
 public class AVLTree<E extends Comparable<E>> implements ISelfBalancingSortedTreeSet<E> {
     //не сделано
     //todo: update it if required
     protected static class AVLNode<E> {
         E value;
         AVLNode<E> left;
-        AVLNode<E> right;
+        AVLNode right;
+        AVLNode<E> parent;
         int leftHeight, rightHeight;
-        boolean isChanged;
 
-        protected AVLNode(E value) {
+        protected AVLNode(AVLNode<E> parent, E value) {
+            this(value);
+            this.parent = parent;
+        }
+
+        public AVLNode(E value) {
             this();
             this.value = value;
         }
 
-
         protected AVLNode() {
             leftHeight = rightHeight = 0;
-            isChanged = false;
         }
     }
 
@@ -66,35 +67,6 @@ public class AVLTree<E extends Comparable<E>> implements ISelfBalancingSortedTre
         modCount = 0;
     }
 
-    public void printTree() {
-        if (isEmpty()) {
-            System.out.println("Tree is empty");
-            return;
-        }
-        ArrayDeque<AVLNode<E>> queue = new ArrayDeque<>();
-        queue.push(root.right);
-
-        while (!queue.isEmpty()) {
-            AVLNode<E> node = queue.pop();
-            System.out.print(node.value + " left - ");
-            if (node.left != null) {
-                queue.push(node.left);
-                System.out.print(node.left.value + "(" + node.leftHeight + ")");
-            } else {
-                System.out.print("null(0)");
-            }
-            System.out.print(" right - ");
-            if (node.right != null) {
-                queue.push(node.right);
-                System.out.print(node.right.value + "(" + node.rightHeight + ")");
-            } else {
-                System.out.print("null(0)");
-            }
-            System.out.println();
-        }
-        System.out.println("-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_");
-    }
-
 
     /**
      * Adds the specified element to this set if it is not already present.
@@ -111,48 +83,102 @@ public class AVLTree<E extends Comparable<E>> implements ISelfBalancingSortedTre
         if (value == null) {
             throw new NullPointerException();
         }
-        size++;
-        modCount++;
-        return addElemToTree(root, value);
+        if (isEmpty()) {
+            root.right = new AVLNode<>(root, value);
+            size++;
+            modCount++;
+            return true;
+        }
+        return addElemToTree(root.right, value);
     }
 
 
     protected boolean addElemToTree(AVLNode<E> node, E elem) {
-        if (node == root || comparator.compare(elem, node.value) >= 0) {
-            node.rightHeight++;
+
+//        while (true) {
+//            int resCompare = comparator.compare(elem, node.value);
+//            if (resCompare > 0) {
+//                if (node.right == null) {
+//                    size++;
+//                    modCount++;
+//                    node.right = new AVLNode<>(node, elem);
+//                    balannceToRoot(node.right);
+//                    return true;
+//                }
+//                node = node.right;
+//            } else if (resCompare < 0) {
+//                if (node.left == null) {
+//                    size++;
+//                    modCount++;
+//                    node.left = new AVLNode<>(node, elem);
+//                    balannceToRoot(node.left);
+//                    return true;
+//                }
+//                node = node.left;
+//            } else {
+//                return false;
+//            }
+//        }
+
+
+        int resCompare = comparator.compare(elem, node.value);
+
+        if (resCompare > 0) {
             if (node.right == null) {
-                node.right = new AVLNode<>(elem);
+                size++;
+                modCount++;
+                node.right = new AVLNode<>(node, elem);
+                balannceToRoot(node);
                 return true;
             }
-            addElemToTree(node.right, elem);
-            balanceNode(node.right, node, false);
-        } else {
-            node.leftHeight--;
-            if (node.left == null) {
-                node.left = new AVLNode<>(elem);
-                return true;
-            }
-            addElemToTree(node.left, elem);
-            balanceNode(node.left, node, true);
+            return addElemToTree(node.right, elem);
         }
 
-        return true;
+        if (resCompare < 0) {
+            if (node.left == null) {
+                size++;
+                modCount++;
+                node.left = new AVLNode<>(node, elem);
+                balannceToRoot(node);
+                return true;
+            }
+            return addElemToTree(node.left, elem);
+        }
+
+        return false;
     }
 
-    private boolean balanceNode(AVLNode<E> node, AVLNode<E> parent, boolean isLeftSon) {
+
+    private void balance2(AVLNode<E> node, boolean isLeftSon) {
+        remakeHeight(node);
+        if (getDiff(node) == 2) {
+            if (getDiff(node.right) < 0) {
+                smallRightRotate(node.right, isLeftSon);
+            }
+            smallLeftRotate(node, isLeftSon);
+        }
+        if (getDiff(node) == -2) {
+            if (getDiff(node.left) > 0) {
+                smallLeftRotate(node.left, isLeftSon);
+            }
+            smallRightRotate(node, isLeftSon);
+        }
+    }
+
+    private boolean balanceNode(AVLNode<E> node, boolean isLeftSon) {
         switch (getDiff(node)) {
         case -2:
             if (getDiff(node.right) <= 0) {
-                smallLeftRotate(node, parent, isLeftSon);
+                smallLeftRotate(node, isLeftSon);
             } else {
-                bigLeftRotate(node, parent, isLeftSon);
+                bigLeftRotate(node, isLeftSon);
             }
             break;
         case 2:
             if (getDiff(node) >= 0) {
-                smallRightRotate(node, parent, isLeftSon);
+                smallRightRotate(node, isLeftSon);
             } else {
-                bigRightRotate(node, parent, isLeftSon);
+                bigRightRotate(node, isLeftSon);
             }
             break;
         }
@@ -160,41 +186,58 @@ public class AVLTree<E extends Comparable<E>> implements ISelfBalancingSortedTre
         return getDiff(node) == 0 && node.leftHeight != 0;
     }
 
-    private void smallRightRotate(AVLNode<E> node, AVLNode<E> parent, boolean isLeftSon) {
-        System.out.println("right Rotate " + node.value);
+    private void smallRightRotate(AVLNode<E> node, boolean isLeftSon) {
+      //  System.out.println("right Rotate " + node.value);
+        AVLNode<E> parent = node.parent;
         AVLNode<E> b = node.left;
-        setLeft(node, b.right);
-        setRight(b, node);
+
+        if (b != null) {
+            setLeft(node, b.right);
+            setRight(b, node);
+        } else {
+            setLeft(node, null);
+        }
+
 
         if (isLeftSon) {
             setLeft(parent, b);
         } else {
             setRight(parent, b);
         }
+        remakeHeight(node);
+        remakeHeight(b);
+        remakeHeight(parent);
     }
 
-    private void smallLeftRotate(AVLNode<E> node, AVLNode<E> parent, boolean isLeftSon) {
+    private void smallLeftRotate(AVLNode<E> node, boolean isLeftSon) {
+        AVLNode<E> parent = node.parent;
         AVLNode<E> b = node.right;
-        System.out.println("left Rotate " + node.value);
-
-        setRight(node, b.left);
-        setLeft(b, node);
+       // System.out.println("left Rotate " + node.value);
+        if (b != null) {
+            setRight(node, b.left);
+            setLeft(b, node);
+        } else {
+            setRight(node, null);
+        }
 
         if (isLeftSon) {
             setLeft(parent, b);
         } else {
             setRight(parent, b);
         }
+        remakeHeight(node);
+        remakeHeight(b);
+        remakeHeight(parent);
     }
 
-    private void bigRightRotate(AVLNode<E> node, AVLNode<E> parent, boolean isLeftSon) {
-        smallLeftRotate(node.left, node, true);
-        smallRightRotate(node, parent, isLeftSon);
+    private void bigRightRotate(AVLNode<E> node, boolean isLeftSon) {
+        smallLeftRotate(node.left, true);
+        smallRightRotate(node, isLeftSon);
     }
 
-    private void bigLeftRotate(AVLNode<E> node, AVLNode<E> parent, boolean isLeftSon) {
-        smallRightRotate(node.right, node, false);
-        smallLeftRotate(node, parent, isLeftSon);
+    private void bigLeftRotate(AVLNode<E> node, boolean isLeftSon) {
+        smallRightRotate(node.right, false);
+        smallLeftRotate(node, isLeftSon);
     }
 
 
@@ -213,26 +256,118 @@ public class AVLTree<E extends Comparable<E>> implements ISelfBalancingSortedTre
         if (value == null) {
             throw new NullPointerException();
         }
+        return !isEmpty() && remove2(root.right, value);
+    }
 
+    private boolean remove2(AVLNode<E> node, E value) {
+        if (node == null) {
+            return false;
+        }
+        final int resCompare = comparator.compare(value, node.value);
+        if (resCompare > 0) {
+            return remove2(node.right, value);
+        } else if (resCompare < 0) {
+            return remove2(node.right, value);
+        } else if (resCompare == 0) {
+            AVLNode<E> q = node.left;
+            AVLNode<E> r = node.right;
+            if( r == null ) return true;
+            AVLNode<E> min = getMin(r);
+            min.right = deleteMin(r);
+            min.left = q;
+            balance2(min, isLeftSon(min));
+            return true;
+        }
+        balannceToRoot(node);
+        return true;
+    }
 
-        return !isEmpty() && searchForRemove(root, value);
+    private AVLNode deleteMin(AVLNode node) {
+        if (node.left == null) {
+            return node.right;
+        }
+
+        node.left = deleteMin(node.left);
+        balance2(node, isLeftSon(node));
+        return node;
+    }
+
+    private AVLNode<E> getMin(AVLNode x) {
+        return x.left == null ? x : getMin(x.left);
     }
 
     private boolean searchForRemove(AVLNode<E> node, E value) {
+        if (node == null) {
+            return false;
+        }
+
         final int resCompare = comparator.compare(value, node.value);
         if (resCompare > 0) {
-            if(node.rightHeight > 0){
-
-            }
+            return searchForRemove(node.right, value);
         }
         if (resCompare < 0) {
-
+            return searchForRemove(node.left, value);
         }
 
         if (resCompare == 0) {
+            size--;
+            modCount++;
+            AVLNode<E> nodeToBalance;
+            if (isSheet(node)) {
+                nodeToBalance = node.parent;
+                deleteNode(node);
+            } else {
 
+                if (node.right != null) {
+
+                    AVLNode<E> min = getMin(node.right);
+                    node.value = min.value;
+                    nodeToBalance = min.parent;
+                    deleteNode(min);
+                } else {
+                    nodeToBalance = node.left;
+                    if (isLeftSon(node)) {
+                        setLeft(node.parent, node.left);
+//                        node.parent.left = node.left;
+                    } else {
+                        setRight(node.parent, node.left);
+//                        node.parent.right = node.left;
+                    }
+                }
+            }
+
+
+            return balannceToRoot(nodeToBalance);
         }
-        return false;
+
+
+        return true;
+    }
+
+    private void deleteNode(AVLNode<E> node) {
+        if (isLeftSon(node)) {
+            node.parent.left = null;
+        } else {
+            node.parent.right = null;
+        }
+    }
+
+    private boolean balannceToRoot(AVLNode<E> node) {
+        while (node.parent != null) {
+            // System.out.println("Balance node - " + node.value);
+            remakeHeight(node.left);
+            remakeHeight(node.right);
+            remakeHeight(node);
+
+            AVLNode<E> next = node.parent;
+            balance2(node, isLeftSon(node));
+            node = next;
+        }
+        return true;
+    }
+
+    private boolean isLeftSon(AVLNode<E> node) {
+        return node.parent.left == node;
     }
 
     /**
@@ -250,18 +385,21 @@ public class AVLTree<E extends Comparable<E>> implements ISelfBalancingSortedTre
         if (value == null) {
             throw new NullPointerException();
         }
-        return !isEmpty() && containsElemInTree(root.right, value);
+        return containsElemInTree(root.right, value);
     }
 
     private boolean containsElemInTree(AVLNode<E> node, E value) {
-        int resCompare = comparator.compare(node.value, value);
+        if (node == null) {
+            return false;
+        }
+        int resCompare = comparator.compare(value, node.value);
         if (resCompare == 0) {
             return true;
         }
         if (resCompare > 0) {
-            return node.right != null && containsElemInTree(node.right, value);
+            return containsElemInTree(node.right, value);
         }
-        return node.left != null && containsElemInTree(node.left, value);
+        return containsElemInTree(node.left, value);
     }
 
     /**
@@ -277,12 +415,8 @@ public class AVLTree<E extends Comparable<E>> implements ISelfBalancingSortedTre
         if (isEmpty()) {
             throw new NoSuchElementException();
         }
-        AVLNode<E> node = root.right;
-        while (node.left != null) {
-            node = node.left;
-        }
+        return getMin(root.right).value;
 
-        return node.value;
     }
 
     /**
@@ -344,6 +478,8 @@ public class AVLTree<E extends Comparable<E>> implements ISelfBalancingSortedTre
      */
     @Override
     public void checkBalance() throws UnbalancedTreeException {
+        //  System.out.println("CHEEEEEEEECK");
+        // printTree();
         traverseTreeAndCheckBalanced(root.right);
     }
 
@@ -369,17 +505,31 @@ public class AVLTree<E extends Comparable<E>> implements ISelfBalancingSortedTre
     }
 
     public int getDiff(AVLNode<E> node) {
-        return node.leftHeight - node.rightHeight;
+        return node.rightHeight - node.leftHeight;
     }
 
     private void setLeft(AVLNode<E> mainNode, AVLNode<E> leftNode) {
         mainNode.left = leftNode;
         mainNode.leftHeight = getHeight(mainNode.left);
+        if (leftNode != null) {
+            leftNode.parent = mainNode;
+        }
     }
 
+    @SuppressWarnings("unchecked")
     private void setRight(AVLNode<E> mainNode, AVLNode<E> rightNode) {
         mainNode.right = rightNode;
         mainNode.rightHeight = getHeight(mainNode.right);
+        if (rightNode != null) {
+            rightNode.parent = mainNode;
+        }
+    }
+
+    private void remakeHeight(AVLNode<E> node) {
+        if (node != null) {
+            node.rightHeight = getHeight(node.right);
+            node.leftHeight = getHeight(node.left);
+        }
     }
 
     private boolean isSheet(AVLNode<E> node) {

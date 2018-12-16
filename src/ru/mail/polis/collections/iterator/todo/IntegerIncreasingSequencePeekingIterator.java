@@ -37,8 +37,6 @@ public class IntegerIncreasingSequencePeekingIterator implements IIncreasingSequ
         this.maxStep = maxStep;
         isFirst = true;
         index = first;
-
-
     }
 
     public int getLast() {
@@ -73,6 +71,7 @@ public class IntegerIncreasingSequencePeekingIterator implements IIncreasingSequ
         while (step < 0) {
             step = 1 + new Random().nextInt(maxStep);
         }
+
         long next = (long) index + step;
 
         index = next > Integer.MAX_VALUE || next > last ? last : index + step;
