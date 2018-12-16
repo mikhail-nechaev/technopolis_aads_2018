@@ -10,8 +10,8 @@ import java.util.NoSuchElementException;
 import java.util.Objects;
 
 /**
- * Resizable array implementation of the {@link IPriorityQueue} interface based on a priority heap.
- * - no capacity restrictions
+ * Resizable values implementation of the {@link IPriorityQueue} interface based on a priority heap.
+ * - no length restrictions
  * - grow as necessary to support
  *
  * @param <E> the type of elements maintained by this priority queue
@@ -132,11 +132,11 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
     }
 
     /**
-     * Retrieves and removes the head of this queue.
+     * Retrieves and removes the firstElem of this queue.
      * <p>
      * Complexity = O(log(n))
      *
-     * @return the head of this queue
+     * @return the firstElem of this queue
      * @throws java.util.NoSuchElementException if this queue is empty
      */
     @Override
@@ -162,11 +162,11 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
     }
 
     /**
-     * Retrieves, but does not remove, the head of this queue.
+     * Retrieves, but does not remove, the firstElem of this queue.
      * <p>
      * Complexity = O(1)
      *
-     * @return the head of this queue
+     * @return the firstElem of this queue
      * @throws java.util.NoSuchElementException if this queue is empty
      */
     @Override
