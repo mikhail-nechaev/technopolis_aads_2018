@@ -4,8 +4,6 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-import ru.mail.polis.collections.list.todo.ArrayPriorityQueueSimple;
-
 /**
  * Итератор возвращающий последовательность последовательностей элементов возрастающих итераторов в порядке возрастания
  * <p>
@@ -19,7 +17,8 @@ import ru.mail.polis.collections.list.todo.ArrayPriorityQueueSimple;
  */
 public class MergingPeekingIncreasingIterator implements Iterator<Integer> {
     private IntegerIncreasingSequencePeekingIterator [] iterators;
-      /**
+
+    /**
      * Creates a {@code MergingPeekingIncreasingIterator} containing the inside all elements of this specified iterators.
      *
      * Complexity = O(n)
