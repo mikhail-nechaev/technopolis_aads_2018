@@ -2,10 +2,7 @@ package ru.mail.polis.collections.list.todo;
 
 import ru.mail.polis.collections.list.IPriorityQueue;
 
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * Resizable array implementation of the {@link IPriorityQueue} interface based on a priority heap.
@@ -16,6 +13,9 @@ import java.util.Objects;
  */
 public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPriorityQueue<E> {
 
+    Object[] queue;
+    int size = 0;
+
     private final Comparator<E> comparator;
 
     public ArrayPriorityQueueSimple() {
@@ -24,7 +24,7 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
 
     /**
      * Creates a {@code IPriorityQueue} containing the elements in the specified collection.
-     *
+     * <p>
      * Complexity = O(n)
      *
      * @param collection the collection whose elements are to be placed into this priority queue
@@ -46,8 +46,8 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
 
     /**
      * Creates a {@code IPriorityQueue} containing the elements in the specified collection
-     *  that orders its elements according to the specified comparator.
-     *
+     * that orders its elements according to the specified comparator.
+     * <p>
      * Complexity = O(n)
      *
      * @param collection the collection whose elements are to be placed into this priority queue
@@ -61,7 +61,7 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
 
     /**
      * Inserts the specified element into this priority queue.
-     *
+     * <p>
      * Complexity = O(log(n))
      *
      * @param value the element to add
@@ -69,39 +69,56 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
      */
     @Override
     public void add(E value) {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (value == null) throw new NullPointerException();
+
+        if (size >= queue.length) {
+            doubleSize();
+        }
+        if (size == 0) {
+            queue[0] = value;
+            size++;
+        } else {
+            size++;
+            siftUp(size - 1, value);
+        }
     }
 
     /**
      * Retrieves and removes the head of this queue.
-     *
+     * <p>
      * Complexity = O(log(n))
      *
      * @return the head of this queue
      * @throws java.util.NoSuchElementException if this queue is empty
      */
+    @SuppressWarnings("unchecked")
     @Override
     public E remove() {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (size == 0) throw new NoSuchElementException();
+        E elem = (E) queue[0];
+        removeAt(0);
+        return elem;
     }
 
     /**
      * Retrieves, but does not remove, the head of this queue.
-     *
+     * <p>
      * Complexity = O(1)
      *
      * @return the head of this queue
      * @throws java.util.NoSuchElementException if this queue is empty
      */
+    @SuppressWarnings("unchecked")
     @Override
     public E element() {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (size == 0) throw new NoSuchElementException();
+        return (E) queue[0];
     }
 
     /**
      * Returns {@code true} if this collection contains the specified element.
      * aka collection contains element el such that {@code Objects.equals(el, value) == true}
-     *
+     * <p>
      * Complexity = O(n)
      *
      * @param value element whose presence in this collection is to be tested
@@ -110,7 +127,14 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
      */
     @Override
     public boolean contains(E value) {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (value == null) throw new NullPointerException();
+
+        for (int i = 0; i < size; i++) {
+            if (value.equals(queue[i])) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -120,7 +144,7 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
      */
     @Override
     public int size() {
-        throw new UnsupportedOperationException("todo: implement this");
+        return size;
     }
 
     /**
@@ -130,7 +154,7 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
      */
     @Override
     public boolean isEmpty() {
-        throw new UnsupportedOperationException("todo: implement this");
+        return size == 0;
     }
 
     /**
@@ -139,7 +163,10 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
      */
     @Override
     public void clear() {
-        throw new UnsupportedOperationException("todo: implement this");
+        for (int i = 0; i < size; i++) {
+            queue[i] = null;
+        }
+        size = 0;
     }
 
     /**
@@ -150,6 +177,113 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
      */
     @Override
     public Iterator<E> iterator() {
-        throw new UnsupportedOperationException("todo: implement this");
+        return new ArrayPriorityQueueIterator();
+    }
+
+    private class ArrayPriorityQueueIterator implements Iterator<E> {
+
+        /**
+         * Returns {@code true} if the iteration has more elements.
+         * (In other words, returns {@code true} if {@link #next} would
+         * return an element rather than throwing an exception.)
+         *
+         * @return {@code true} if the iteration has more elements
+         */
+        @Override
+        public boolean hasNext() {
+            // TODO
+            return false;
+        }
+
+        /**
+         * Returns the next element in the iteration.
+         *
+         * @return the next element in the iteration
+         * @throws NoSuchElementException if the iteration has no more elements
+         */
+        @Override
+        public E next() {
+            // TODO
+            return null;
+        }
+
+        /**
+         * Removes from the underlying collection the last element returned
+         * by this iterator (optional operation).  This method can be called
+         * only once per call to {@link #next}.  The behavior of an iterator
+         * is unspecified if the underlying collection is modified while the
+         * iteration is in progress in any way other than by calling this
+         * method.
+         *
+         * @throws UnsupportedOperationException if the {@code remove}
+         *                                       operation is not supported by this iterator
+         * @throws IllegalStateException         if the {@code next} method has not
+         *                                       yet been called, or the {@code remove} method has already
+         *                                       been called after the last call to the {@code next}
+         *                                       method
+         * @implSpec The default implementation throws an instance of
+         * {@link UnsupportedOperationException} and performs no other action.
+         */
+        @Override
+        public void remove() {
+            // TODO
+        }
+    }
+
+    private void doubleSize() {
+        int currentSize = queue.length;
+        int newSize = currentSize << 1;
+        if (newSize < 0) throw new IllegalStateException("Max queue size is reached.");
+        queue = Arrays.copyOf(queue, newSize);
+    }
+
+    @SuppressWarnings("unchecked")
+    private void siftUp(int elemIndex, E elem) {
+        while (elemIndex > 0) {
+            int parentIndex = (elemIndex - 1) >>> 1;
+            Object parent = queue[parentIndex];
+            if (comparator.compare(elem, (E) parent) >= 0) break;
+
+            queue[elemIndex] = parent;
+            elemIndex = parentIndex;
+        }
+        queue[elemIndex] = elem;
+    }
+
+    @SuppressWarnings("unchecked")
+    private void siftDown(int elemIndex, E elem) {
+        int halfIndex = size >>> 1; // element at that index is the first who has no children
+        while (elemIndex < halfIndex) {
+            int childIndex = (elemIndex << 1) + 1;
+            int rightChildIndex = childIndex + 1;
+
+            Object child = queue[childIndex];
+            if (rightChildIndex < size
+                    && comparator.compare((E) child, (E) queue[rightChildIndex]) > 0) {
+                child = queue[rightChildIndex];
+                childIndex = rightChildIndex;
+            }
+            if (comparator.compare(elem, (E) child) <= 0) break;
+            queue[elemIndex] = child;
+            elemIndex = childIndex;
+        }
+        queue[elemIndex] = elem;
+    }
+
+    @SuppressWarnings("unchecked")
+    private void removeAt(int toRemove) {
+        size--;
+        if (size == toRemove) {
+            queue[toRemove] = null;
+
+        } else {
+            E moved = (E) queue[size];
+            queue[size] = null;
+
+            siftDown(toRemove, moved);
+            if (queue[toRemove] == moved) {
+                siftUp(toRemove, moved);
+            }
+        }
     }
 }
