@@ -54,8 +54,12 @@ public class TestIPriorityQueueRemove {
         Assert.assertTrue(pq.size() == 5);
         Iterator<Integer> iterator = pq.iterator();
         while (iterator.hasNext()) {
-            iterator.next();
-            iterator.remove();
+            int next = iterator.next();
+            try {
+                iterator.remove();
+            } catch (Exception e) {
+                Assert.fail("next = " + next + ", cl = " + e.getClass());
+            }
         }
         Assert.assertTrue(pq.isEmpty());
     }
@@ -68,9 +72,15 @@ public class TestIPriorityQueueRemove {
         Iterator<Integer> iterator = pq.iterator();
         SortedSet<Integer> set = new TreeSet<>();
         for (int i = 0; i < 100; i++) {
-            set.add(iterator.next());
-            iterator.remove();
+            int next = iterator.next();
+            set.add(next);
+            try {
+                iterator.remove();
+            } catch (Exception e) {
+                Assert.fail("i = " + i + ", next = " + next + ", cl = " + e.getClass());
+            }
         }
+
         Assert.assertTrue(pq.isEmpty());
         Assert.assertTrue("first = " + set.first(), set.first() == 0);
         Assert.assertTrue("last = " + set.last(), set.last() == 99);
