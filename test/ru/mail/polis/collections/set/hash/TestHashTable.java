@@ -165,7 +165,7 @@ public class TestHashTable extends AbstractSetTest {
         Assert.assertFalse(testSet.iterator().hasNext());
     }
 
-    @Test
+    @Test(timeout = 1000L)
     public void testIterator3() {
         for (int i = 0; i < 4; i++) {
             testSet.add(entities.get(i));

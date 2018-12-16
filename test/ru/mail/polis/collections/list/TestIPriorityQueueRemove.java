@@ -72,9 +72,9 @@ public class TestIPriorityQueueRemove {
             iterator.remove();
         }
         Assert.assertTrue(pq.isEmpty());
-        Assert.assertTrue(set.first() == 0);
-        Assert.assertTrue(set.last() == 99);
-        Assert.assertTrue(set.size() == 100);
+        Assert.assertTrue("first = " + set.first(), set.first() == 0);
+        Assert.assertTrue("last = " + set.last(), set.last() == 99);
+        Assert.assertTrue("size = " + set.size(), set.size() == 100);
     }
 
     @Test
@@ -91,9 +91,9 @@ public class TestIPriorityQueueRemove {
             iterator.remove();
         }
         Assert.assertTrue(pq.isEmpty());
-        Assert.assertTrue(set.first() == 0);
-        Assert.assertTrue(set.last() == 19);
-        Assert.assertTrue(set.size() == 20);
+        Assert.assertTrue("first = " + set.first(), set.first() == 0);
+        Assert.assertTrue("last = " + set.last(), set.last() == 19);
+        Assert.assertTrue("size = " + set.size(), set.size() == 20);
     }
 
     @Test(expected = IllegalStateException.class)
