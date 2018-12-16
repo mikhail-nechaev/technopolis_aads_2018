@@ -46,7 +46,6 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
      * @throws NullPointerException if the specified comparator is null
      */
     public ArrayPriorityQueueSimple(Comparator<E> comparator) {
-
         this.comparator = Objects.requireNonNull(comparator, "comparator");
     }
 
@@ -64,10 +63,14 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
         if (collection==null||comparator==null) throw new NullPointerException();
         this.comparator = Objects.requireNonNull(comparator, "comparator");
         Iterator<E> iterator=collection.iterator();
-        while(iterator.hasNext()){
-            add(iterator.next());
+        data=new Object[collection.size()];
+        for (int i=0;i<collection.size();i++){
+            data[i]=iterator.next();
+            count++;
         }
-        //todo: do some stuff with collection
+        for(int i=count/2;i>=0;i--){
+            shiftDown(i);
+        }
     }
 
     /**

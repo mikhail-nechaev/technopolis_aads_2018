@@ -106,7 +106,7 @@ public class IntegerIncreasingSequencePeekingIterator implements IIncreasingSequ
     @Override
     public int compareTo(IPeekingIterator<Integer> other) {
         if(hasNext()&&other.hasNext()){
-            return peek()-other.peek();
+            return peek().compareTo(other.peek());
         }
         if (hasNext()){
             return 1;
