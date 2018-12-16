@@ -240,36 +240,40 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
     }
 
     private class ArrayPriorityQueueIterator implements Iterator<E> {
-        private int currentPosition = 1;
+        private int nextIndex = 0;
+        private int removedIndex = 0;
         private int expectedModCount = modCount;
 
         @Override
         public boolean hasNext() {
-            return currentPosition <= size();
+            return nextIndex < size();
         }
 
         @Override
         public E next() {
-            if (currentPosition > size()) {
+            if(!hasNext()) {
                 throw new NoSuchElementException();
             }
-            E tmp = data[currentPosition - 1];
-            currentPosition++;
+            E tmp = data[nextIndex];
+            removedIndex = nextIndex;
+            nextIndex++;
             return tmp;
         }
 
         @Override
         public void remove() {
             checkForComodification();
-            if(currentPosition == 2) {
+            if(nextIndex == 0) {
                 throw new IllegalStateException();
             }
-            swap(data, currentPosition - 2, size() - 1);
+            swap(data, removedIndex, size() - 1);
+            size--;
             for (int i = size / 2; i >= 0; i--) {
                 siftDown(i);
             }
             modCount++;
             expectedModCount++;
+            nextIndex = removedIndex;
         }
 
         final void checkForComodification() {

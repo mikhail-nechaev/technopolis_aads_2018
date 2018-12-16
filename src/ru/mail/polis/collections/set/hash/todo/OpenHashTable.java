@@ -217,8 +217,10 @@ public class OpenHashTable<E extends IOpenHashTableEntity> implements IOpenHashT
             prevIndex = nextIndex;
             do {
                 nextIndex++;
-            } while(nextIndex < (tableSize() - 1) && (table[nextIndex] == null || deleted[nextIndex]));
-            next = table[nextIndex];
+            } while(nextIndex < tableSize() && (table[nextIndex] == null || deleted[nextIndex]));
+            if (nextIndex < tableSize()) {
+                next = table[nextIndex];
+            }
             restSize--;
             return lastReturned;
         }
