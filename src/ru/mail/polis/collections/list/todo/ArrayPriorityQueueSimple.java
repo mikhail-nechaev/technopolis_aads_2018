@@ -25,7 +25,7 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
 
     private int arrayLength;
 
-    private static final int MIN_INITIAL_CAPACITY = 8;
+    private static final int MIN_INITIAL_CAPACITY = 16;
 
     private static final float LOAD_FACTOR = (float) 0.8;
 
@@ -174,15 +174,13 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
     }
 
 
-    private void delete(int index){
-        arrayPriorityQueue[0] = arrayPriorityQueue[index];
-        arrayPriorityQueue[index] = null;
-        if(arrayLength != 0)
-        {
-            heapfy(0);
-        }
-        arrayLength--;
+    private void swap(E[] arrayP, int a, int b){
+        E tmp = arrayP[a];
+        arrayP[a] = arrayP[b];
+        arrayP[b] = tmp;
     }
+
+
 
     /**
      * Returns an iterator over the elements in this queue. The iterator
@@ -195,13 +193,12 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
 
         return new Iterator<E>() {
 
-            private int index;
-            private int cursor = -1;
+            private int index = 0;
             private int size = arrayLength;
 
             @Override
             public boolean hasNext() {
-                return index < size;
+                return index <= size;
             }
 
             @Override
@@ -209,18 +206,20 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
                 if(!hasNext()){
                     throw new NoSuchElementException();
                 }
+                E tmp = arrayPriorityQueue[index];
                 index = index + 1;
-                cursor = index;
-                return arrayPriorityQueue[cursor];
+                return tmp;
             }
 
             @Override
-            public void remove() throws IllegalStateException{
-                if(cursor == -1 ){
-                    throw new IllegalStateException();
+            public void remove() {
+                swap(arrayPriorityQueue, index-2, arrayLength-1);
+                arrayPriorityQueue[arrayLength - 1] = null;
+                for (int i = arrayLength / 2; i >= 0; i--) {
+                    heapfy(i);
                 }
-                delete(cursor);
-                cursor = -1;
+                arrayLength--;
+                size -- ;
             }
         };
     }

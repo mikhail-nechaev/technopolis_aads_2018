@@ -47,9 +47,9 @@ public class AVLTree<E extends Comparable<E>> implements ISelfBalancingSortedTre
 
     protected final Comparator<E> comparator;
     protected AVLNode<E> root;
-    private int length = 0;
+    private int length;
 
-    private int getHeight(AVLNode current){
+    protected int getHeight(AVLNode current){
         if(current == null){
             return 0;
         }
@@ -57,7 +57,7 @@ public class AVLTree<E extends Comparable<E>> implements ISelfBalancingSortedTre
     }
 
 
-    private  AVLNode rightRotate(AVLNode current){
+    protected   AVLNode rightRotate(AVLNode current){
         AVLNode b = current.left;
         current.left = b.right;
 
@@ -72,7 +72,7 @@ public class AVLTree<E extends Comparable<E>> implements ISelfBalancingSortedTre
 
     }
 
-    private AVLNode leftRotate(AVLNode current){
+    protected AVLNode leftRotate(AVLNode current){
         AVLNode b = current.right;
         current.right = b.left;
 
@@ -88,12 +88,12 @@ public class AVLTree<E extends Comparable<E>> implements ISelfBalancingSortedTre
     }
 
 
-    private void insert(E value){
+    protected void insert(E value){
         this.root = insert(this.root, value);
     }
 
 
-    private AVLNode insert(AVLNode current, E value){
+    protected AVLNode insert(AVLNode current, E value){
         if(current == null){
            return new AVLNode(value);
         }
@@ -136,14 +136,14 @@ public class AVLTree<E extends Comparable<E>> implements ISelfBalancingSortedTre
     }
 
     /*This is a different between left height and right height of AVL Node */
-    private int getBalance(AVLNode current){ // aka balanceFactor
+    protected int getBalance(AVLNode current){ // aka balanceFactor
         if(current == null){
             return  0;
         }
         return getHeight(current.left) - getHeight(current.right);
     }
 
-    private AVLNode find(AVLNode current, E value){
+    protected AVLNode find(AVLNode current, E value){
         if(current == null || current.value == null || comparator.compare((E) current.value,value) == 0) {
             return current;
         }
@@ -156,13 +156,13 @@ public class AVLTree<E extends Comparable<E>> implements ISelfBalancingSortedTre
     }
 
 
-    private AVLNode treeMin(AVLNode current){
+    protected AVLNode treeMin(AVLNode current){
         while(current.left != null){
             current = current.left;
         }
         return current;
     }
-    private AVLNode treeMax(AVLNode current){
+    protected AVLNode treeMax(AVLNode current){
         while(current.right != null){
             current = current.right;
         }
@@ -171,12 +171,12 @@ public class AVLTree<E extends Comparable<E>> implements ISelfBalancingSortedTre
 
 
 
-    private void delete(E value){
+    protected void delete(E value){
         this.root = delete(root, value);
     }
 
 
-    private AVLNode delete(AVLNode current, E value) throws NoSuchElementException{
+    protected AVLNode delete(AVLNode current, E value) throws NoSuchElementException{
         if(current == null){
             throw new NoSuchElementException();
         }
@@ -200,7 +200,7 @@ public class AVLTree<E extends Comparable<E>> implements ISelfBalancingSortedTre
         return fixRemoveBalance(current);
     }
 
-    private AVLNode<E> removeMin(AVLNode<E>  current) {
+    protected AVLNode<E> removeMin(AVLNode<E>  current) {
         if(current.left == null){
             return current.right;
         }
@@ -209,7 +209,7 @@ public class AVLTree<E extends Comparable<E>> implements ISelfBalancingSortedTre
     }
 
     
-    private AVLNode<E> fixRemoveBalance(AVLNode<E> current){
+    protected AVLNode<E> fixRemoveBalance(AVLNode<E> current){
 
         current.height = Math.max(getHeight(current.left), getHeight(current.right)) + 1;
 

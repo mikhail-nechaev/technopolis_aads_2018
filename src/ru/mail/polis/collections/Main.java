@@ -25,7 +25,8 @@ public class Main {
             redBlackTree.add(2);
             redBlackTree.add(3);
             redBlackTree.add(4);
-            redBlackTree.add(5);
+            redBlackT
+            ree.add(5);
             redBlackTree.add(6);
             redBlackTree.add(7);
             redBlackTree.add(8);
@@ -76,6 +77,21 @@ public class Main {
 
 
 
-
+        Object a = 35;
+        ArrayPriorityQueueSimple arrayPriorityQueueSimple = new ArrayPriorityQueueSimple();
+        arrayPriorityQueueSimple.add(5);
+        arrayPriorityQueueSimple.add(7);
+        arrayPriorityQueueSimple.add(15);
+        arrayPriorityQueueSimple.add(23);
+        arrayPriorityQueueSimple.add(27);
+        arrayPriorityQueueSimple.add(33);
+        arrayPriorityQueueSimple.add(35);
+        Iterator iterator = arrayPriorityQueueSimple.iterator();
+        while (iterator.hasNext()){
+            iterator.next();
+            if(iterator.next() == a){
+                iterator.remove();
+            }
+        }
     }
 }

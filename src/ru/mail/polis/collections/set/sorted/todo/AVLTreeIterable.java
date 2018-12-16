@@ -4,6 +4,7 @@ import ru.mail.polis.collections.set.sorted.ISortedSetIterable;
 
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 /**
  * A AVL tree with iterator based {@link ru.mail.polis.collections.set.sorted.ISelfBalancingSortedTreeSet} implementation.
@@ -11,6 +12,10 @@ import java.util.Iterator;
  * @param <E> the type of elements maintained by this set
  */
 public class AVLTreeIterable<E extends Comparable<E>> extends AVLTree<E> implements ISortedSetIterable<E> {
+
+
+
+
 
     public AVLTreeIterable() {
         super();
@@ -21,6 +26,10 @@ public class AVLTreeIterable<E extends Comparable<E>> extends AVLTree<E> impleme
         super(comparator);
     }
 
+
+
+
+
     /**
      * Returns an iterator over the elements in this set in ascending order.
      *
@@ -28,17 +37,25 @@ public class AVLTreeIterable<E extends Comparable<E>> extends AVLTree<E> impleme
      */
     @Override
     public Iterator<E> iterator() {
+
         return new Iterator<E>() {
+            private AVLNode current = treeMin(root);
+
             @Override
             public boolean hasNext() {
-                return false;
+               return current != null;
             }
 
             @Override
             public E next() {
+                if(!hasNext()){
+                    throw new NoSuchElementException();
+                }
                 return null;
             }
+
         };
+
     }
 
     /**
