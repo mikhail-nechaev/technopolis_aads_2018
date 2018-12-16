@@ -14,12 +14,16 @@ import java.util.NoSuchElementException;
  * @param <E> the type of elements maintained by this set
  */
 public class AVLTree<E extends Comparable<E>> implements ISelfBalancingSortedTreeSet<E> {
-
-    //todo: update it if required
     protected static class AVLNode<E> {
         E value;
         AVLNode<E> left;
         AVLNode<E> right;
+        int height;
+
+        protected AVLNode(E value){
+            this.value = value;
+            this.height = 1;
+        }
     }
 
     /**
@@ -27,6 +31,8 @@ public class AVLTree<E extends Comparable<E>> implements ISelfBalancingSortedTre
      */
     protected final Comparator<E> comparator;
     protected AVLNode<E> root;
+    protected int size = 0;
+
 
     public AVLTree() {
         this(Comparator.naturalOrder());
@@ -42,6 +48,65 @@ public class AVLTree<E extends Comparable<E>> implements ISelfBalancingSortedTre
         this.comparator = comparator;
     }
 
+    private int height(AVLNode<E> cur){
+        return cur == null ? 0 : cur.height;
+    }
+
+    private void recountHeight(AVLNode<E> cur){
+        int rightHeight = height(cur.right);
+        int leftHeight = height(cur.left);
+        cur.height = (rightHeight > leftHeight ? rightHeight : leftHeight) + 1;
+    }
+
+    private AVLNode<E> smallLeftRotation(AVLNode<E> cur){
+        AVLNode<E> rightChild = cur.right;
+        cur.right = rightChild.left;
+        rightChild.left = cur;
+        recountHeight(cur);
+        recountHeight(rightChild);
+        return rightChild;
+    }
+
+    private AVLNode<E> smallRightRotation(AVLNode<E> cur){
+        AVLNode<E> leftChild = cur.left;
+        cur.left = leftChild.right;
+        leftChild.right = cur;
+        recountHeight(cur);
+        recountHeight(leftChild);
+        return leftChild;
+    }
+
+    private AVLNode<E> balance(AVLNode<E> cur){
+        recountHeight(cur);
+        if(height(cur.right) - height(cur.left) == 2){
+            if(height(cur.right.left) > height(cur.right.right)){
+                cur.right = smallRightRotation(cur.right);
+            }
+            return smallLeftRotation(cur);
+        }
+        if(height(cur.left) - height(cur.right) == 2){
+            if(height(cur.left.right) > height(cur.left.left)){
+                cur.left = smallLeftRotation(cur.left);
+            }
+            return smallRightRotation(cur);
+        }
+        return cur;
+    }
+
+    private AVLNode<E> add(E value, AVLNode<E> cur){
+        if(cur == null){
+            size++;
+            return new AVLNode<>(value);
+        }
+        int cmp = comparator.compare(value, cur.value);
+        if (cmp < 0) {
+            cur.left = add(value, cur.left);
+        } else if (cmp > 0){
+            cur.right = add(value, cur.right);
+        }
+        return balance(cur);
+    }
+
     /**
      * Adds the specified element to this set if it is not already present.
      * <p>
@@ -54,9 +119,64 @@ public class AVLTree<E extends Comparable<E>> implements ISelfBalancingSortedTre
      */
     @Override
     public boolean add(E value) {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (value == null) {
+            throw new NullPointerException();
+        }
+        int oldSize = size;
+        root = add(value, root);
+        return size - oldSize != 0;
     }
 
+    private AVLNode<E> findMin(AVLNode<E> cur){
+        AVLNode<E> min = cur;
+        while(min.left != null){
+            min = min.left;
+        }
+        return min;
+    }
+
+    private AVLNode<E> removeMin(AVLNode<E> cur){
+        if(cur.left == null){
+            return cur.right;
+        }
+        cur.left = removeMin(cur.left);
+        return balance(cur);
+    }
+
+    private AVLNode<E> findMax(AVLNode<E> cur){
+        AVLNode<E> max = cur;
+        while(max.right != null){
+            max = max.right;
+        }
+        return max;
+    }
+    private AVLNode<E> remove(E value, AVLNode<E> cur){
+        if(cur == null){
+            return null;
+        }
+        int cmp = comparator.compare(value, cur.value);
+        if (cmp < 0) {
+            cur.left = remove(value, cur.left);
+        } else if (cmp > 0){
+            cur.right = remove(value, cur.right);
+        } else{
+            size--;
+            AVLNode<E> leftChild = cur.left;
+            AVLNode<E> rightChild = cur.right;
+            if(rightChild == null){
+                return leftChild;
+            }
+            if(leftChild == null){
+                return rightChild;
+            }
+            AVLNode<E> min = findMin(rightChild);
+            min.right = removeMin(rightChild);
+            min.left = leftChild;
+
+            return balance(min);
+        }
+        return balance(cur);
+    }
     /**
      * Removes the specified element from this set if it is present.
      * <p>
@@ -68,7 +188,12 @@ public class AVLTree<E extends Comparable<E>> implements ISelfBalancingSortedTre
      */
     @Override
     public boolean remove(E value) {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (value == null) {
+            throw new NullPointerException();
+        }
+        int oldSize = size;
+        root = remove(value, root);
+        return size - oldSize != 0;
     }
 
     /**
@@ -83,7 +208,23 @@ public class AVLTree<E extends Comparable<E>> implements ISelfBalancingSortedTre
      */
     @Override
     public boolean contains(E value) {
-        throw new UnsupportedOperationException("todo: implement this");
+        if(value == null){
+            throw new NullPointerException();
+        }
+        AVLNode<E> cur = root;
+        int cmp;
+        do {
+            if(cur == null){
+                return false;
+            }
+            cmp = comparator.compare(value, cur.value);
+            if (cmp < 0) {
+                cur = cur.left;
+            } else if (cmp > 0) {
+                cur = cur.right;
+            }
+        } while(cmp != 0);
+        return true;
     }
 
     /**
@@ -96,7 +237,10 @@ public class AVLTree<E extends Comparable<E>> implements ISelfBalancingSortedTre
      */
     @Override
     public E first() {
-        throw new UnsupportedOperationException("todo: implement this");
+        if(isEmpty()){
+            throw new NoSuchElementException();
+        }
+        return findMin(root).value;
     }
 
     /**
@@ -109,7 +253,10 @@ public class AVLTree<E extends Comparable<E>> implements ISelfBalancingSortedTre
      */
     @Override
     public E last() {
-        throw new UnsupportedOperationException("todo: implement this");
+        if(isEmpty()){
+            throw new NoSuchElementException();
+        }
+        return findMax(root).value;
     }
 
     /**
@@ -119,7 +266,7 @@ public class AVLTree<E extends Comparable<E>> implements ISelfBalancingSortedTre
      */
     @Override
     public int size() {
-        throw new UnsupportedOperationException("todo: implement this");
+        return size;
     }
 
     /**
@@ -129,7 +276,7 @@ public class AVLTree<E extends Comparable<E>> implements ISelfBalancingSortedTre
      */
     @Override
     public boolean isEmpty() {
-        throw new UnsupportedOperationException("todo: implement this");
+        return size == 0;
     }
 
     /**
@@ -138,7 +285,8 @@ public class AVLTree<E extends Comparable<E>> implements ISelfBalancingSortedTre
      */
     @Override
     public void clear() {
-        throw new UnsupportedOperationException("todo: implement this");
+        root = null;
+        size = 0;
     }
 
     /**
