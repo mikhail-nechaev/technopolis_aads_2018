@@ -10,22 +10,31 @@ In all classes need implement all required methods.
 Before pull request make sure than relevant tests is passed.
 
 ---
-| Points | Iterator remove | Class | Test |
-| ------ |-----------------| ----- | ---- |
-| 2.5    | +1 point TestIDequeRemove | ArrayDequeSimple | TestIDeque
-| 2.5    | +1 point TestIDequeRemove | LinkedDequeSimple | TestIDeque
-| 2.5    | +1 point        | ArrayPriorityQueueSimple | TestIPriorityQueue
-| 2.5    | -               | MergingPeekingIncreasingIterator + IntegerIncreasingSequencePeekingIterator | TestIntegerIncreasingSequencePeekingIterator + TestMergingPeekingIncreasingIterator 
-| 7.5    | -               | ArrayDequeFull | TestIDeque + TestFullDeque
-| 7.5    | -               | LinkedDequeFull | TestIDeque + TestFullDeque
-| 5.0    | -               | AVLTree | TestBalancedSortedSet (AVL: remove = true)
-| 5.0    | +1 point        | AVLTreeIterable | --
-| 5.0    | -               | RedBlackTree (add) | TestBalancedSortedSet (RB: remove = false)
-| 5.0    | -               | RedBlackTree (add + remove) | TestBalancedSortedSet (RB: remove = true)
-| 5.0    | +1 point        | OpenHashTable + Student | TestHashTable
-| =50    | =5 | |
+| Points | Test      | Task |
+| ------ | --------- | ----- |
+| 2.5    | T1_ADS    | ArrayDequeSimple | 
+| 1.0    | T2_ASDIR  | ArrayDequeSimple + Iterator Remove | 
+| 7.5    | T3_ADF    | ArrayDequeFull | 
+| 2.5    | T4_LDS    | LinkedDequeSimple | 
+| 1.0    | T5_LDSIR  | LinkedDequeSimple + Iterator Remove | 
+| 7.5    | T6_LDF    | LinkedDequeFull | 
+| 2.5    | T7_APQS   | ArrayPriorityQueueSimple | 
+| 1.0    | T8_APQSIR | ArrayPriorityQueueSimple + Iterator Remove | 
+| 2.5    | T9_MPII   | MergingPeekingIncreasingIterator + IntegerIncreasingSequencePeekingIterator |  
+| 5.0    | T10_AVL   | AVLTree | 
+| 5.0    | T11_AVLI  | AVLTreeIterable | 
+| 1.0    | T12_AVLIR | AVLTreeIterable + Iterator Remove | 
+| 5.0    | T13_RBA   | RedBlackTree (add) | 
+| 5.0    | T14_TBAR  | RedBlackTree (add + remove) | 
+| 5.0    | T15_OHT   | OpenHashTable + Student | 
+| 1.0    | T16_OHTIR | OpenHashTable + Student + Iterator Remove |
 
+**Max points == 55*
+
+Run `TestAllTask` for check all task.
+ 
 ---
+
 **How to pull changes from master inside your fork**
 
 Make once:

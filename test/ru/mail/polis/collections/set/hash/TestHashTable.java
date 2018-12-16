@@ -2,9 +2,7 @@ package ru.mail.polis.collections.set.hash;
 
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.FixMethodOrder;
 import org.junit.Test;
-import org.junit.runners.MethodSorters;
 import ru.mail.polis.collections.set.AbstractSetTest;
 import ru.mail.polis.collections.set.ISet;
 import ru.mail.polis.collections.set.hash.todo.OpenHashTable;
@@ -13,7 +11,9 @@ import ru.mail.polis.collections.set.hash.todo.Student;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -23,7 +23,6 @@ import java.util.stream.IntStream;
  * Created by Nechaev Mikhail
  * Since 07/12/2018.
  */
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestHashTable extends AbstractSetTest {
 
     private final List<IOpenHashTableEntity> entities = List.of(
@@ -154,6 +153,35 @@ public class TestHashTable extends AbstractSetTest {
                 checkHash(entity, lastTableSize);
             }
         }
+    }
+
+    @Test(expected = NoSuchElementException.class)
+    public void testIterator1() {
+        testSet.iterator().next();
+    }
+
+    @Test
+    public void testIterator2() {
+        Assert.assertFalse(testSet.iterator().hasNext());
+    }
+
+    @Test
+    public void testIterator3() {
+        for (int i = 0; i < 4; i++) {
+            testSet.add(entities.get(i));
+            validSet.add(entities.get(i));
+        }
+        Iterator<IOpenHashTableEntity> iterator = testSet.iterator();
+        while (iterator.hasNext()) {
+            validSet.remove(iterator.next());
+        }
+        Assert.assertTrue(validSet.isEmpty());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testBroken() {
+        testSet.add(new BrokenStudent(0));
+        testSet.add(new BrokenStudent(0));
     }
 
     private void check(Set<IOpenHashTableEntity> validSet, ISet<IOpenHashTableEntity> testSet, IOpenHashTableEntity value, TransformOperation transformOperation) {
