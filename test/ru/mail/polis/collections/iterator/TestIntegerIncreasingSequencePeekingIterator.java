@@ -56,6 +56,7 @@ public class TestIntegerIncreasingSequencePeekingIterator {
 
     @Test
     public void testIncreasing() {
+        Assert.fail("У меня слишком долго работает, поэтому я добавил в начале теста Assert.fail");
         int first = Integer.MIN_VALUE;
         int last = 1;
         int step = 10;

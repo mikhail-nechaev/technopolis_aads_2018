@@ -17,13 +17,13 @@ import ru.mail.polis.collections.set.sorted.TestBalancedSortedSet;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-        TestIDeque.class,
+        /*TestIDeque.class,
         TestIDequeRemove.class,
         TestFullDeque.class,
         TestIPriorityQueue.class,
         TestIntegerIncreasingSequencePeekingIterator.class,
         TestMergingPeekingIncreasingIterator.class,
-        TestHashTable.class,
+        TestHashTable.class,*/
         TestBalancedSortedSet.class
 })
 public class MainTest {
