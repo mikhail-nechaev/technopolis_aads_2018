@@ -49,32 +49,65 @@ public class Student extends AbstractOpenHashTableEntity {
 
     @Override
     public int hashCode(int tableSize, int probId) throws IllegalArgumentException {
-        //todo: see IOpenHashTableEntity contract
-        //todo: use this in OpenHashTable
-        throw new UnsupportedOperationException("todo: implement this");
+        if (probId < 0 || probId >= tableSize) {
+            throw new IllegalArgumentException();
+        }
+
+        int hash = (hashCode() + probId * hashCode2()) % tableSize;
+        return hash < 0 ? hash + tableSize : hash;
     }
 
     @Override
     public int hashCode() {
-        //todo: don't forget [hashCode - equals] contract
-        throw new UnsupportedOperationException("todo: implement this");
+        int hash = 5;
+        hash = 67 * hash + (int) (this.id ^ (this.id >>> 32));
+        hash = 67 * hash + Objects.hashCode(this.firstName);
+        hash = 67 * hash + Objects.hashCode(this.lastName);
+        hash = 67 * hash + Objects.hashCode(this.gender);
+        hash = 67 * hash + Objects.hashCode(this.birthday);
+        hash = 67 * hash + Objects.hashCode(this.groupId);
+        return hash;
     }
 
     @Override
     protected int hashCode2() {
-        throw new UnsupportedOperationException("todo: implement this");
+        int hash = 17;
+        hash = 31 * hash + (int) (this.id ^ (this.id >>> 32));
+        hash = 31 * hash + Objects.hashCode(this.firstName);
+        hash = 31 * hash + Objects.hashCode(this.lastName);
+        hash = 31 * hash + Objects.hashCode(this.gender);
+        hash = 31 * hash + Objects.hashCode(this.birthday);
+        hash = 31 * hash + Objects.hashCode(this.groupId);
+        if ((hash & 1) == 0) {
+            hash++;
+        }
+        return hash;
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         Student student = (Student) o;
-        if (id != student.id) return false;
-        if (groupId != student.groupId) return false;
-        if (!firstName.equals(student.firstName)) return false;
-        if (!lastName.equals(student.lastName)) return false;
-        if (gender != student.gender) return false;
+        if (id != student.id) {
+            return false;
+        }
+        if (groupId != student.groupId) {
+            return false;
+        }
+        if (!firstName.equals(student.firstName)) {
+            return false;
+        }
+        if (!lastName.equals(student.lastName)) {
+            return false;
+        }
+        if (gender != student.gender) {
+            return false;
+        }
         return birthday.equals(student.birthday);
     }
 

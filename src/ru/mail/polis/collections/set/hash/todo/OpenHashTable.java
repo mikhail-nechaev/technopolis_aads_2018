@@ -3,22 +3,44 @@ package ru.mail.polis.collections.set.hash.todo;
 import ru.mail.polis.collections.set.hash.IOpenHashTable;
 import ru.mail.polis.collections.set.hash.IOpenHashTableEntity;
 
+import java.util.Arrays;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 /**
- *
  * Implementation open addressed hash table with double hashing
  *
  * <a href="https://en.wikipedia.org/wiki/Double_hashing">Double_hashing</a>
- *
- * Use {@link IOpenHashTableEntity#hashCode(int,int)} for hash code calculating
- *
+ * <p>
+ * Use {@link IOpenHashTableEntity#hashCode(int, int)} for hash code calculating
+ * <p>
  * Use loadFactor = from 0.5f to 0.75f included
  *
  * @param <E> the type of elements maintained by this hash table
  */
 public class OpenHashTable<E extends IOpenHashTableEntity> implements IOpenHashTable<E> {
+    private Object[] table;
+    private boolean[] deleted;
+    private final float loadFactor = 0.5f;
+    private int size = 0;
 
+    public OpenHashTable() {
+        table = new Object[8];
+        deleted = new boolean[8];
+    }
+
+    private void rehash() {
+        Object[] oldTable = Arrays.copyOf(table, tableSize());
+        table = new Object[tableSize() << 1];
+        deleted = new boolean[tableSize() << 1];
+        int oldSize = size;
+        for (int i = 0; i < oldTable.length; i++) {
+            if (oldTable[i] != null && !deleted[i]) {
+                add((E) oldTable[i]);
+            }
+        }
+        size = oldSize;
+    }
 
     /**
      * Adds the specified element to this set if it is not already present.
@@ -30,9 +52,28 @@ public class OpenHashTable<E extends IOpenHashTableEntity> implements IOpenHashT
      * @throws IllegalArgumentException if some property of the element prevents it from being added to this collection
      *                                  In other words if {@link IOpenHashTableEntity#hashCode(int, int)} specified element is incorrect.
      */
+
     @Override
     public boolean add(E value) {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (value == null) {
+            throw new NullPointerException();
+        }
+        if (size >= loadFactor * tableSize()) {
+            rehash();
+        }
+
+        for (int probeId = 0; probeId < tableSize(); probeId++) {
+            int hash = value.hashCode(tableSize(), probeId);
+            if (table[hash] == null || deleted[hash]) {
+                size++;
+                table[hash] = value;
+                return true;
+            }
+            if (value.equals(table[hash])) {
+                break;
+            }
+        }
+        return false;
     }
 
     /**
@@ -46,7 +87,22 @@ public class OpenHashTable<E extends IOpenHashTableEntity> implements IOpenHashT
      */
     @Override
     public boolean remove(E value) {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (value == null) {
+            throw new NullPointerException();
+        }
+
+        for (int probeId = 0; probeId < tableSize(); probeId++) {
+            int hash = value.hashCode(tableSize(), probeId);
+            if (table[hash] == null) {
+                break;
+            }
+            if (value.equals(table[hash]) && !deleted[hash]) {
+                size--;
+                deleted[hash] = true;
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -61,7 +117,19 @@ public class OpenHashTable<E extends IOpenHashTableEntity> implements IOpenHashT
      */
     @Override
     public boolean contains(E value) {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (value == null) {
+            throw new NullPointerException();
+        }
+        for (int probeId = 0; probeId < tableSize(); probeId++) {
+            int hash = value.hashCode(tableSize(), probeId);
+            if (table[hash] == null) {
+                break;
+            }
+            if (value.equals(table[hash]) && !deleted[hash]) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -71,7 +139,7 @@ public class OpenHashTable<E extends IOpenHashTableEntity> implements IOpenHashT
      */
     @Override
     public int size() {
-        throw new UnsupportedOperationException("todo: implement this");
+        return size;
     }
 
     /**
@@ -81,7 +149,7 @@ public class OpenHashTable<E extends IOpenHashTableEntity> implements IOpenHashT
      */
     @Override
     public boolean isEmpty() {
-        throw new UnsupportedOperationException("todo: implement this");
+        return size == 0;
     }
 
     /**
@@ -90,7 +158,9 @@ public class OpenHashTable<E extends IOpenHashTableEntity> implements IOpenHashT
      */
     @Override
     public void clear() {
-        throw new UnsupportedOperationException("todo: implement this");
+        size = 0;
+        table = new Object[8];
+        deleted = new boolean[8];
     }
 
     /**
@@ -100,11 +170,43 @@ public class OpenHashTable<E extends IOpenHashTableEntity> implements IOpenHashT
      */
     @Override
     public Iterator<E> iterator() {
-        throw new UnsupportedOperationException("todo: implement this");
+        return new Iterator<E>() {
+            private int nextIndex=0;
+            private int lastNextIndex = -1;
+            private int size = size();
+
+            @Override
+            public boolean hasNext() {
+                return nextIndex<size;
+            }
+
+            @Override
+            public E next() {
+                if(!hasNext()){
+                    throw new NoSuchElementException();
+                }
+                while(table[nextIndex] == null || deleted[nextIndex]){
+                    nextIndex++;
+                }
+                lastNextIndex = nextIndex;
+                return (E)table[lastNextIndex];
+            }
+
+            @Override
+            public void remove() {
+                if (lastNextIndex < 0) {
+                    throw new IllegalStateException();
+                }
+                size--;
+                deleted[lastNextIndex] = true;
+                lastNextIndex = -1;
+            }
+        };
+
     }
 
     @Override
     public int tableSize() {
-        throw new UnsupportedOperationException("todo: return dataArray.length");
+        return table.length;
     }
 }
