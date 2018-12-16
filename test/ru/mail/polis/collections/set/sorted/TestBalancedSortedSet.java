@@ -4,6 +4,7 @@ import org.junit.FixMethodOrder;
 import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
 import org.junit.runners.Parameterized;
+
 import ru.mail.polis.collections.TestHelper;
 import ru.mail.polis.collections.set.sorted.todo.AVLTree;
 import ru.mail.polis.collections.set.sorted.todo.RedBlackTree;
@@ -21,10 +22,9 @@ import java.util.Comparator;
 public class TestBalancedSortedSet extends AbstractTestBalancedSortedSet {
 
     private static final Object[][] classes = new Object[][]{
-           {AVLTree.class, Boolean.TRUE},
-           {AVLTree.class, Boolean.FALSE},
-         //  {RedBlackTree.class, Boolean.FALSE},
-       //     {RedBlackTree.class, Boolean.TRUE},
+            {AVLTree.class, Boolean.TRUE},
+            {RedBlackTree.class, Boolean.FALSE},
+            {RedBlackTree.class, Boolean.TRUE},
     };
 
     @Parameterized.Parameter()
