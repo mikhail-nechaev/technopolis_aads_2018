@@ -49,20 +49,55 @@ public class Student extends AbstractOpenHashTableEntity {
 
     @Override
     public int hashCode(int tableSize, int probId) throws IllegalArgumentException {
-        //todo: see IOpenHashTableEntity contract
-        //todo: use this in OpenHashTable
-        throw new UnsupportedOperationException("todo: implement this");
+        if(probId < 0 || probId >= tableSize || tableSize < 0)
+            throw new IllegalArgumentException();
+        int hash1 = Math.abs(hashCode()%tableSize);
+        int hash2 = (1 + (Math.abs(hashCode2()) % ( tableSize - 1 )));
+        if (hash2 % 2 == 0) {
+            hash2++;
+        }
+        hash2 %= (tableSize - 1);
+        if(hash2 == 0)
+            hash2++;
+        return (hash1 + probId * hash2) % tableSize;
     }
 
     @Override
     public int hashCode() {
-        //todo: don't forget [hashCode - equals] contract
-        throw new UnsupportedOperationException("todo: implement this");
+        int hash = 17;
+        hash = 37 * hash + (int) (id ^ (id >>> 32));
+        hash = 37 * hash + firstName.hashCode();
+        hash = 37 * hash + lastName.hashCode();
+        hash = 37 * hash + gender.hashCode();
+        hash = 37 * hash + birthday.hashCode();
+        hash = 37 * hash + groupId;
+        return hash;
     }
 
+    private int myHash(int x) {
+        int hash = 0;
+        int currByte;
+        for (int i = 0; i < Integer.BYTES; i++) {
+            currByte = (x >> (i * 8))  & 255;
+            hash += currByte;
+            hash += (hash << 10);
+            hash ^= (hash >> 6);
+        }
+        hash +=  (hash << 3);
+        hash ^= (hash >> 11);
+        hash += (hash << 15);
+        return hash;
+    }
     @Override
     protected int hashCode2() {
-        throw new UnsupportedOperationException("todo: implement this");
+        int hash = 19;
+        hash = 37 * hash + myHash((int) (id ^ (id >>> 32)));
+        hash = 37 * hash + myHash(firstName.hashCode());
+        hash = 37 * hash + myHash(lastName.hashCode());
+        hash = 37 * hash + myHash(gender.hashCode());
+        hash = 37 * hash + myHash(birthday.hashCode());
+        hash = 37 * hash + myHash(groupId);
+        return hash;
     }
 
     @Override
