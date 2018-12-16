@@ -67,8 +67,11 @@ public class OpenHashTable<E extends IOpenHashTableEntity> implements IOpenHashT
         if(table[hash] == null) {
             table[hash] = value;
         } else {
-            while(table[hash] != null && !value.equals(table[hash]) && !deleted[hash]) {
+            while(probId < tableSize() && table[hash] != null && !value.equals(table[hash]) && !deleted[hash]) {
                 hash = value.hashCode(tableSize(), probId++);
+            }
+            if(probId == tableSize()) {
+                throw new IllegalArgumentException();
             }
             if (value.equals(table[hash])) {
                 return false;
@@ -214,7 +217,7 @@ public class OpenHashTable<E extends IOpenHashTableEntity> implements IOpenHashT
             prevIndex = nextIndex;
             do {
                 nextIndex++;
-            } while(nextIndex < tableSize() && (table[nextIndex] == null || deleted[nextIndex]));
+            } while(nextIndex < (tableSize() - 1) && (table[nextIndex] == null || deleted[nextIndex]));
             next = table[nextIndex];
             restSize--;
             return lastReturned;
@@ -229,6 +232,7 @@ public class OpenHashTable<E extends IOpenHashTableEntity> implements IOpenHashT
             deleted[prevIndex] = true;
             modCount++;
             expectedModCount++;
+            size--;
         }
 
         private void checkForComodification() {
