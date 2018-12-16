@@ -60,7 +60,6 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
      */
     public ArrayPriorityQueueSimple(Collection<E> collection, Comparator<E> comparator) {
         this.comparator = Objects.requireNonNull(comparator, "comparator");
-        //todo: do some stuff with collection
     }
 
     /**
