@@ -2,8 +2,10 @@ package ru.mail.polis.collections.list.todo;
 
 import ru.mail.polis.collections.list.IDeque;
 
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.ListIterator;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 
 /**
@@ -13,19 +15,86 @@ import java.util.Objects;
  *
  * @param <E> the type of elements held in this deque
  */
-public class ArrayDequeSimple<E> implements IDeque<E> {
-    private static final int DEFAULT_CAPACITY = 16; /** Isn`t fixed, expandable with resize method, power of two */
-    private E[] dequeue;                            /** Array for the deque */
-    private E head;
-    private E tail;
-    private Comparator<E> comparator;
-    private int size = 0;
 
+@SuppressWarnings("unchecked")
+public class ArrayDequeSimple<E> implements IDeque<E> {
+    protected static final int DEFAULT_CAPACITY = 100;
+    private final int startCapacity;
+    /**
+     * Isn`t fixed, expandable with widen method, reducable with
+     * reduce method
+     */
+    protected E[] dequeue; // Array for the deque
+    /**
+     * next two are indexes as pointers
+     */
+    protected int head = 0;
+    protected int tail = -1;
+    protected int size;
+
+    /**
+     * Constructor of an empty Dequeue
+     */
     public ArrayDequeSimple() {
-        this(Comparator.naturalOrder());
-        E[] dequeue = (E[]) new Object[DEFAULT_CAPACITY];
+        this(DEFAULT_CAPACITY);
     }
 
+    /**
+     * Constructor by amount of elements
+     */
+    public ArrayDequeSimple(int amount) {
+        dequeue = (E[]) new Object[amount];
+        this.startCapacity = amount;
+        size = 0;
+    }
+
+    /**
+     * Constructor by collection
+     */
+    public ArrayDequeSimple(Collection<E> collection) {
+        this(collection.size());
+        for (E item : collection) {
+            addFirst(item);
+        }
+    }
+
+    /**
+     * Resize method is called when head == tail
+     */
+    private void widen() {
+        E[] newDequeue = (E[]) new Object[dequeue.length * 2 + 1];
+        int l,r; //pointers on left and right parts of newDequeue in oldDequeue
+        if (head < tail) {
+            r = dequeue.length - head;
+            l = head;
+        }
+        else {
+            l = dequeue.length - head;
+            r = dequeue.length - tail;
+        }
+        System.arraycopy(dequeue, l, newDequeue, 0, head);
+        System.arraycopy(dequeue, r, newDequeue, head + 1, r - 1);
+        head = 0;
+        tail = size - 1;
+    }
+
+    private void reduce() {
+        if (dequeue.length > startCapacity) {
+            E[] newDequeue = (E[]) new Object[dequeue.length / 2];
+            int r, l;
+            if (head < tail) {
+                r = dequeue.length - head;
+                l = head;
+            }
+            else {
+                l = dequeue.length - head;
+                r = dequeue.length - tail;
+            }
+
+            head = 0;
+            tail = size - 1;
+        }
+    }
 
     /**
      * Inserts the specified element at the front of this deque.
@@ -35,7 +104,27 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public void addFirst(E value) {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (value == null) {
+            throw new NullPointerException("Value can not be null");
+        }
+        if (isEmpty()) {
+            head = tail = 0;
+            dequeue[head] = value;
+            size++;
+            return;
+        }
+
+        head--;
+        if (head == -1) {
+            head = dequeue.length - 1;
+        }
+        dequeue[head] = value;
+        size++;
+
+        if (size == dequeue.length) {
+//            widen();
+        }
+
     }
 
     /**
@@ -46,8 +135,19 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public E removeFirst() {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (isEmpty()) {
+            throw new NoSuchElementException("No elements in dequeue");
+        }
+        E value = dequeue[head];
+        dequeue[head] = null;
+        head = ++head % dequeue.length;
+        size--;
+        if (size < dequeue.length / 2) {
+//            reduce();
+        }
+        return value;
     }
+
 
     /**
      * Retrieves, but does not remove, the first element of this queue.
@@ -57,7 +157,10 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public E getFirst() {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (isEmpty()) {
+            throw new NoSuchElementException("No elements in dequeue");
+        }
+        return dequeue[head];
     }
 
     /**
@@ -68,7 +171,21 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public void addLast(E value) {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (value == null) {
+            throw new NullPointerException("Value can not be null");
+        }
+        if (isEmpty()) {
+            head = tail = 0;
+            dequeue[tail] = value;
+            size++;
+            return;
+        }
+        tail = ++tail % dequeue.length;
+        dequeue[tail] = value;
+        size++;
+        if (size == dequeue.length) {
+//            widen();
+        }
     }
 
     /**
@@ -79,7 +196,20 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public E removeLast() {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (isEmpty()) {
+            throw new NoSuchElementException("No elements in dequeue");
+        }
+        E value = dequeue[tail];
+        dequeue[tail] = null;
+        tail--;
+        if (tail == -1) {
+            tail = dequeue.length - 1;
+        }
+        size--;
+//        if (size < dequeue.length / 2) {
+//            reduce();
+//        }
+        return value;
     }
 
     /**
@@ -90,7 +220,10 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public E getLast() {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (isEmpty()) {
+            throw new NoSuchElementException("No elements in dequeue");
+        }
+        return dequeue[tail];
     }
 
     /**
@@ -103,7 +236,15 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public boolean contains(E value) {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (value == null) {
+            throw new NullPointerException("Search for a null element");
+        }
+        for (int i = 0, index = head; i < size; i++, index = ++index % dequeue.length) {
+            if (dequeue[index].equals(value)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -113,9 +254,7 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public int size() {
-        throw new UnsupportedOperationException("todo: implement this");
-        return (tail - head) & (dequeue.length - 1);
-
+        return size;
     }
 
     /**
@@ -125,8 +264,7 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public boolean isEmpty() {
-        throw new UnsupportedOperationException("todo: implement this");
-        return (size == 0);
+        return size == 0;
     }
 
     /**
@@ -135,7 +273,6 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public void clear() {
-        throw new UnsupportedOperationException("todo: implement this");
         size = 0;
     }
 
@@ -147,6 +284,95 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public ListIterator<E> iterator() {
-        throw new UnsupportedOperationException("todo: implement this");
+        return new DequeueIterator();
+    }
+
+    private class DequeueIterator implements ListIterator<E> {
+        private int pos, size;
+
+        public DequeueIterator() {
+            pos = head;
+            size = size();
+        }
+
+        @Override
+        public boolean hasNext() {
+            return (pos < size);
+        }
+
+        @Override
+        public E next() {
+            if (!hasNext()) {
+                throw new NoSuchElementException();
+            }
+            E res = (E) dequeue[pos];
+            pos = ++pos % dequeue.length;
+            return res;
+        }
+
+        @Override
+        public boolean hasPrevious() {
+            return (pos > head);
+        }
+
+        @Override
+        public E previous() {
+            if (hasPrevious()) {
+                E res = (E) dequeue[pos];
+                pos++;
+                return res;
+            } else {
+                throw new UnsupportedOperationException("No element");
+            }
+        }
+
+        @Override
+        public int nextIndex() {
+            if (hasNext()) {
+                pos++;
+                return pos;
+            } else {
+                throw new UnsupportedOperationException("No element");
+            }
+        }
+
+        @Override
+        public int previousIndex() {
+            if (hasPrevious()) {
+                pos--;
+                return pos;
+            } else {
+                throw new UnsupportedOperationException("No element");
+            }
+        }
+
+        @Override
+        public void remove() {
+            if (!hasNext()) {
+                throw new UnsupportedOperationException("No elements in dequeue");
+            }
+            E value;
+
+            value = this.next();
+            for (int i = 1; i <= this.size; i++) {
+                if (dequeue[i] == value) {
+                    dequeue[i] = null;
+                }
+            }
+            //TODO
+        }
+
+        @Override
+        public void set(E e) {
+            //TODO
+        }
+
+        @Override
+        public void add(E e) {
+            if (isEmpty()) {
+                throw new UnsupportedOperationException("No elements in dequeue");
+            }
+            //TODO
+        }
     }
 }
