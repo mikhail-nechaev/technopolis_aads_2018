@@ -13,7 +13,7 @@ import java.util.NoSuchElementException;
  */
 public class LinkedDequeSimple<E> implements IDeque<E> {
 
-    private class Node<T> {
+    class Node<T> {
         T value;
         Node<T> next;
         Node<T> prev;
@@ -25,10 +25,10 @@ public class LinkedDequeSimple<E> implements IDeque<E> {
         }
     }
 
-    private int size = 0;
+    int size = 0;
 
-    private Node<E> first;
-    private Node<E> last;
+    Node<E> first;
+    Node<E> last;
 
     /**
      * Inserts the specified element at the front of this deque.
@@ -83,6 +83,7 @@ public class LinkedDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public E getFirst() {
+        if (isEmpty()) throw new NoSuchElementException();
         return first.value;
     }
 
@@ -139,6 +140,7 @@ public class LinkedDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public E getLast() {
+        if (isEmpty()) throw new NoSuchElementException();
         return last.value;
     }
 
@@ -157,7 +159,7 @@ public class LinkedDequeSimple<E> implements IDeque<E> {
             if (value.equals(otherNode.value))
                 return true;
         }
-        return true;
+        return false;
     }
 
     /**
@@ -196,7 +198,7 @@ public class LinkedDequeSimple<E> implements IDeque<E> {
 
         first = null;
         last = null;
-        size =0;
+        size = 0;
     }
 
     /**
@@ -224,8 +226,7 @@ public class LinkedDequeSimple<E> implements IDeque<E> {
          */
         @Override
         public boolean hasNext() {
-            if (current == null) return false;
-            return current.next != null;
+            return current != null;
         }
 
         /**

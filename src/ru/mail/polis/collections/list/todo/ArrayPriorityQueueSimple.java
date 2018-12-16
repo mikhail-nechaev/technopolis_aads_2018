@@ -13,8 +13,8 @@ import java.util.*;
  */
 public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPriorityQueue<E> {
 
-    Object[] queue;
-    int size = 0;
+    private Object[] queue;
+    private int size = 0;
 
     private final Comparator<E> comparator;
 
@@ -43,6 +43,7 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
      * @throws NullPointerException if the specified comparator is null
      */
     public ArrayPriorityQueueSimple(Comparator<E> comparator) {
+        queue = new Object[13];
         this.comparator = Objects.requireNonNull(comparator, "comparator");
     }
 
@@ -185,7 +186,7 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
     }
 
     private class ArrayPriorityQueueIterator implements Iterator<E> {
-
+        int cursor = -1;
         /**
          * Returns {@code true} if the iteration has more elements.
          * (In other words, returns {@code true} if {@link #next} would
@@ -195,8 +196,7 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
          */
         @Override
         public boolean hasNext() {
-            // TODO
-            return false;
+            return cursor < size;
         }
 
         /**
@@ -205,10 +205,11 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
          * @return the next element in the iteration
          * @throws NoSuchElementException if the iteration has no more elements
          */
+        @SuppressWarnings("unchecked")
         @Override
         public E next() {
-            // TODO
-            return null;
+            if (!hasNext()) throw new NoSuchElementException();
+            return (E) queue[++cursor];
         }
 
         /**

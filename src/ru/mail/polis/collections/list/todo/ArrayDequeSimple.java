@@ -36,7 +36,9 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
     public void addFirst(E value) {
         if (value == null) throw new NullPointerException("Element can't be null.");
 
-        if (--head < 0) head = data.length - 1;
+        if (--head < 0) {
+            head = data.length - 1;
+        }
         data[head] = value;
         if (head == tail) doubleSize();
     }
@@ -53,7 +55,9 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
 
         E result = getFirst();
         data[head++] = null;
-        if (head > data.length) head = 0;
+        if (head >= data.length) {
+            head = 0;
+        }
         return result;
     }
 
@@ -129,7 +133,7 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public boolean contains(E value) {
-        if (value == null) return false;
+        if (value == null) throw new NullPointerException();
 
         int i = head;
         Object element;
@@ -196,12 +200,14 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
 
         @Override
         public boolean hasNext() {
-            int currentPointer = returnedPointer < 0 ? head : returnedPointer;
-            return currentPointer < data.length ? data[currentPointer + 1] != null : data[0] != null;
+            int currentPointer = returnedPointer < 0 ? head - 1 : returnedPointer;
+            return currentPointer + 1 < data.length ? data[currentPointer + 1] != null : data[0] != null;
         }
 
         @Override
         public E next() {
+            if (!hasNext()) throw new NoSuchElementException();
+
             int currentPointer = returnedPointer < 0 ? head - 1 : returnedPointer;
             returnedPointer = currentPointer + 1 < data.length ? currentPointer + 1 : 0;
             @SuppressWarnings("unchecked")
@@ -219,6 +225,8 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
 
         @Override
         public E previous() {
+            if (!hasPrevious()) throw new NoSuchElementException();
+
             if (!deleted) {
                 returnedPointer = returnedPointer > 0 ? returnedPointer - 1 : data.length - 1;
             }

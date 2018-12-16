@@ -607,6 +607,42 @@ public class ArrayDequeFull<E> extends ArrayDequeSimple<E> implements Deque<E> {
      */
     @Override
     public Iterator<E> descendingIterator() {
-        return null;
+        return new ArrayDequeDescendingIterator();
+    }
+
+    private class ArrayDequeDescendingIterator implements Iterator<E> {
+
+        private int returnedPointer = tail;
+        private boolean deleted = false;
+
+        /**
+         * Returns {@code true} if the iteration has more elements.
+         * (In other words, returns {@code true} if {@link #next} would
+         * return an element rather than throwing an exception.)
+         *
+         * @return {@code true} if the iteration has more elements
+         */
+        @Override
+        public boolean hasNext() {
+            if (deleted) return data[returnedPointer] != null;
+            return returnedPointer > 0 ? data[returnedPointer - 1] != null : data[data.length - 1] != null;
+        }
+
+        /**
+         * Returns the next element in the iteration.
+         *
+         * @return the next element in the iteration
+         * @throws NoSuchElementException if the iteration has no more elements
+         */
+        @Override
+        public E next() {
+            if (!deleted) {
+                returnedPointer = returnedPointer > 0 ? returnedPointer - 1 : data.length - 1;
+            }
+
+            @SuppressWarnings("unchecked")
+            E prev = (E) data[returnedPointer];
+            return prev;
+        }
     }
 }
