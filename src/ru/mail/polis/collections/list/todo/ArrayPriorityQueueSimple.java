@@ -2,9 +2,11 @@ package ru.mail.polis.collections.list.todo;
 
 import ru.mail.polis.collections.list.IPriorityQueue;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 
 /**
@@ -17,6 +19,60 @@ import java.util.Objects;
 public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPriorityQueue<E> {
 
     private final Comparator<E> comparator;
+    private Object[] queue;
+    int size;
+    private static final int CAPACITY = 16;
+
+    private void ensureCapacity(){
+        int oldLength = queue.length;
+        int newLength = oldLength << 1 + 1;
+        queue = Arrays.copyOf(queue, newLength);
+    }
+
+    @SuppressWarnings("unchecked")
+    private void heapify(){
+        for(int i = (size >> 1) - 1; i >= 0; i--){
+            siftDown(i, (E) queue[i]);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private void swap(int i, int j){
+        E temp = (E) queue[i];
+        queue[i] = queue[j];
+        queue[j] = temp;
+    }
+
+    @SuppressWarnings("unchecked")
+    private void siftDown(int k, E e){
+        while (((k << 1) + 1) < size){
+            int left = (k << 1) + 1;
+            int right = (k << 1) + 2;
+            int j = left;
+
+            if(right < size && comparator.compare((E) queue[right], (E) queue[j]) < 0){
+                j = right;
+            }
+            if(comparator.compare(e, (E) queue[j]) <= 0)
+                break;
+            swap(k ,j);
+            k = j;
+        }
+        queue[k] = e;
+    }
+
+    @SuppressWarnings("unchecked")
+    private void siftUp(int k, E e){
+        while (k > 0){
+            int parent = (k-1) >> 1;
+            if(comparator.compare(e, (E)  queue[parent]) >= 0){
+                break;
+            }
+            swap(k, parent);
+            k = parent;
+        }
+        queue[k] = e;
+    }
 
     public ArrayPriorityQueueSimple() {
         this(Comparator.naturalOrder());
@@ -42,8 +98,10 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
      * @param comparator comparator the comparator that will be used to order this priority queue.
      * @throws NullPointerException if the specified comparator is null
      */
+    @SuppressWarnings("unchecked")
     public ArrayPriorityQueueSimple(Comparator<E> comparator) {
         this.comparator = Objects.requireNonNull(comparator, "comparator");
+        this.queue = new Object[CAPACITY];
     }
 
     /**
@@ -58,9 +116,12 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
      * @param comparator comparator the comparator that will be used to order this priority queue.
      * @throws NullPointerException if the specified collection or comparator is null
      */
+    @SuppressWarnings("unchecked")
     public ArrayPriorityQueueSimple(Collection<E> collection, Comparator<E> comparator) {
         this.comparator = Objects.requireNonNull(comparator, "comparator");
-        //todo: do some stuff with collection
+        queue = collection.toArray();
+        size = queue.length;
+        heapify();
     }
 
     /**
@@ -73,7 +134,13 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
      */
     @Override
     public void add(E value) {
-        throw new UnsupportedOperationException("todo: implement this");
+        Objects.requireNonNull(value);
+        int heapSize = size;
+        if(heapSize >= queue.length){
+            ensureCapacity();
+        }
+        siftUp(heapSize, value);
+        size++;
     }
 
     /**
@@ -84,9 +151,18 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
      * @return the head of this queue
      * @throws java.util.NoSuchElementException if this queue is empty
      */
+    @SuppressWarnings("unchecked")
     @Override
     public E remove() {
-        throw new UnsupportedOperationException("todo: implement this");
+       if(isEmpty()){
+           throw new NoSuchElementException();
+       }
+       E value = (E) queue[0];
+       queue[0] = queue[size - 1];
+       queue[size - 1] = null;
+       size--;
+       siftDown(0, (E) queue[0]);
+       return value;
     }
 
     /**
@@ -98,8 +174,12 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
      * @throws java.util.NoSuchElementException if this queue is empty
      */
     @Override
+    @SuppressWarnings("unchecked")
     public E element() {
-        throw new UnsupportedOperationException("todo: implement this");
+        if(isEmpty()){
+            throw new NoSuchElementException();
+        }
+        return (E) queue[0];
     }
 
     /**
@@ -114,7 +194,13 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
      */
     @Override
     public boolean contains(E value) {
-        throw new UnsupportedOperationException("todo: implement this");
+        Objects.requireNonNull(value);
+        for(int i = 0; i < size; i++){
+            if(value.equals(queue[i])){
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -124,7 +210,7 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
      */
     @Override
     public int size() {
-        throw new UnsupportedOperationException("todo: implement this");
+        return size;
     }
 
     /**
@@ -134,7 +220,7 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
      */
     @Override
     public boolean isEmpty() {
-        throw new UnsupportedOperationException("todo: implement this");
+        return size == 0;
     }
 
     /**
@@ -143,7 +229,9 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
      */
     @Override
     public void clear() {
-        throw new UnsupportedOperationException("todo: implement this");
+        for (int i = 0; i < size; i++)
+            queue[i] = null;
+        size = 0;
     }
 
     /**
@@ -154,6 +242,26 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
      */
     @Override
     public Iterator<E> iterator() {
-        throw new UnsupportedOperationException("todo: implement this");
+        return new PriorityQueueIterator();
+    }
+
+    private class PriorityQueueIterator implements Iterator<E>{
+
+        private int cursor;
+        private int lastReturned = -1;
+
+        @Override
+        public boolean hasNext() {
+            return cursor < size;
+        }
+
+        @Override
+        @SuppressWarnings("unchecked")
+        public E next() {
+            if (cursor < size)
+                return (E) queue[lastReturned = cursor++];
+            throw new NoSuchElementException();
+        }
+
     }
 }
