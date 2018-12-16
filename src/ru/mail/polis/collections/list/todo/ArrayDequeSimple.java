@@ -249,12 +249,13 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
 
         @Override
         public void remove() {
-            int currentPointer = returnedPointer < 0 ? head : returnedPointer;
-            boolean shifted = delete(currentPointer);
+            if (returnedPointer < 0 || deleted) throw new IllegalStateException();
+
+            boolean shifted = delete(returnedPointer);
             if (shifted) {
                 returnedPointer = returnedPointer > 0 ? returnedPointer - 1 : data.length - 1;
-                deleted = true;
             }
+            deleted = true;
         }
 
         @Override
@@ -277,12 +278,16 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
 
         int i = head;
         int j = 0;
-        while (data[i] != null) {
+        while (i != tail) {
             newData[j++] = data[i];
-            if (++i == currentSize) i = 0;
+            if (++i == currentSize) {
+                i = 0;
+            }
         }
 
         data = newData;
+        head = 0;
+        tail = currentSize;
     }
 
     /**
@@ -295,8 +300,11 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
     boolean delete(int i) {
         int h = head;
         int t = tail;
-        int elementsBefore = i - h > 0 ? i - h : data.length - i + h;
-        int elementsAfter = t - i > 0 ? t - i : data.length - t + i;
+        int elementsBefore = i - h >= 0 ? i - h : data.length - i + h;
+        int elementsAfter = t - i > 0 ? t - i - 1 : data.length - t + i;
+        if (i == t) {
+            elementsAfter = 0;
+        }
 
         if (elementsBefore < elementsAfter) {
             if (h <= i) {

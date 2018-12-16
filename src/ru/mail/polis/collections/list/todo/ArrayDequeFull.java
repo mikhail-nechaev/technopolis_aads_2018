@@ -136,8 +136,7 @@ public class ArrayDequeFull<E> extends ArrayDequeSimple<E> implements Deque<E> {
      */
     @Override
     public boolean removeFirstOccurrence(Object o) {
-        if (o == null)
-            return false;
+        if (o == null) throw new NullPointerException();
 
         int i = head;
         Object x;
@@ -171,17 +170,19 @@ public class ArrayDequeFull<E> extends ArrayDequeSimple<E> implements Deque<E> {
      */
     @Override
     public boolean removeLastOccurrence(Object o) {
-        if (o == null)
-            return false;
+        if (o == null) throw new NullPointerException();
 
-        int i = tail;
+        int i = tail - 1;
+        if (i < 0) {
+            i = data.length - 1;
+        }
         Object x;
         while ( (x = data[i]) != null) {
             if (o.equals(x)) {
                 delete(i);
                 return true;
             }
-            if (--i == -1) i = data.length;
+            if (--i == -1) i = data.length - 1;
         }
         return false;
     }
@@ -429,7 +430,13 @@ public class ArrayDequeFull<E> extends ArrayDequeSimple<E> implements Deque<E> {
      */
     @Override
     public boolean addAll(Collection<? extends E> c) {
-        return false;
+        if (c == null) throw new NullPointerException();
+        if (c.isEmpty()) return false;
+
+        for (E element : c) {
+            add(element);
+        }
+        return true;
     }
 
     /**

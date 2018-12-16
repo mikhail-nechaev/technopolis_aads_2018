@@ -61,7 +61,9 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
      */
     public ArrayPriorityQueueSimple(Collection<E> collection, Comparator<E> comparator) {
         this.comparator = Objects.requireNonNull(comparator, "comparator");
-        //todo: do some stuff with collection
+        queue = Objects.requireNonNull(collection).toArray();
+        size = collection.size();
+        heapify();
     }
 
     /**
@@ -186,7 +188,8 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
     }
 
     private class ArrayPriorityQueueIterator implements Iterator<E> {
-        int cursor = -1;
+        int cursor = 0;
+        ArrayDeque<E> movedElements = new ArrayDeque<>();
         /**
          * Returns {@code true} if the iteration has more elements.
          * (In other words, returns {@code true} if {@link #next} would
@@ -196,7 +199,7 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
          */
         @Override
         public boolean hasNext() {
-            return cursor < size;
+            return size > 0 && cursor < size || !movedElements.isEmpty();
         }
 
         /**
@@ -209,7 +212,11 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
         @Override
         public E next() {
             if (!hasNext()) throw new NoSuchElementException();
-            return (E) queue[++cursor];
+            if (size > 0 && cursor < size) {
+                return (E) queue[cursor++];
+            } else {
+                return movedElements.poll();
+            }
         }
 
         /**
@@ -231,7 +238,13 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
          */
         @Override
         public void remove() {
-            // TODO
+            if (cursor == 0) throw new IllegalStateException();
+            E moved = removeAt(cursor - 1);
+            if (moved == null) {
+                cursor--;
+            } else {
+                movedElements.add(moved);
+            }
         }
     }
 
@@ -276,11 +289,10 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
     }
 
     @SuppressWarnings("unchecked")
-    private void removeAt(int toRemove) {
+    private E removeAt(int toRemove) {
         size--;
         if (size == toRemove) {
             queue[toRemove] = null;
-
         } else {
             E moved = (E) queue[size];
             queue[size] = null;
@@ -288,7 +300,19 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
             siftDown(toRemove, moved);
             if (queue[toRemove] == moved) {
                 siftUp(toRemove, moved);
+                if (queue[toRemove] != moved) {
+                    return moved;
+                }
             }
+        }
+        return null;
+    }
+
+    @SuppressWarnings("unchecked")
+    private void heapify() {
+        final Object[] elements = queue;
+        for (int i = (size >>> 1) - 1; i >= 0; i--) {
+            siftDown(i, (E) elements[i]);
         }
     }
 }
