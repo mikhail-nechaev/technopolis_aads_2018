@@ -25,7 +25,7 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
 
     private int arrayLength;
 
-    private static final int MIN_INITIAL_CAPACITY = 16;
+    private static final int MIN_INITIAL_CAPACITY = 32;
 
     private static final float LOAD_FACTOR = (float) 0.8;
 
@@ -122,9 +122,9 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
         E tmp = arrayPriorityQueue[0];
         arrayPriorityQueue[0] = arrayPriorityQueue[arrayLength-1];
         arrayPriorityQueue[arrayLength - 1] = null;
-        if(arrayLength != 0)
-        {
-            heapfy(0); // heapfy с головы
+
+        for (int i = arrayLength / 2; i >= 0; i--) {
+            heapfy(i);
         }
         arrayLength--;
         return tmp;
@@ -174,10 +174,14 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
     }
 
 
-    private void swap(E[] arrayP, int a, int b){
-        E tmp = arrayP[a];
-        arrayP[a] = arrayP[b];
-        arrayP[b] = tmp;
+    private void removeAt(int index){
+
+        arrayPriorityQueue[index] =  arrayPriorityQueue[arrayLength - 1];
+        arrayPriorityQueue[arrayLength - 1] = null;
+        arrayLength --;
+        for (int i = arrayLength / 2; i >= 0; i--) {
+            heapfy(i);
+        }
     }
 
 
@@ -194,11 +198,11 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
         return new Iterator<E>() {
 
             private int index = 0;
-            private int size = arrayLength;
+            private int cursor = -1;
 
             @Override
             public boolean hasNext() {
-                return index <= size;
+                return index < arrayLength ;
             }
 
             @Override
@@ -206,20 +210,17 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
                 if(!hasNext()){
                     throw new NoSuchElementException();
                 }
-                E tmp = arrayPriorityQueue[index];
-                index = index + 1;
-                return tmp;
+                return arrayPriorityQueue[cursor = index++];
             }
 
             @Override
             public void remove() {
-                swap(arrayPriorityQueue, index-2, arrayLength-1);
-                arrayPriorityQueue[arrayLength - 1] = null;
-                for (int i = arrayLength / 2; i >= 0; i--) {
-                    heapfy(i);
+                if(cursor < 0){
+                    throw new IllegalStateException();
                 }
-                arrayLength--;
-                size -- ;
+                index--;
+                removeAt(index);
+                cursor = -1;
             }
         };
     }

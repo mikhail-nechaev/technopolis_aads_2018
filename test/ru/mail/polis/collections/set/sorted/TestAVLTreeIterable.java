@@ -32,7 +32,8 @@ public class TestAVLTreeIterable {
         Iterator<Integer> iterator = sortedSet.iterator();
         for (int i = 0; i <= 10; i++) {
             int next = iterator.next();
-            Assert.assertTrue("i = " + i + ", n = " + next, iterator.next() == i);
+            Assert.assertTrue("i = " + i + ", n = " + next, next == i);
+           /* Assert.assertTrue("i = " + i + ", n = " + next, iterator.next() == i);*/
         }
         Assert.assertFalse(iterator.hasNext());
     }
@@ -51,7 +52,7 @@ public class TestAVLTreeIterable {
         Iterator<Integer> iterator = sortedSet.descendingIterator();
         for (int i = 10; i >= 0; i--) {
             int next = iterator.next();
-            Assert.assertTrue("i = " + i + ", n = " + next, iterator.next() == i);
+            Assert.assertTrue("i = " + i + ", n = " + next, next == i);
         }
         Assert.assertFalse(iterator.hasNext());
     }

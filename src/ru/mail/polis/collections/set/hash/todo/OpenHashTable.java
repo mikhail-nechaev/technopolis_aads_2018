@@ -21,12 +21,14 @@ import java.util.Iterator;
 public class OpenHashTable<E extends IOpenHashTableEntity>  implements IOpenHashTable<E> {
 
     private static final double LOAD_FACTOR = 0.5;
-    private static final Object Integer = 0;
-    private static final Object Double = 1;
-    private static final Object Float = 2;
+
     private E [] arrayHash;
     private int length;
-    private final Class<E> typeParameterClass;
+
+    public OpenHashTable(Class<IOpenHashTableEntity> iOpenHashTableEntityClass) {
+
+    }
+
 
     private boolean isNil(E value){
         return value  == null;// || value == nil;
@@ -42,11 +44,11 @@ public class OpenHashTable<E extends IOpenHashTableEntity>  implements IOpenHash
 
 
 
-    public OpenHashTable(Class<E> typeParameterClass){
-        this.typeParameterClass = typeParameterClass;
-        arrayHash = (E[]) new Object[29];
-    }
 
+
+    public OpenHashTable(){
+
+    }
 
     private void doubleCapacity(){
         int newCapacity = arrayHash.length << 1;

@@ -47,7 +47,7 @@ public class AVLTree<E extends Comparable<E>> implements ISelfBalancingSortedTre
 
     protected final Comparator<E> comparator;
     protected AVLNode<E> root;
-    private int length;
+    protected int length;
 
     protected int getHeight(AVLNode current){
         if(current == null){
@@ -234,7 +234,7 @@ public class AVLTree<E extends Comparable<E>> implements ISelfBalancingSortedTre
         if(value == null){
             throw  new NullPointerException();
         }
-        AVLNode current = find(root,value);
+        AVLNode current = find(root, value);
         if(current == null){
             insert(value);
             length ++;

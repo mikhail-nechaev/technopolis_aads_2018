@@ -3,6 +3,8 @@ package ru.mail.polis.collections;
 import java.util.Iterator;
 import java.util.ListIterator;
 
+
+
 import ru.mail.polis.collections.list.todo.ArrayDequeFull;
 import ru.mail.polis.collections.list.todo.ArrayDequeSimple;
 import ru.mail.polis.collections.list.todo.ArrayPriorityQueueSimple;
@@ -10,6 +12,7 @@ import ru.mail.polis.collections.list.todo.LinkedDequeSimple;
 import ru.mail.polis.collections.set.hash.todo.OpenHashTable;
 import ru.mail.polis.collections.set.sorted.UnbalancedTreeException;
 import ru.mail.polis.collections.set.sorted.todo.AVLTree;
+import ru.mail.polis.collections.set.sorted.todo.AVLTreeIterable;
 import ru.mail.polis.collections.set.sorted.todo.RedBlackTree;
 
 public class Main {
@@ -25,8 +28,6 @@ public class Main {
             redBlackTree.add(2);
             redBlackTree.add(3);
             redBlackTree.add(4);
-            redBlackT
-            ree.add(5);
             redBlackTree.add(6);
             redBlackTree.add(7);
             redBlackTree.add(8);
@@ -60,7 +61,7 @@ public class Main {
         }
         catch (UnbalancedTreeException e){
             e.printStackTrace();
-        }
+        }*/
 
 
 
@@ -68,30 +69,11 @@ public class Main {
 
 
 
-        /*ArrayDequeFull arrayDequeFull = new ArrayDequeFull();
-        arrayDequeFull.addFirst(4);
-        arrayDequeFull.addFirst(8);
-        arrayDequeFull.removeFirst();
-        System.out.println(arrayDequeFull.getFirst());
-        System.out.println(arrayDequeFull.getLast());*/
 
 
 
-        Object a = 35;
-        ArrayPriorityQueueSimple arrayPriorityQueueSimple = new ArrayPriorityQueueSimple();
-        arrayPriorityQueueSimple.add(5);
-        arrayPriorityQueueSimple.add(7);
-        arrayPriorityQueueSimple.add(15);
-        arrayPriorityQueueSimple.add(23);
-        arrayPriorityQueueSimple.add(27);
-        arrayPriorityQueueSimple.add(33);
-        arrayPriorityQueueSimple.add(35);
-        Iterator iterator = arrayPriorityQueueSimple.iterator();
-        while (iterator.hasNext()){
-            iterator.next();
-            if(iterator.next() == a){
-                iterator.remove();
-            }
-        }
+
+
+
     }
 }
