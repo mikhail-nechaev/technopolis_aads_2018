@@ -100,19 +100,23 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
         }
     }
 
-    private void shiftDown(int children) {
-        int index = children;
+    private void shiftDown(int parent) {
+        int index = parent;
         while (index*2+1<count){
             if(index*2+2<data.length && comparator.compare((E) data[index*2+2],(E) data[index*2+1])<0){
-                E copy = (E) data[index];
-                data[index]=data[index*2+2];
-                data[index*2+2]=copy;
+                if (comparator.compare((E) data[index],(E) data[index*2+2])>0){
+                    E copy = (E) data[index];
+                    data[index]=data[index*2+2];
+                    data[index*2+2]=copy;
+                }
                 index=index*2+2;
             }else{
-                E copy = (E) data[index];
-                data[index]=data[index*2+1];
-                data[index*2+1]=copy;
-                index=index*2+1;
+                if (comparator.compare((E) data[index],(E) data[index*2+1])>0) {
+                    E copy = (E) data[index];
+                    data[index] = data[index * 2 + 1];
+                    data[index * 2 + 1] = copy;
+                }
+                index = index * 2 + 1;
             }
         }
     }
@@ -241,8 +245,9 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
                     throw new IllegalStateException();
                 }
                 data[index -1]=data[size()-1];
-                shiftDown(index-1);
+                index--;
                 count--;
+                shiftDown(index);
                 canRemove=false;
             }
         };

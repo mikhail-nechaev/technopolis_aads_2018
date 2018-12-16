@@ -175,73 +175,46 @@ public class AVLTree<E extends Comparable<E>> implements ISelfBalancingSortedTre
     public boolean remove(E value){
         Objects.requireNonNull(value);
         int size=count;
-        root=remove(root,value,null);
+        root=remove(root,value);
         return size>count;
     }
 
-    public AVLNode<E> remove(AVLNode<E> node,E value,AVLNode<E> parent){
+    protected AVLNode<E> remove(AVLNode<E> node,E value){
         if(node==null){
             return null;
         }
         int cmp=comparator.compare(node.value,value);
         if (cmp==0){
-            node=deleteNode(node,parent);
             count--;
+            AVLNode<E> left=node.left;
+            AVLNode<E> right=node.right;
+            if (right==null){
+
+                node.left=null;
+                return left;
+            }
+            AVLNode<E> minRight=findMinNode(right);
+            minRight.right=removeMinNode(right);
+            minRight.left=left;
+            return  balanceSubTree(minRight);
         }else if(cmp<0){
-            node.right=remove(node.right,value,node);
+            node.right=remove(node.right,value);
         }else{
-            node.left=remove(node.left,value,node);
+            node.left=remove(node.left,value);
         }
         return balanceSubTree(node);
     }
 
-    protected AVLNode<E> deleteNode(AVLNode<E> node,AVLNode<E> parent){
-        if (node.left!=null&&node.right!=null){
-            AVLNode<E> prevNext=node;
-            AVLNode<E> next=node.left;
-            while(next.right!=null){
-                prevNext=next;
-                next=next.right;
-            }
-            node.value=next.value;
-            next.value=null;
-            if (prevNext==node){
-                node.left=next.left;
-                updateHeight(node);
-            }else{
-                prevNext.right=next.left;
-                updateHeight(prevNext);
-                balanceSubTree(prevNext);
-            }
-
-            next.right=null;
-
-        }else{
-            if (node.left!=null){
-                node=reLink(parent,node,node.left);
-            }else if (node.right!=null){
-                node=reLink(parent,node,node.right);
-            }else{
-                node=reLink(parent,node,null);
-            }
+    protected AVLNode<E> removeMinNode(AVLNode<E> node) {
+        if (node.left==null){
+            return node.right;
         }
-
-        return node;
-
+        node.left=removeMinNode(node.left);
+        return balanceSubTree(node);
     }
 
-    protected AVLNode<E> reLink(AVLNode<E> parent,AVLNode<E> current, AVLNode<E> child){
-        if (root == current) {
-            root = child;
-        }
-        else if (parent.left == current) {
-            parent.left = child;
-        }
-        else {
-            parent.right = child;
-        }
-        return child;
-
+    protected AVLNode<E> findMinNode(AVLNode<E> node) {
+        return node.left==null?node:findMinNode(node.left);
     }
 
     /**
