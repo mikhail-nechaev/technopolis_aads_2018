@@ -7,8 +7,13 @@ import ru.mail.polis.collections.iterator.TestMergingPeekingIncreasingIterator;
 import ru.mail.polis.collections.list.TestFullDeque;
 import ru.mail.polis.collections.list.TestIDeque;
 import ru.mail.polis.collections.list.TestIDequeRemove;
-import ru.mail.polis.collections.list.TestIPriorityQueue;
+import ru.mail.polis.collections.list.TestIPriorityQueueBase;
+import ru.mail.polis.collections.list.TestIPriorityQueueComp;
+import ru.mail.polis.collections.list.TestIPriorityQueueRemove;
 import ru.mail.polis.collections.set.hash.TestHashTable;
+import ru.mail.polis.collections.set.hash.TestHastTableIteratorRemove;
+import ru.mail.polis.collections.set.sorted.TestAVLTreeIterable;
+import ru.mail.polis.collections.set.sorted.TestAVLTreeIterableRemove;
 import ru.mail.polis.collections.set.sorted.TestBalancedSortedSet;
 
 /*
@@ -20,11 +25,16 @@ import ru.mail.polis.collections.set.sorted.TestBalancedSortedSet;
         TestIDeque.class,
         TestIDequeRemove.class,
         TestFullDeque.class,
-        TestIPriorityQueue.class,
+        TestIPriorityQueueBase.class,
+        TestIPriorityQueueComp.class,
+        TestIPriorityQueueRemove.class,
         TestIntegerIncreasingSequencePeekingIterator.class,
         TestMergingPeekingIncreasingIterator.class,
         TestHashTable.class,
-        TestBalancedSortedSet.class
+        TestHastTableIteratorRemove.class,
+        TestBalancedSortedSet.class,
+        TestAVLTreeIterable.class,
+        TestAVLTreeIterableRemove.class
 })
 public class MainTest {
     //Run this from IntelliJ IDEA
