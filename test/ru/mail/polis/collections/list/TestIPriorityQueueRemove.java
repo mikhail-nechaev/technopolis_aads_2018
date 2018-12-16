@@ -8,6 +8,8 @@ import ru.mail.polis.collections.list.todo.ArrayPriorityQueueSimple;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -64,11 +66,15 @@ public class TestIPriorityQueueRemove {
             pq.add(i);
         }
         Iterator<Integer> iterator = pq.iterator();
+        SortedSet<Integer> set = new TreeSet<>();
         for (int i = 0; i < 100; i++) {
-            Assert.assertTrue(iterator.next() == i);
+            set.add(iterator.next());
             iterator.remove();
         }
         Assert.assertTrue(pq.isEmpty());
+        Assert.assertTrue(set.first() == 0);
+        Assert.assertTrue(set.last() == 99);
+        Assert.assertTrue(set.size() == 100);
     }
 
     @Test
@@ -79,9 +85,22 @@ public class TestIPriorityQueueRemove {
         Collections.shuffle(data);
         pq = new ArrayPriorityQueueSimple<>(data);
         Iterator<Integer> iterator = pq.iterator();
+        SortedSet<Integer> set = new TreeSet<>();
         for (int i = 0; i < 20; i++) {
-            Assert.assertTrue(iterator.next() == i);
+            set.add(iterator.next());
             iterator.remove();
         }
+        Assert.assertTrue(pq.isEmpty());
+        Assert.assertTrue(set.first() == 0);
+        Assert.assertTrue(set.last() == 19);
+        Assert.assertTrue(set.size() == 20);
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void test6() {
+        pq.add(1);
+        Iterator<Integer> iterator = pq.iterator();
+        iterator.remove();
+        iterator.remove();
     }
 }
