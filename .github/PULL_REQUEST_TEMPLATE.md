@@ -1,3 +1,7 @@
+Remove line if task was accepted earlier.
+
+Mark task as done `[x]` if your resolve it.
+
 - [ ] 1 ArrayDequeSimple
 - [ ] 2 ArrayDequeSimple + Iterator Remove
 - [ ] 3 ArrayDequeFull
