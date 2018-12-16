@@ -2,7 +2,9 @@ package ru.mail.polis.collections.list.todo;
 
 import ru.mail.polis.collections.list.IDeque;
 
-import java.util.Iterator;
+import java.sql.SQLOutput;
+import java.util.ListIterator;
+import java.util.NoSuchElementException;
 
 /**
  * Resizable cyclic array implementation of the {@link IDeque} interface.
@@ -13,6 +15,90 @@ import java.util.Iterator;
  */
 public class ArrayDequeSimple<E> implements IDeque<E> {
 
+    private E[] deque;
+    private int arraySize; // Размер массива
+    private int size; // Количество элементов а очереди
+
+
+    //[last, ... , first]
+    private int firstCursor;
+    private int lastCursor;
+
+    public E[] getDeque() {
+        return deque;
+    }
+
+    public int getFirstCursor() {
+        return firstCursor;
+    }
+
+    public int getLastCursor() {
+        return lastCursor;
+    }
+
+    public ArrayDequeSimple() {
+        arraySize = 10;
+        deque = (E[]) new Object[arraySize];
+        size = 0;
+        firstCursor = arraySize - 1;
+        lastCursor = 0;
+    }
+
+    public ArrayDequeSimple(int arraySize) {
+        this.arraySize = arraySize;
+        deque = (E[]) new Object[arraySize];
+        size = 0;
+        firstCursor = arraySize - 1;
+        lastCursor = 0;
+
+    }
+
+    /**
+     * Увеличение номера элемента, с переходом в начало массива при достижении его конца:
+     * [max + 1] => [0]
+     *
+     * @param n
+     * @return
+     */
+    private int cyclicInc(int n) {
+        return ++n >= arraySize ? n - arraySize : n;
+    }
+
+    /**
+     * Уменьшение номера элемента, с переходом в конец массива при достижении его начала:
+     * [-1] => [max]
+     *
+     * @param n
+     * @return
+     */
+    private int cyclicDec(int n) {
+        return --n < 0 ? n + arraySize : n;
+    }
+
+    /**
+     * Увеличение размеров массива в 2 раза с копирыванием элементов
+     */
+    private void resize() {
+        arraySize *= 2;
+        E[] deque = (E[]) new Object[arraySize];
+        for (int i = lastCursor, j = 0; j < size; i = cyclicInc(i), j++) {
+            deque[j] = this.deque[i];
+        }
+        this.deque = deque;
+        lastCursor = 0;
+        firstCursor = size - 1;
+    }
+
+    /**
+     * Проверка на заполненность очереди.
+     * Применять в начале методов с добавлением элементов.
+     */
+    private void checkFullDeque() {
+        if (size == arraySize) {
+            resize();
+        }
+    }
+
     /**
      * Inserts the specified element at the front of this deque.
      *
@@ -21,7 +107,13 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public void addFirst(E value) {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (value == null) {
+            throw new NullPointerException();
+        }
+        checkFullDeque();
+        firstCursor = cyclicInc(firstCursor);
+        deque[firstCursor] = value;
+        size++;
     }
 
     /**
@@ -32,7 +124,13 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public E removeFirst() {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (isEmpty()) {
+            throw new NoSuchElementException();
+        }
+        size--;
+        E value = deque[firstCursor];
+        firstCursor = cyclicDec(firstCursor);
+        return value;
     }
 
     /**
@@ -43,7 +141,10 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public E getFirst() {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (isEmpty()) {
+            throw new NoSuchElementException();
+        }
+        return deque[firstCursor];
     }
 
     /**
@@ -54,7 +155,13 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public void addLast(E value) {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (value == null) {
+            throw new NullPointerException();
+        }
+        checkFullDeque();
+        lastCursor = cyclicDec(lastCursor);
+        deque[lastCursor] = value;
+        size++;
     }
 
     /**
@@ -65,7 +172,13 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public E removeLast() {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (isEmpty()) {
+            throw new NoSuchElementException();
+        }
+        size--;
+        E value = deque[lastCursor];
+        lastCursor = cyclicInc(lastCursor);
+        return value;
     }
 
     /**
@@ -76,7 +189,10 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public E getLast() {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (isEmpty()) {
+            throw new NoSuchElementException();
+        }
+        return deque[lastCursor];
     }
 
     /**
@@ -89,7 +205,18 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public boolean contains(E value) {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (value == null) {
+            throw new NullPointerException();
+        }
+        if (!isEmpty()) {
+            for (int i = lastCursor; i != cyclicInc(firstCursor); i = cyclicInc(i)) {
+                if (deque[i].equals(value)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+        return false;
     }
 
     /**
@@ -99,7 +226,7 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public int size() {
-        throw new UnsupportedOperationException("todo: implement this");
+        return size;
     }
 
     /**
@@ -109,7 +236,7 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public boolean isEmpty() {
-        throw new UnsupportedOperationException("todo: implement this");
+        return size == 0;
     }
 
     /**
@@ -118,7 +245,10 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public void clear() {
-        throw new UnsupportedOperationException("todo: implement this");
+        deque = (E[]) new Object[arraySize];
+        size = 0;
+        firstCursor = arraySize - 1;
+        lastCursor = 0;
     }
 
     /**
@@ -128,7 +258,108 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      * @return an iterator over the elements in this collection in proper sequence
      */
     @Override
-    public Iterator<E> iterator() {
-        throw new UnsupportedOperationException("todo: implement this");
+    public ListIterator<E> iterator() {
+        return new ListIterator<>() {
+            //private int last = ArrayDequeSimple.this.lastCursor;
+            private int first = ArrayDequeSimple.this.firstCursor;
+            private int size = ArrayDequeSimple.this.size;
+            private int position = -1;
+            // set(), add(), remove() => true
+            // next(), previous() => false
+            private boolean doOperation = true;
+
+            // last < 8 9 0 1 2 3 > first
+            // next < 5 4 3 2 1 0 > previous
+            private int cyclicConvert(int n) {
+                if (position <= first) {
+                    return first - n;
+                } else {
+                    return ArrayDequeSimple.this.arraySize - n + first;
+                }
+            }
+
+            @Override
+            public boolean hasNext() {
+                return position < size - 1;
+            }
+
+            @Override
+            public E next() {
+                if (!hasNext()) {
+                    throw new NoSuchElementException();
+                }
+                doOperation = false;
+                return ArrayDequeSimple.this.deque[cyclicConvert(++position)];
+            }
+
+            @Override
+            public boolean hasPrevious() {
+                return position > 0;
+            }
+
+            @Override
+            public E previous() {
+                if (!hasPrevious()) {
+                    throw new NoSuchElementException();
+                }
+                doOperation = false;
+                return ArrayDequeSimple.this.deque[cyclicConvert(--position)];
+            }
+
+            @Override
+            public int nextIndex() {
+                return hasNext() ? position + 1 : size;
+            }
+
+            @Override
+            public int previousIndex() {
+                return hasPrevious() ? position - 1 : -1;
+            }
+
+            @Override
+            public void remove() {
+                if (doOperation) {
+                    throw new IllegalStateException();
+                }
+                doOperation = true;
+
+                for (int i = position; i > 0; i--) {
+                    ArrayDequeSimple.this.deque[cyclicConvert(i)] =
+                            ArrayDequeSimple.this.deque[cyclicConvert(i - 1)];
+                }
+                position--;
+                size = --ArrayDequeSimple.this.size;
+                ArrayDequeSimple.this.firstCursor = ArrayDequeSimple.this.cyclicDec(ArrayDequeSimple.this.firstCursor);
+                first = ArrayDequeSimple.this.firstCursor;
+            }
+
+            @Override
+            public void set(E e) {
+                if (doOperation) {
+                    throw new IllegalStateException();
+                }
+                doOperation = true;
+                ArrayDequeSimple.this.deque[cyclicConvert(position)] = e;
+            }
+
+            @Override
+            public void add(E e) {
+                doOperation = true;
+                ArrayDequeSimple.this.checkFullDeque();
+                E k = e;
+                size = ++ArrayDequeSimple.this.size;
+                for (int i = position; i < size - 1; i++) {
+                    swap(k, ArrayDequeSimple.this.deque[cyclicConvert(i)]);
+                }
+                ArrayDequeSimple.this.deque[cyclicConvert(size - 1)] = k;
+            }
+
+            private void swap(E t1, E t2) {
+                E t = t1;
+                t1 = t2;
+                t2 = t;
+            }
+        };
+
     }
 }
