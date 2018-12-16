@@ -3,6 +3,7 @@ package ru.mail.polis.collections.set.hash.todo;
 import ru.mail.polis.collections.set.hash.IOpenHashTable;
 import ru.mail.polis.collections.set.hash.IOpenHashTableEntity;
 
+import java.util.Hashtable;
 import java.util.Iterator;
 
 /**
@@ -18,7 +19,6 @@ import java.util.Iterator;
  * @param <E> the type of elements maintained by this hash table
  */
 public class OpenHashTable<E extends IOpenHashTableEntity> implements IOpenHashTable<E> {
-
 
     /**
      * Adds the specified element to this set if it is not already present.
@@ -101,5 +101,10 @@ public class OpenHashTable<E extends IOpenHashTableEntity> implements IOpenHashT
     @Override
     public Iterator<E> iterator() {
         throw new UnsupportedOperationException("todo: implement this");
+    }
+
+    @Override
+    public int tableSize() {
+        throw new UnsupportedOperationException("todo: return dataArray.length");
     }
 }
