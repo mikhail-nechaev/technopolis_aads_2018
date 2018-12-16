@@ -3,6 +3,7 @@ package ru.mail.polis.collections.list.todo;
 import ru.mail.polis.collections.list.IDeque;
 
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 /**
  * Linked list implementation of the {@link IDeque} interface with no capacity restrictions.
@@ -10,6 +11,13 @@ import java.util.Iterator;
  * @param <E> the type of elements held in this deque
  */
 public class LinkedDequeSimple<E> implements IDeque<E> {
+
+
+    Node head;
+
+    Node tail;
+
+    int N = 0;
 
     /**
      * Inserts the specified element at the front of this deque.
@@ -19,7 +27,25 @@ public class LinkedDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public void addFirst(E value) {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (value == null) {
+            throw new NullPointerException("Specified element is null");
+        }
+
+        Node node = new Node(value);
+
+        Node tmp = head;
+
+        head = node;
+
+        head.next = tmp;
+
+        if (N == 0) {
+            tail = head;
+        } else {
+            tmp.previous = head;
+        }
+
+        N++;
     }
 
     /**
@@ -30,7 +56,22 @@ public class LinkedDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public E removeFirst() {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (N == 0) {
+            throw new NoSuchElementException("Deque is empty");
+        }
+
+        E first = head.value;
+
+        head = head.next;
+        N--;
+
+        if (N == 0) {
+            tail = null;
+        } else {
+            head.previous = null;
+        }
+
+        return first;
     }
 
     /**
@@ -41,7 +82,10 @@ public class LinkedDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public E getFirst() {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (isEmpty()) {
+            throw new NoSuchElementException("Deque is empty");
+        }
+        return head.value;
     }
 
     /**
@@ -52,7 +96,21 @@ public class LinkedDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public void addLast(E value) {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (value == null) {
+            throw new NullPointerException("Specified element is null");
+        }
+
+        Node node = new Node(value);
+
+        if (N == 0) {
+            head = node;
+        } else {
+            tail.next = node;
+            node.previous = tail;
+        }
+
+        tail = node;
+        N++;
     }
 
     /**
@@ -63,7 +121,23 @@ public class LinkedDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public E removeLast() {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (N == 0) {
+            throw new NoSuchElementException("Deque is empty");
+        }
+
+        E last = tail.value;
+
+        if (N == 1) {
+            head = null;
+            tail = null;
+        } else {
+            tail = tail.previous;
+            tail.next = null;
+        }
+
+        N--;
+
+        return last;
     }
 
     /**
@@ -74,7 +148,10 @@ public class LinkedDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public E getLast() {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (isEmpty()) {
+            throw new NoSuchElementException("Deque is empty");
+        }
+        return tail.value;
     }
 
     /**
@@ -87,7 +164,21 @@ public class LinkedDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public boolean contains(E value) {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (value == null) {
+            throw new NullPointerException("Specified element is null");
+        }
+
+        Node target = head;
+
+        while (target != null) {
+            if (value.equals(target.value)) {
+                return true;
+            }
+
+            target = target.next;
+        }
+
+        return false;
     }
 
     /**
@@ -97,7 +188,7 @@ public class LinkedDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public int size() {
-        throw new UnsupportedOperationException("todo: implement this");
+        return N;
     }
 
     /**
@@ -107,7 +198,7 @@ public class LinkedDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public boolean isEmpty() {
-        throw new UnsupportedOperationException("todo: implement this");
+        return N == 0;
     }
 
     /**
@@ -116,7 +207,9 @@ public class LinkedDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public void clear() {
-        throw new UnsupportedOperationException("todo: implement this");
+        head = null;
+        tail = null;
+        N = 0;
     }
 
     /**
@@ -127,6 +220,70 @@ public class LinkedDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public Iterator<E> iterator() {
-        throw new UnsupportedOperationException("todo: implement this");
+        return new LinkedDequeIterator();
+    }
+
+    private class LinkedDequeIterator implements Iterator<E> {
+
+
+        private Node target = head;
+        private Node previousTargetForRemove;
+        private boolean canRemove = false;
+
+        @Override
+        public void remove() {
+            if (N > 0 && canRemove) {
+                if (size() == 1) {
+                    clear();
+                } else if (previousTargetForRemove.previous == null) {
+                    removeFirst();
+                } else if (previousTargetForRemove.next == null) {
+                    removeLast();
+                } else {
+                    previousTargetForRemove.previous.next = previousTargetForRemove.next;
+                    previousTargetForRemove.next.previous = previousTargetForRemove.previous;
+                    N--;
+                }
+            } else {
+                throw new IllegalStateException("Deque is empty");
+            }
+        }
+
+        @Override
+        public boolean hasNext() {
+            return target != null;
+        }
+
+        @Override
+        public E next() {
+            if (hasNext()) {
+                E tmp = target.value;
+                previousTargetForRemove = new Node(target);
+                target = target.next;
+                canRemove = true;
+                return tmp;
+            } else {
+                throw new NoSuchElementException("Deque is empty");
+            }
+        }
+    }
+
+    class Node {
+
+        E value;
+
+        Node next;
+        Node previous;
+
+
+        Node(E value) {
+            this.value = value;
+        }
+
+        Node(Node clone) {
+            this.value = clone.value;
+            this.previous = clone.previous;
+            this.next = clone.next;
+        }
     }
 }
