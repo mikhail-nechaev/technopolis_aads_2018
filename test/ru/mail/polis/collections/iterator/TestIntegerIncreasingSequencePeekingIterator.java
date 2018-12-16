@@ -54,11 +54,11 @@ public class TestIntegerIncreasingSequencePeekingIterator {
         checkLast(iterator);
     }
 
-    @Test
+    @Test(timeout = 6000L) //6 seconds in millis
     public void testIncreasing() {
         int first = Integer.MIN_VALUE;
         int last = 1;
-        int step = 10;
+        int step = 10000;
         IIncreasingSequenceIterator<Integer> iterator = new IntegerIncreasingSequencePeekingIterator(first, last, step);
         checkFirst(iterator, first);
         Assert.assertTrue(iterator.hasNext());
@@ -140,17 +140,15 @@ public class TestIntegerIncreasingSequencePeekingIterator {
     private void checkIncrease(IIncreasingSequenceIterator<Integer> iterator, int lastCurrent, int last, int step) {
         int current;
         while (iterator.hasNext()) {
-            Assert.assertTrue(lastCurrent != last);
+            Assert.assertTrue(String.format("lc = %s, l = %s", lastCurrent, last), lastCurrent != last);
             current = iterator.peek();
-            checkStep(iterator, lastCurrent, current, step);
+            Assert.assertTrue(String.format("c = %s, lc = %s", current, lastCurrent), current > lastCurrent);
+            Assert.assertTrue(String.format("c = %s, l = %s", current, last), current <= last);
+            Assert.assertTrue(String.format("c = %s, lc = %s, s=%s", lastCurrent, last, step), current - lastCurrent <= step);
+            int next = iterator.next();
+            Assert.assertTrue(String.format("c = %s, n = %s", current, next), current == next);
             lastCurrent = current;
         }
-    }
-
-    private void checkStep(IIncreasingSequenceIterator<Integer> iterator, int lastCurrent, int current, int step) {
-        Assert.assertTrue(current == iterator.next());
-        Assert.assertTrue("c = " + current + ", lc = " + lastCurrent, current > lastCurrent);
-        Assert.assertTrue((long) current - lastCurrent <= step);
     }
 
     private void checkLast(IIncreasingSequenceIterator<Integer> iterator) {
