@@ -1,5 +1,6 @@
 package ru.mail.polis.collections.iterator.todo;
 
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
@@ -16,6 +17,7 @@ import java.util.NoSuchElementException;
  */
 public class MergingPeekingIncreasingIterator implements Iterator<Integer> {
     private IntegerIncreasingSequencePeekingIterator [] iterators;
+
     /**
      * Creates a {@code MergingPeekingIncreasingIterator} containing the inside all elements of this specified iterators.
      *

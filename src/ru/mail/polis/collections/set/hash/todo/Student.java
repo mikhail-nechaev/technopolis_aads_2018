@@ -49,7 +49,7 @@ public class Student extends AbstractOpenHashTableEntity {
 
     @Override
     public int hashCode(int tableSize, int probId) throws IllegalArgumentException {
-        if(probId < 0 || probId >= tableSize || tableSize < 0)
+        if(probId < 0 || probId >= tableSize)
             throw new IllegalArgumentException();
         int hash1 = Math.abs(hashCode()%tableSize);
         int hash2 = (1 + (Math.abs(hashCode2()) % ( tableSize - 1 )));

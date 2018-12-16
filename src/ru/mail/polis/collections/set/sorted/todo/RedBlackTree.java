@@ -27,7 +27,7 @@ public class RedBlackTree<E extends Comparable<E>> implements ISelfBalancingSort
     }
 
     //todo: update it if required
-    static final class RBNode<E> {
+    final class RBNode<E> {
         E value;
         RBNode<E> left;
         RBNode<E> right;
@@ -41,6 +41,22 @@ public class RedBlackTree<E extends Comparable<E>> implements ISelfBalancingSort
             this.color = color;
         }
 
+        public RBNode<E> getSuccessor() {
+            RBNode<E> temp;
+            RBNode<E> node = this;
+            if(!(node.right == null || node.right == emptyNode)) {
+                temp = node.right;
+                while(!(temp.left == null || temp.left == emptyNode))
+                    temp = temp.left;
+                return temp;
+            }
+            temp = node.parent;
+            while(temp != emptyNode && node == temp.right) {
+                node = temp;
+                temp = temp.parent;
+            }
+            return temp;
+        }
         @Override
         public String toString() {
             return "RBNode{" +
@@ -121,7 +137,7 @@ public class RedBlackTree<E extends Comparable<E>> implements ISelfBalancingSort
         return root;
     }
 
-    //Функция восстановления свойств красно-чёрного дерева
+    //Функция восстановления свойств после добавления элемента
     private void balance(RBNode<E> node) {
         RBNode<E> uncle;
         while(node != root && node.parent.color == RBColor.RED) {
@@ -209,7 +225,107 @@ public class RedBlackTree<E extends Comparable<E>> implements ISelfBalancingSort
     @Override
     public boolean remove(E value) {
         Objects.requireNonNull(value);
+        RBNode<E> curr = root;
+        while(curr != emptyNode && curr != null) {
+            if(compare(value, curr.value) < 0)
+                curr = curr.left;
+            else if(compare(value, curr.value) > 0)
+                curr = curr.right;
+            else if(compare(value, curr.value) == 0)
+                break;
+        }
+        if(curr != emptyNode && compare(value, curr.value) == 0) {
+            RBNode<E> temp, successor;
+            if(curr == null || curr == emptyNode)
+                return false;
+            if(curr.left == null || curr.left == emptyNode || curr.right == null || curr.right == emptyNode)
+                successor = curr;
+            else
+                successor = curr.getSuccessor();
+
+            if(!(successor.left == null || successor.left == emptyNode))
+                temp = successor.left;
+            else
+                temp = successor.right;
+
+            temp.parent = successor.parent;
+            if(successor.parent == null || successor.parent == emptyNode)
+                root = temp;
+            else if(successor == successor.parent.left)
+                successor.parent.left = temp;
+            else
+                successor.parent.right = temp;
+            if(successor != curr)
+                curr.value = successor.value;
+
+            if(successor.color == RBColor.BLACK) {
+                removeFixUp(temp);
+            }
+            size--;
+            return true;
+        }
         return false;
+    }
+
+    //Функция восстановления свойств после удаления
+    private void removeFixUp(RBNode<E> node) {
+        RBNode<E> temp;
+        while(node != root && node.color == RBColor.BLACK) {
+            if(node == node.parent.left) {
+                temp = node.parent.right;
+                if(temp.color == RBColor.RED) {
+                    temp.color = RBColor.BLACK;
+                    node.parent.color = RBColor.RED;
+                    leftRotate(node.parent);
+                    temp = node.parent.right;
+                }
+                if(temp.left.color == RBColor.BLACK && temp.right.color == RBColor.BLACK) {
+                    temp.color = RBColor.RED;
+                    node = node.parent;
+                }
+                else {
+                    if(temp.right.color == RBColor.BLACK) {
+                        temp.left.color = RBColor.BLACK;
+                        temp.color = RBColor.RED;
+                        rightRotate(temp);
+                        temp = node.parent.right;
+                    }
+                    temp.color = node.parent.color;
+                    node.parent.color = RBColor.BLACK;
+                    temp.right.color = RBColor.BLACK;
+                    leftRotate(node.parent);
+                    node = root;
+                }
+            }
+            else {
+                temp = node.parent.left;
+                if(temp.color == RBColor.RED) {
+                    temp.color = RBColor.BLACK;
+                    node.parent.color = RBColor.RED;
+                    rightRotate(node.parent);
+                    temp = node.parent.left;
+                }
+                if(temp.left.color == RBColor.BLACK && temp.right.color == RBColor.BLACK) {
+                    temp.color = RBColor.RED;
+                    node = node.parent;
+                }
+                else {
+                    if(temp.left.color == RBColor.BLACK) {
+                        temp.right.color = RBColor.BLACK;
+                        temp.color = RBColor.RED;;
+                        leftRotate(temp);
+                        temp = node.parent.left;
+                    }
+                    temp.color = node.parent.color;
+                    node.parent.color = RBColor.BLACK;
+                    temp.left.color = RBColor.BLACK;
+
+                    rightRotate(node.parent);
+                    node = root;
+                }
+            }
+        }
+        node.color = RBColor.BLACK;
     }
 
     /**

@@ -47,7 +47,7 @@ public class AVLTreeIterable<E extends Comparable<E>> extends AVLTree<E> impleme
         private int nextIndex = 0;
         private int expectedModCount = modCount;
         AVLTreeIterator() {
-            values = (E []) new Object[size()];
+            values = (E []) new Comparable[size()];
             inorderTraverse(root);
             next = size() == 0 ? null : values[nextIndex];
         }
@@ -63,7 +63,9 @@ public class AVLTreeIterable<E extends Comparable<E>> extends AVLTree<E> impleme
                 throw new NoSuchElementException();
             lastReturned = next;
             nextIndex++;
-            next = values[nextIndex];
+            if(hasNext()) {
+                next = values[nextIndex];
+            }
             return lastReturned;
         }
 
@@ -96,7 +98,7 @@ public class AVLTreeIterable<E extends Comparable<E>> extends AVLTree<E> impleme
         private int nextIndex = 0;
         private int expectedModCount = modCount;
         AVLTreeDescendingIterator() {
-            values = (E []) new Object[size()];
+            values = (E []) new Comparable[size()];
             inorderReverse(root);
             next = size() == 0 ? null : values[nextIndex];
         }
@@ -112,7 +114,9 @@ public class AVLTreeIterable<E extends Comparable<E>> extends AVLTree<E> impleme
                 throw new NoSuchElementException();
             lastReturned = next;
             nextIndex++;
-            next = values[nextIndex];
+            if(hasNext()) {
+                next = values[nextIndex];
+            }
             return lastReturned;
         }
 
