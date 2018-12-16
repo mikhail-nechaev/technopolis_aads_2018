@@ -7,6 +7,7 @@ import ru.mail.polis.collections.list.todo.ArrayPriorityQueueSimple;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -72,5 +73,30 @@ public class TestIPriorityQueueBase {
         testPQ.add(11);
         testPQ.add(12);
         Assert.assertTrue(testPQ.contains(11));
+    }
+
+    @Test
+    public void iterator1() {
+        testPQ = new ArrayPriorityQueueSimple<>();
+        Assert.assertFalse(testPQ.iterator().hasNext());
+    }
+
+    @Test
+    public void iterator2() {
+        testPQ = new ArrayPriorityQueueSimple<>();
+        testPQ.add(1);
+        Iterator<Integer> iterator = testPQ.iterator();
+        Assert.assertTrue(iterator.hasNext());
+    }
+
+    @Test
+    public void iterator3() {
+        testPQ = new ArrayPriorityQueueSimple<>();
+        testPQ.add(1);
+        Iterator<Integer> iterator = testPQ.iterator();
+        Assert.assertTrue(iterator.hasNext());
+        Assert.assertTrue(iterator.next() == 1);
+        Assert.assertFalse(iterator.hasNext());
+        Assert.assertTrue(testPQ.size() == 1);
     }
 }
