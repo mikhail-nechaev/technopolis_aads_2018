@@ -84,6 +84,9 @@ public class OpenHashTable<E extends IOpenHashTableEntity> implements IOpenHashT
 
         int probId = 0;
         for(int i = value.hashCode(tableSize(), probId), j = -1; ; i = value.hashCode(tableSize(), ++probId)){
+            if(probId >= tableSize()){
+                throw new IllegalArgumentException();
+            }
             if(table[i] == DELETED){
                 j = (j == -1) ? i : j;
             } else if(table[i] != null){
@@ -119,6 +122,9 @@ public class OpenHashTable<E extends IOpenHashTableEntity> implements IOpenHashT
 
         int probId = 0;
         for(int i = value.hashCode(tableSize(), probId); ; i = value.hashCode(tableSize(), ++probId)){
+            if(probId >= tableSize()){
+                throw new IllegalArgumentException();
+            }
             if(table[i] == DELETED) continue;
             if(table[i] == null) return false;
 
@@ -146,6 +152,9 @@ public class OpenHashTable<E extends IOpenHashTableEntity> implements IOpenHashT
 
         int probId = 0;
         for(int i = value.hashCode(tableSize(), probId), j = -1; ; i = value.hashCode(tableSize(), ++probId)){
+            if(probId >= tableSize()){
+                throw new IllegalArgumentException();
+            }
             if(table[i] == DELETED){
                 j = (j == -1) ? i : j;
             } else if(table[i] != null){
