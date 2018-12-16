@@ -100,6 +100,7 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
         }
     }
 
+
     private void shiftDown(int parent) {
         int index = parent;
         while (index*2+1<count){
