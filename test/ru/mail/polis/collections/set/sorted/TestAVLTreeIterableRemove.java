@@ -70,13 +70,15 @@ public class TestAVLTreeIterableRemove {
             sortedSet.add(i);
         }
         Iterator<Integer> desc = sortedSet.descendingIterator();
-        for (int i = 9; i >= 5; i++) {
-            Assert.assertTrue(desc.next() == i);
+        for (int i = 9; i >= 5; i--) {
+            int next = desc.next();
+            Assert.assertTrue("i = " + i + ", n = " + next, next == i);
             desc.remove();
         }
         Iterator<Integer> asc = sortedSet.iterator();
         for (int i = 0; i < 5; i++) {
-            Assert.assertTrue(asc.next() == i);
+            int next = asc.next();
+            Assert.assertTrue("i = " + i + ", n = " + next, next == i);
         }
         Assert.assertFalse(asc.hasNext());
     }

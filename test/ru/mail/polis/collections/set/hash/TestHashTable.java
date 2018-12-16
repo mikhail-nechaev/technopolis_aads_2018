@@ -178,7 +178,7 @@ public class TestHashTable extends AbstractSetTest {
         Assert.assertTrue(validSet.isEmpty());
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class, timeout = 5000L)
     public void testBroken() {
         testSet.add(new BrokenStudent(0));
         testSet.add(new BrokenStudent(0));

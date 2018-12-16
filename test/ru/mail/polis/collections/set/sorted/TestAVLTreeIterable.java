@@ -2,6 +2,7 @@ package ru.mail.polis.collections.set.sorted;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import ru.mail.polis.collections.set.sorted.todo.AVLTreeIterable;
 
@@ -25,7 +26,7 @@ public class TestAVLTreeIterable {
 
     @Test
     public void test2() {
-        for (int i = 10; i >= 0; i++) {
+        for (int i = 10; i >= 0; i--) {
             sortedSet.add(i);
         }
         Iterator<Integer> iterator = sortedSet.iterator();
@@ -43,11 +44,11 @@ public class TestAVLTreeIterable {
 
     @Test
     public void test4() {
-        for (int i = 10; i >= 0; i++) {
+        for (int i = 10; i >= 0; i--) {
             sortedSet.add(i);
         }
         Iterator<Integer> iterator = sortedSet.descendingIterator();
-        for (int i = 10; i >= 0; i++) {
+        for (int i = 10; i >= 0; i--) {
             Assert.assertTrue(iterator.next() == i);
         }
         Assert.assertFalse(iterator.hasNext());

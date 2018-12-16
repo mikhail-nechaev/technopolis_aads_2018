@@ -88,7 +88,6 @@ public abstract class AbstractTestBalancedSortedSet extends AbstractSetTest {
     @Test
     public void test03_1() {
         for (int value = 0; value < 10; value++) {
-            System.out.println(value);
             check(valid, tested, value, TransformOperation.ADD);
         }
     }
