@@ -13,10 +13,10 @@ import java.util.Objects;
  */
 public class LinkedDequeSimple<E> implements IDeque<E> {
 
-    private static class Node<T> {
-        private Node<T> previous;
-        private Node<T> next;
-        private T value;
+    static class Node<T> {
+        Node<T> previous;
+        Node<T> next;
+        T value;
 
         Node(Node<T> previous, T value, Node<T> next) {
             this.previous = previous;
@@ -28,9 +28,9 @@ public class LinkedDequeSimple<E> implements IDeque<E> {
         }
     }
 
-    private Node<E> head;
-    private Node<E> tail;
-    private int size;
+    Node<E> head;
+    Node<E> tail;
+    int size;
 
     public LinkedDequeSimple() {
         head = null;
@@ -38,7 +38,7 @@ public class LinkedDequeSimple<E> implements IDeque<E> {
         size = 0;
     }
 
-    private void throwNPEIfNull(Object o) {
+    void throwNPEIfNull(Object o) {
         if (o == null) {
             throw new NullPointerException("Adding null is not supported");
         }
@@ -95,7 +95,7 @@ public class LinkedDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public E getFirst() {
-       throwExceptionIfEmpty();
+        throwExceptionIfEmpty();
         return head.value;
     }
 

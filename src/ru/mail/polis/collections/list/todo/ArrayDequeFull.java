@@ -242,8 +242,9 @@ public class ArrayDequeFull<E> extends ArrayDequeSimple<E> implements Deque<E> {
             return (T[]) Arrays.copyOf(linearized, size, a.getClass());
         }
         System.arraycopy(linearized, 0, a, 0, size);
-        if (a.length > size)
+        if (a.length > size) {
             a[size] = null;
+        }
         return a;
     }
 
