@@ -11,7 +11,7 @@ import java.util.NoSuchElementException;
  *
  * @param <E> the type of elements held in this deque
  */
-public abstract class LinkedDequeSimple<E> implements IDeque<E> {
+public class LinkedDequeSimple<E> implements IDeque<E> {
 
     private class Node<T> {
         T value;

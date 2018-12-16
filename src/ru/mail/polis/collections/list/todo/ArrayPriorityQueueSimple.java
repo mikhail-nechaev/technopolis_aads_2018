@@ -24,7 +24,9 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
 
     /**
      * Creates a {@code IPriorityQueue} containing the elements in the specified collection.
-     * <p>
+     *
+     * You may consider that all elements in collection is not a null.
+     *
      * Complexity = O(n)
      *
      * @param collection the collection whose elements are to be placed into this priority queue
@@ -46,8 +48,10 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
 
     /**
      * Creates a {@code IPriorityQueue} containing the elements in the specified collection
-     * that orders its elements according to the specified comparator.
-     * <p>
+     *  that orders its elements according to the specified comparator.
+     *
+     * You may consider that all elements in collection is not a null.
+     *
      * Complexity = O(n)
      *
      * @param collection the collection whose elements are to be placed into this priority queue
