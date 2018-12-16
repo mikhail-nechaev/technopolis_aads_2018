@@ -2,14 +2,7 @@ package ru.mail.polis.collections.list;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.junit.runners.Parameterized;
-import ru.mail.polis.collections.list.todo.ArrayDequeFull;
-import ru.mail.polis.collections.list.todo.ArrayDequeSimple;
-import ru.mail.polis.collections.list.todo.LinkedDequeFull;
-import ru.mail.polis.collections.list.todo.LinkedDequeSimple;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
@@ -18,22 +11,6 @@ import java.util.NoSuchElementException;
  * Since 30/11/2018.
  */
 public abstract class AbstractIDequeTest extends AbstractIQueueTest {
-
-    @Parameterized.Parameter()
-    public Class<?> testClass;
-
-    @Parameterized.Parameters(name = "{0}")
-    public static Collection<Class<?>> data() {
-        return Arrays.asList(
-                ArrayDequeSimple.class
-                ,
-                LinkedDequeSimple.class
-                ,
-                ArrayDequeFull.class
-                ,
-                LinkedDequeFull.class
-        );
-    }
 
     @Override
     public abstract IDeque<String> get();
