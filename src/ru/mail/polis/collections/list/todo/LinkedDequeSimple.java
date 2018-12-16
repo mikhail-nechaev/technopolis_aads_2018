@@ -13,11 +13,11 @@ import java.util.NoSuchElementException;
 public class LinkedDequeSimple<E> implements IDeque<E> {
 
 
-    private Node head;
+    Node head;
 
-    private Node tail;
+    Node tail;
 
-    private int N = 0;
+    int N = 0;
 
     /**
      * Inserts the specified element at the front of this deque.
@@ -228,11 +228,12 @@ public class LinkedDequeSimple<E> implements IDeque<E> {
 
         private Node target = head;
         private Node previousTargetForRemove;
+        private boolean canRemove = false;
 
         @Override
         public void remove() {
-            if (N > 0) {
-                if (head == tail) {
+            if (N > 0 && canRemove) {
+                if (size() == 1) {
                     clear();
                 } else if (previousTargetForRemove.previous == null) {
                     removeFirst();
@@ -259,6 +260,7 @@ public class LinkedDequeSimple<E> implements IDeque<E> {
                 E tmp = target.value;
                 previousTargetForRemove = new Node(target);
                 target = target.next;
+                canRemove = true;
                 return tmp;
             } else {
                 throw new NoSuchElementException("Deque is empty");
@@ -266,7 +268,7 @@ public class LinkedDequeSimple<E> implements IDeque<E> {
         }
     }
 
-    private class Node {
+    class Node {
 
         E value;
 

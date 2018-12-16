@@ -311,6 +311,7 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
 
         private int target = head;
         private int previousTarget;
+        private boolean canRemove = false;
 
         /**
          * Removes from the underlying collection the last element returned
@@ -322,7 +323,7 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
         @Override
         public void remove() {
 
-            if (target == head || N == 0) {
+            if (target == head || N == 0 || !canRemove) {
                 throw new IllegalStateException();
             }
 
@@ -343,6 +344,7 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
                 target--;
             }
 
+            canRemove = false;
             N--;
 
         }
@@ -377,6 +379,7 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
                     target = 0;
                 }
 
+                canRemove = true;
                 return (E) value;
             } else {
                 throw new NoSuchElementException("Deque is empty");

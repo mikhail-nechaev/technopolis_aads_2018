@@ -504,6 +504,7 @@ public class ArrayDequeFull<E> extends ArrayDequeSimple<E> implements Deque<E> {
         private int i = N;
         private int target = tail;
         private int previousTarget;
+        private boolean canRemove = false;
 
         /**
          * Returns {@code true} if the iteration has more elements.
@@ -535,6 +536,8 @@ public class ArrayDequeFull<E> extends ArrayDequeSimple<E> implements Deque<E> {
                     target = deque.length - 1;
                 }
 
+                canRemove = true;
+
                 return (E) value;
             } else {
                 throw new NoSuchElementException("Deque is empty");
@@ -551,7 +554,7 @@ public class ArrayDequeFull<E> extends ArrayDequeSimple<E> implements Deque<E> {
         @Override
         public void remove() {
 
-            if (N == 0 || target == tail) {
+            if (N == 0 || target == tail || !canRemove) {
                 throw new IllegalStateException();
             }
 
@@ -572,6 +575,7 @@ public class ArrayDequeFull<E> extends ArrayDequeSimple<E> implements Deque<E> {
                 tail = tail == 0 ? deque.length - 1 : tail - 1;
             }
 
+            canRemove = false;
             N--;
 
         }
