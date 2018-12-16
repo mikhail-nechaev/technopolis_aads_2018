@@ -36,7 +36,8 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
             throw new NullPointerException();
         }
         if (isEmpty()) {
-
+            head = 5;
+            tail = 5;
         } else {
             head = head == 0 ? array.length - 1 : head - 1;
         }
@@ -73,7 +74,7 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
         @SuppressWarnings("unchecked")
         E first = (E) array[head];
         array[head] = null;
-        head = head == array.length - 1 ? 0: head + 1;
+        head = head == array.length - 1 ? 0 : head + 1;
         size--;
         return first;
     }
@@ -106,7 +107,7 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
             throw new NullPointerException();
         }
         if (isEmpty()) {
-
+            head = tail = array.length / 2;
         } else {
             tail = tail == array.length - 1 ? 0 : tail + 1;
         }

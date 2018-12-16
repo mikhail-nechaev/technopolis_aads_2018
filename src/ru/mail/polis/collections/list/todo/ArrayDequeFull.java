@@ -1,6 +1,5 @@
 package ru.mail.polis.collections.list.todo;
 
-import java.lang.reflect.Array;
 import java.util.*;
 
 public class ArrayDequeFull<E> extends ArrayDequeSimple<E> implements Deque<E> {
@@ -231,13 +230,13 @@ public class ArrayDequeFull<E> extends ArrayDequeSimple<E> implements Deque<E> {
 
     private class DescendingIterator implements Iterator<E> {
 
-        private int cursor = tail;
+        private int cursor = tail < array.length - 1 ? tail + 1 : 0;
         private int end = head;
         private int lastReturn = -1;
 
         @Override
         public boolean hasNext() {
-            return cursor != end;
+            return cursor != end && !isEmpty();
         }
 
         @Override
