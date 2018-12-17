@@ -32,7 +32,7 @@ public interface ICollection<E> {
      * @return {@code true} if this collection contains the specified element
      * @throws NullPointerException if the specified element is null
      */
-    boolean contains(Object value);
+    boolean contains(E value);
 
     /**
      * Removes all of the elements from this collection.

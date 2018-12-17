@@ -72,21 +72,6 @@ public class OpenHashTable<E extends IOpenHashTableEntity>  implements IOpenHash
     public boolean add(E value){
         float occupancy = (float) length / (float) arrayHash.length;
         boolean isComplete = false;
-        /*if(typeParameterClass.equals(Integer) || typeParameterClass.equals(Double) || typeParameterClass.equals(Float)) {
-            for(int i = 0; i < arrayHash.length; i++) {
-                int j = (hashFunctionInteger(value) + i * hashFunctionInteger2(value)) % arrayHash.length;
-                if(isNil(arrayHash[j])){
-                    if(occupancy >= LOAD_FACTOR){
-                        doubleCapacity();
-                    }
-                    arrayHash[j] = value;
-                    isComplete = true;
-                    length ++;
-                    break;
-                }
-            }
-        }*/
-
 
         return isComplete;
     }
@@ -115,8 +100,20 @@ public class OpenHashTable<E extends IOpenHashTableEntity>  implements IOpenHash
      * @throws IllegalArgumentException if some property of the element prevents it from being added to this collection
      *                                  In other words if {@link IOpenHashTableEntity#hashCode(int, int)} specified element is incorrect.
      */
+
+
+    /**
+     * Returns {@code true} if this collection contains the specified element.
+     * aka collection contains element el such that {@code Objects.equals(el, value) == true}
+     *
+     * @param value element whose presence in this collection is to be tested
+     * @return {@code true} if this collection contains the specified element
+     * @throws NullPointerException     if the specified element is null
+     * @throws IllegalArgumentException if some property of the element prevents it from being added to this collection
+     *                                  In other words if {@link IOpenHashTableEntity#hashCode(int, int)} specified element is incorrect.
+     */
     @Override
-    public boolean contains(Object value) {
+    public boolean contains(E value) {
        /* for(int i=0; i < arrayHash.length; i++){
             //выполняя i - пробу, мы считаем индекс в массиве
             int j = hashFunction(i);

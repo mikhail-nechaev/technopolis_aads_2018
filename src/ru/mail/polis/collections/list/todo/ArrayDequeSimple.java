@@ -179,7 +179,7 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
 
 
     @Override
-    public boolean contains(Object value) throws NullPointerException {
+    public boolean contains(E value) throws NullPointerException {
         if(value == null){
             throw new NullPointerException();
         }

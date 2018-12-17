@@ -553,7 +553,7 @@ public class RedBlackTree<E extends Comparable<E>> implements ISelfBalancingSort
      * @throws NullPointerException if the specified element is null
      */
     @Override
-    public boolean contains(Object value) throws NullPointerException {
+    public boolean contains(E value) throws NullPointerException {
         if(value == null){
             throw new NullPointerException();
         }

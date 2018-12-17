@@ -64,7 +64,7 @@ public  class LinkedDequeFull<E> extends LinkedDequeSimple<E> implements Deque<E
 
     @Override
     public boolean contains(Object value) {
-        return super.contains(value);
+        return super.contains((E) value);
     }
 
 

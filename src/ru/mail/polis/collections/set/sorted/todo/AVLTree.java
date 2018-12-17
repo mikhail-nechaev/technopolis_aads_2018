@@ -264,7 +264,7 @@ public class AVLTree<E extends Comparable<E>> implements ISelfBalancingSortedTre
 
     @SuppressWarnings("RedundantIfStatement")
     @Override
-    public boolean contains(Object value) throws NullPointerException {
+    public boolean contains(E value) throws NullPointerException {
         if(value == null){
             throw new NullPointerException();
         }
