@@ -181,12 +181,12 @@ public class RedBlackTree<E extends Comparable<E>> implements ISelfBalancingSort
                     if (x == x.parent.right) {
                         x = x.parent;
                         leftRotate(x);
-                    } else {//тут не было else
+                    }
 
-                    x.parent.color = RBColor.BLACK;
-                    x.parent.parent.color = RBColor.RED;
-                    rightRotate(x.parent.parent);
-                      }
+                        x.parent.color = RBColor.BLACK;
+                        x.parent.parent.color = RBColor.RED;
+                        rightRotate(x.parent.parent);
+
                 }
             } else {
                 RBNode<E> y = x.parent.parent.left;
@@ -199,11 +199,11 @@ public class RedBlackTree<E extends Comparable<E>> implements ISelfBalancingSort
                     if (x == x.parent.left) {
                         x = x.parent;
                         rightRotate(x);
-                    } else { //тут не было else
-                    x.parent.color = RBColor.BLACK;
-                    x.parent.parent.color = RBColor.RED;
-                    leftRotate(x.parent.parent);
-                     }
+                    }
+                        x.parent.color = RBColor.BLACK;
+                        x.parent.parent.color = RBColor.RED;
+                        leftRotate(x.parent.parent);
+
                 }
             }
         }
@@ -224,8 +224,8 @@ public class RedBlackTree<E extends Comparable<E>> implements ISelfBalancingSort
             throw new NullPointerException();
         }
 
-        RBNode<E> node =  search(root, value);
-        if (node == nilT){
+        RBNode<E> node = search(root, value);
+        if (node == nilT) {
             return false;
         }
         delete(node);
@@ -338,14 +338,15 @@ public class RedBlackTree<E extends Comparable<E>> implements ISelfBalancingSort
     }
 
     protected RBNode<E> treeMinimum(RBNode<E> x) {
-       return x.left == nilT ? x: treeMinimum(x.left);
+        return x.left == nilT ? x : treeMinimum(x.left);
     }
+
     protected RBNode<E> treeMaximum(RBNode<E> x) {
-        return x.right == nilT ? x: treeMaximum(x.right);
+        return x.right == nilT ? x : treeMaximum(x.right);
     }
 
 
-    public RBNode<E> search(RBNode<E> node, E value){
+    public RBNode<E> search(RBNode<E> node, E value) {
         if (node == nilT) {
             return node;
         }
@@ -401,7 +402,7 @@ public class RedBlackTree<E extends Comparable<E>> implements ISelfBalancingSort
         if (isEmpty()) {
             throw new NoSuchElementException();
         }
-       return treeMaximum(root).value;
+        return treeMaximum(root).value;
     }
 
     /**
