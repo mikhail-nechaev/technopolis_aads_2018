@@ -314,12 +314,14 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
                 return false;
             } else {
                 System.arraycopy(data, i, data, i + 1, elementsAfter);
+                data[i] = null;
                 tail = t == 0 ? data.length - 1 : t - 1;
                 return true;
             }
         } else {
             if (i < t) {
                 System.arraycopy(data, i, data, i + 1, elementsAfter);
+                data[i] = null;
                 tail = t - 1;
                 return true;
             } else {
