@@ -71,11 +71,7 @@ public class TestIPriorityQueueComp {
 
     @Test(expected = NoSuchElementException.class)
     public void noRemove() {
-        try {
-            testPQ.remove();
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        }
+        testPQ.remove();
     }
 
     @Test

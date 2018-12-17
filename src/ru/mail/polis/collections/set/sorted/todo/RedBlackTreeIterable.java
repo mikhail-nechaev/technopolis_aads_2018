@@ -1,6 +1,5 @@
 package ru.mail.polis.collections.set.sorted.todo;
 
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
@@ -19,133 +18,92 @@ public class RedBlackTreeIterable<E extends Comparable<E>> extends RedBlackTree<
         super();
     }
 
-    /**
-     * Creates a {@code ISelfBalancingSortedTreeSet} that orders its elements according to the specified comparator.
-     *
-     * @param comparator comparator the comparator that will be used to order this priority queue.
-     * @throws NullPointerException if the specified comparator is null
-     */
+
     public RedBlackTreeIterable(Comparator<E> comparator) throws NullPointerException {
         super(comparator);
     }
 
 
 
-    protected class StackIterator<E> {
-        private E[] Nodes;
-        private int arrayLength;
+    private class RBTreeIterator<E extends Comparable<E>> implements Iterator{
 
-        private static final int MIN_INITIAL_CAPACITY = 25;
-
-        private static final float LOAD_FACTOR = (float) 0.8;
-
-        StackIterator() {
-            Nodes = (E[]) new Object[MIN_INITIAL_CAPACITY];
-            arrayLength = 0;
+        private void inorderTraverse(RBNode currentNode) {
+            if (currentNode == null) return;
+            inorderTraverse(currentNode.left);
+            Nodes[index++] = (E) currentNode.value;
+            inorderTraverse(currentNode.right);
         }
-
-        public void push(E value) throws NullPointerException {
-            if (value == null) {
-                throw new NullPointerException();
-            }
-            float occupancy = (float) arrayLength / (float) Nodes.length;
-            if (occupancy >= LOAD_FACTOR) {
-                doubleCapacity();
-            }
-            arrayLength++;
-            Nodes[arrayLength - 1] = value;
-        }
-
-        private void doubleCapacity() {
-            Nodes = Arrays.copyOf(Nodes, Nodes.length << 1);
-        }
-
-        private E pop() {
-            if (isEmpty()) {
-                throw new NoSuchElementException();
-            }
-            arrayLength--;
-            return Nodes[arrayLength];
-        }
-
-       /* private void removeAtIndex(RBNode current){
-            remove(current.value);
+       /* private void removeAtIndex(int index){
+            AVLNode currentNode = null;
+            currentNode.value = Nodes[index];
+            AVLTreeIterable.this.remove(currentNode.value);
         }*/
 
-        private boolean isEmpty() {
-            return arrayLength == 0;
+        private E [] Nodes;
+        private int index;
+        private int cursor;
+        private int sizeIterable = size();
+        private E current;
+
+
+        RBTreeIterator(){
+            Nodes =(E[]) new Comparable[size()];
+            inorderTraverse(root);
         }
 
-    }
-
-
-    private class RBNodeIterator <E extends Comparable<E>>implements Iterator<E> {
-
-
-
-        RBNode <E> index = (RBNode<E>) root;
-        StackIterator <RBNode<E>> stackIterator;
-        public RBNodeIterator(){
-            stackIterator = new StackIterator<>();
-
-            while (index != null){
-                stackIterator.push(index);
-                index = index.left;
-            }
-        }
         @Override
         public boolean hasNext() {
-            return !stackIterator.isEmpty();
+            return cursor < sizeIterable;
         }
 
 
+
         @Override
-        public E next() throws NoSuchElementException {
+        public E next() {
             if(!hasNext()){
                 throw new NoSuchElementException();
             }
-            RBNode<E> node = stackIterator.pop();
-            E temp = node.value;
-            if (node.right != null) {
-                node = node.right;
-                while (node != null) {
-                    stackIterator.push(node);
-                    node = node.left;
-                }
-
-            }
-
-            return temp;
+            current = Nodes[cursor];
+            cursor++;
+            return  current;
         }
-        @Override
-        public void remove() throws IllegalStateException{
-            if(index == null){
+
+
+       /* @Override
+        public void remove() {
+            if(cursor < 0){
                 throw new IllegalStateException();
             }
-            //stackIterator.removeAtIndex(index);
-        }
+            removeAtIndex(index);
+            cursor--;
+        }*/
     }
 
 
+    private class RBTreeDescendingIterator<E extends Comparable<E>> implements Iterator{
 
-    private class RedBlackTreeDescendingIterator <E extends Comparable<E>> implements Iterator<E>{
-
-        RBNode <E> index = (RBNode<E>) root;
-        StackIterator <RBNode<E>> stackIterator;
-
-        RedBlackTreeDescendingIterator (){
-            stackIterator = new StackIterator<>();
-
-            while (index != null){
-                stackIterator.push(index);
-                index = index.right;
-            }
+        private void reverseInorderTraverse(RBNode current) {
+            if (current == null) return;
+            reverseInorderTraverse(current.right);
+            Nodes[index++] = (E) current.value;
+            reverseInorderTraverse(current.left);
         }
 
+        private E [] Nodes;
+        private int index;
+        private int cursor;
+        private int sizeIterable = size();
+        private E current;
+
+
+        RBTreeDescendingIterator(){
+            Nodes =(E[]) new Comparable[size()];
+            reverseInorderTraverse(root);
+        }
 
         @Override
         public boolean hasNext() {
-            return !stackIterator.isEmpty();
+            return cursor < sizeIterable;
         }
 
 
@@ -154,17 +112,9 @@ public class RedBlackTreeIterable<E extends Comparable<E>> extends RedBlackTree<
             if(!hasNext()){
                 throw new NoSuchElementException();
             }
-            RBNode <E> node = stackIterator.pop();
-            E temp = node.value;
-            if (node.left != null) {
-                node = node.left;
-                while (node != null) {
-                    stackIterator.push(node);
-                    node = node.right;
-                }
-
-            }
-            return temp;
+            current = Nodes[cursor];
+            cursor++;
+            return  current;
         }
     }
 
@@ -173,23 +123,13 @@ public class RedBlackTreeIterable<E extends Comparable<E>> extends RedBlackTree<
 
 
 
-    /**
-     * Returns an iterator over the elements in this set in ascending order.
-     *
-     * @return an iterator over the elements in this set in ascending order
-     */
     @Override
     public Iterator<E> iterator() {
-        return new RBNodeIterator<>();
+        return new RBTreeIterator<>();
     }
 
-    /**
-     * Returns an iterator over the elements in this set in descending order.
-     *
-     * @return an iterator over the elements in this set in descending order
-     */
     @Override
     public Iterator<E> descendingIterator() {
-        return new RedBlackTreeDescendingIterator<>();
+        return new RBTreeDescendingIterator();
     }
 }

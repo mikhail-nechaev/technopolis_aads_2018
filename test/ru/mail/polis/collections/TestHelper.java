@@ -14,7 +14,7 @@ import java.util.Set;
  */
 public class TestHelper {
 
-    public static final Collection<Object[]> COMPARATORS = Arrays.asList(new Object[][]{
+    public static final Collection<Object[]> COMPARATORS = Set.of(new Object[][]{
             {Comparator.naturalOrder(), "NATURAL"},
             {Comparator.reverseOrder(), "REVERSE"},
             {Comparator.comparingInt((Integer v) -> v % 2).thenComparingInt(v -> v), "EVEN_FIRST"},

@@ -70,7 +70,7 @@ public class TestIPriorityQueue {
     }
 
     @Test(expected = NoSuchElementException.class)
-    public void noRemove() throws NoSuchMethodException {
+    public void noRemove()  {
         testPQ.remove();
     }
 
@@ -133,7 +133,7 @@ public class TestIPriorityQueue {
         return eq(truePQ.element(), testPQ.element());
     }
 
-    private boolean remove(PriorityQueue<Integer> truePQ, IPriorityQueue<Integer> testPQ) throws NoSuchMethodException {
+    private boolean remove(PriorityQueue<Integer> truePQ, IPriorityQueue<Integer> testPQ) {
         return eq(truePQ.remove(), testPQ.remove());
     }
 

@@ -52,9 +52,6 @@ public class OpenHashTable<E extends IOpenHashTableEntity>  implements IOpenHash
 
     private void doubleCapacity(){
         int newCapacity = arrayHash.length << 1;
-        if(newCapacity < 0){
-            throw new IllegalStateException("Sorry, size of Table too big");
-        }
         E [] a = (E[]) new Object[newCapacity];
         System.arraycopy(arrayHash, 0, a, 0,arrayHash.length);
         arrayHash = a;

@@ -43,7 +43,7 @@ public interface IPriorityQueue<E extends Comparable<E>> extends ICollectionIter
      * @return the head of this queue
      * @throws java.util.NoSuchElementException if this queue is empty
      */
-    E remove() throws NoSuchMethodException;
+    E remove() ;
 
     /**
      * Retrieves, but does not remove, the head of this queue.

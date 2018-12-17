@@ -1,6 +1,8 @@
 package ru.mail.polis.collections.iterator.todo;
 
+import java.util.Arrays;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 import ru.mail.polis.collections.iterator.IPeekingIterator;
 import ru.mail.polis.collections.list.todo.ArrayPriorityQueueSimple;
@@ -17,7 +19,7 @@ import ru.mail.polis.collections.list.todo.ArrayPriorityQueueSimple;
  * k — суммарное количество элементов
  */
 public class MergingPeekingIncreasingIterator implements Iterator<Integer> {
-    ArrayPriorityQueueSimple<IPeekingIterator<Integer>> arrayPriorityQueueSimple = new ArrayPriorityQueueSimple<>();
+    ArrayPriorityQueueSimple<IPeekingIterator<Integer>> arrayPriorityQueueSimple;
 
     /**
      * Creates a {@code MergingPeekingIncreasingIterator} containing the inside all elements of this specified iterators.
@@ -27,7 +29,7 @@ public class MergingPeekingIncreasingIterator implements Iterator<Integer> {
      * @param iterators the iterators whose are to be placed into this merging peeking increasing iterator
      */
     public MergingPeekingIncreasingIterator(IntegerIncreasingSequencePeekingIterator... iterators) {
-        //todo: do some stuff with iterators
+        arrayPriorityQueueSimple = new ArrayPriorityQueueSimple<>(Arrays.asList(iterators));
     }
 
     /**
@@ -41,7 +43,7 @@ public class MergingPeekingIncreasingIterator implements Iterator<Integer> {
      */
     @Override
     public boolean hasNext() {
-        throw new UnsupportedOperationException("todo: implement this");
+        return arrayPriorityQueueSimple.size() > 0;
     }
 
     /**
@@ -54,6 +56,14 @@ public class MergingPeekingIncreasingIterator implements Iterator<Integer> {
      */
     @Override
     public Integer next() {
-        throw new UnsupportedOperationException("todo: implement this");
+        if(!hasNext()){
+            throw new NoSuchElementException();
+        }
+        IntegerIncreasingSequencePeekingIterator iterator = (IntegerIncreasingSequencePeekingIterator) arrayPriorityQueueSimple.remove();
+        Integer value = iterator.next();
+        if (iterator.hasNext()) {
+            arrayPriorityQueueSimple.add(iterator);
+        }
+        return value;
     }
 }

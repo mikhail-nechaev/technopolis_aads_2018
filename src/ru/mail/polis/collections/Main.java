@@ -20,60 +20,13 @@ public class Main {
     public static void main(String[] args) {
 
 
-
-
-       /* RedBlackTree redBlackTree = new RedBlackTree();
-        try {
-            redBlackTree.add(1);
-            redBlackTree.add(2);
-            redBlackTree.add(3);
-            redBlackTree.add(4);
-            redBlackTree.add(6);
-            redBlackTree.add(7);
-            redBlackTree.add(8);
-            redBlackTree.add(12);
-            redBlackTree.add(11);
-            redBlackTree.add(10);
-            redBlackTree.add(9);
-            redBlackTree.add(8);
-            System.out.println(redBlackTree.contains(100));
-            System.out.println(redBlackTree.size());
-            redBlackTree.checkBalance();
-            redBlackTree.remove(3);
-            redBlackTree.checkBalance();
-            redBlackTree.remove(7);
-            redBlackTree.checkBalance();
-            redBlackTree.remove(12);
-            redBlackTree.checkBalance();
-            redBlackTree.remove(19);
-            redBlackTree.checkBalance();
-            redBlackTree.remove(2);
-            redBlackTree.checkBalance();
-            redBlackTree.remove(1);
-            redBlackTree.checkBalance();
-            redBlackTree.remove(9);
-            redBlackTree.checkBalance();
-            redBlackTree.remove(25);
-            redBlackTree.checkBalance();
-            redBlackTree.remove(33);
-            redBlackTree.checkBalance();
-            System.out.println(redBlackTree.isEmpty());
+        AVLTreeIterable avlTreeIterable = new AVLTreeIterable();
+        for(int i = 0; i < 20; i++){
+            avlTreeIterable.add(i);
         }
-        catch (UnbalancedTreeException e){
-            e.printStackTrace();
-        }*/
-
-
-
-
-
-
-
-
-
-
-
-
-
+        Iterator iterator = avlTreeIterable.iterator();
+        while (iterator.hasNext()){
+            System.out.println(iterator.next());
+        }
     }
 }

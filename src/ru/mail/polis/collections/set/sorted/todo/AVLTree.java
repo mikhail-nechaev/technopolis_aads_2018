@@ -16,18 +16,19 @@ import java.util.Objects;
  */
 @SuppressWarnings("unchecked")
 
-public class AVLTree<E extends Comparable<E>> implements ISelfBalancingSortedTreeSet<E> {
+public class AVLTree<E extends Comparable<E>> implements ISelfBalancingSortedTreeSet<E>  {
 
 
-    protected static class AVLNode<E extends  Comparable<E>> {
+    protected static class AVLNode<E extends  Comparable<E>>  {
         E value;
         AVLNode<E> left;
         AVLNode<E> right;
         int height = 1;
 
-        AVLNode(E value){
+         AVLNode(E value){
             this.value = value;
         }
+
     }
 
 

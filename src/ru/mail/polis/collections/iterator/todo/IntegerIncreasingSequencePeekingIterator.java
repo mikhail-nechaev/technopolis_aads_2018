@@ -4,6 +4,7 @@ import ru.mail.polis.collections.iterator.IIncreasingSequenceIterator;
 import ru.mail.polis.collections.iterator.IPeekingIterator;
 
 import java.util.NoSuchElementException;
+import java.util.Random;
 
 /**
  *
@@ -15,89 +16,67 @@ public class IntegerIncreasingSequencePeekingIterator implements IIncreasingSequ
     private int last;
     private int maxStep;
     private int index;
+    private int lastReterned;
+    private int count;
 
 
-    private void increment(){
-        index ++;
-    }
 
-
-    /**
-     * minStep = 1
-     *
-     * first must be less or equal last
-     *
-     * maxStep must be positive
-     *
-     * @param first — min value in iterator
-     * @param last - max value in iterator included
-     * @param maxStep — max diff between adjacent values
-     * @throws IllegalArgumentException if arguments is invalid
-     */
-    public IntegerIncreasingSequencePeekingIterator(int first, int last, int maxStep) throws IllegalStateException {
+    public IntegerIncreasingSequencePeekingIterator(int first, int last, int maxStep)  {
+        if(maxStep < 1 || first > last){
+            throw new IllegalArgumentException();
+        }
         this.first = first;
         this.last = last;
         this.maxStep = maxStep;
         this.index = this.first;
-        if(maxStep < 1 || first > last){
-            throw new IllegalStateException();
-        }
+        this.count = 0;
 
     }
 
-
-    /**
-     * Returns {@code true} if the iteration has more elements.
-     *
-     * In other words, returns {@code false} if lastNextElement + minStep > last.
-     *
-     * @return {@code true} if the iteration has more elements
-     */
     @Override
     public boolean hasNext() {
-        return index < last;
+        return count == 0 || lastReterned < last;
     }
 
-    /**
-     * Returns the next element in the iteration.
-     *
-     * @return the next element in the iteration
-     * @throws NoSuchElementException if the iteration has no more elements
-     */
+
     @Override
     public Integer next() {
         if(!hasNext()){
             throw new NoSuchElementException();
         }
-        int stp;
-        /**/
-        return 1;
+        lastReterned = index;
+        long step =(long) new Random().nextInt(maxStep) + 1L;
+        while (step > Integer.MAX_VALUE){
+            step =(long) new Random().nextInt(maxStep) + 1L;
+        }
+
+        if((long)index + step > last){
+            index = last;
+        }
+        else {
+            index += step;
+        }
+        count ++;
+        return lastReterned;
     }
 
-    /**
-     * Retrieves the next element in the iteration, but does not iterate.
-     *
-     * @return the next element in the iteration
-     * @throws NoSuchElementException if the iteration has no more elements
-     */
+
     @Override
     public Integer peek() {
-        throw new UnsupportedOperationException("todo: implement this");
+        if(!hasNext()){
+            throw new NoSuchElementException();
+        }
+        return index;
     }
 
-    /**
-     * Compares this object with the specified object for order.
-     * Returns a negative integer, zero, or a positive integer as this peeked value is less
-     * than, equal to, or greater than the peeked value specified object.
-     *
-     * <p> If iterator has no elements so it is less.
-     *
-     * @param other the {@link IPeekingIterator} to be compared.
-     * @return a negative integer, zero, or a positive integer as this peeked value
-     * is less than, equal to, or greater than the peeked value specified iterator.
-     */
     @Override
     public int compareTo(IPeekingIterator<Integer> other) {
-        throw new UnsupportedOperationException("todo: implement this");
+        if(this.hasNext() && other.hasNext()){
+            return Integer.compare(peek(), other.peek());
+        }
+        if(other.hasNext()){
+            return -1;
+        }
+        return 1;
     }
 }

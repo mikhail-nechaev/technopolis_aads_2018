@@ -18,7 +18,7 @@ import java.util.Deque;
 /**
  * Makes sense to make sure that the TestIDeque for Full* classes passes.
  */
-@SuppressWarnings("unchecked")
+
 @RunWith(value = Parameterized.class)
 public class TestFullDeque extends AbstractTestFullDeque {
 
