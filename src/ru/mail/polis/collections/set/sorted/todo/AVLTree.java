@@ -127,7 +127,10 @@ public class AVLTree<E extends Comparable<E>> implements ISelfBalancingSortedTre
         return size - oldSize != 0;
     }
 
-    private AVLNode<E> findMin(AVLNode<E> cur){
+    protected AVLNode<E> findMin(AVLNode<E> cur){
+        if(cur == null){
+            throw new NoSuchElementException();
+        }
         AVLNode<E> min = cur;
         while(min.left != null){
             min = min.left;
@@ -143,7 +146,10 @@ public class AVLTree<E extends Comparable<E>> implements ISelfBalancingSortedTre
         return balance(cur);
     }
 
-    private AVLNode<E> findMax(AVLNode<E> cur){
+    protected AVLNode<E> findMax(AVLNode<E> cur){
+        if(cur == null){
+            throw new NoSuchElementException();
+        }
         AVLNode<E> max = cur;
         while(max.right != null){
             max = max.right;

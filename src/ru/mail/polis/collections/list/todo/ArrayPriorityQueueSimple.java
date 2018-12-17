@@ -232,7 +232,6 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
 
     private void removeElement(int index) {
         size--;
-        array[index] = swap(array[size], array[size] = array[index]);
         siftDown(index);
     }
 

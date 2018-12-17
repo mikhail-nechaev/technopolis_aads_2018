@@ -3,7 +3,6 @@ package ru.mail.polis.collections.iterator.todo;
 import ru.mail.polis.collections.iterator.IIncreasingSequenceIterator;
 import ru.mail.polis.collections.iterator.IPeekingIterator;
 
-import java.security.InvalidAlgorithmParameterException;
 import java.util.NoSuchElementException;
 import java.util.Random;
 
