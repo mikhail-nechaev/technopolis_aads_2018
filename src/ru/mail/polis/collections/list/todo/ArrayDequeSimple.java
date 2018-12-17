@@ -294,42 +294,5 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
             canRemove = false;
             ArrayDequeSimple.this.delete(lastRealIndex);
         }
-//        private int cursor = head;
-//        private int end = tail;
-//        private int lastReturn = -1;
-//
-//        @Override
-//        public boolean hasNext() {
-//            return cursor != end;
-//        }
-//
-//        @Override
-//        public E next() {
-//            if (cursor == end) {
-//                throw new NoSuchElementException();
-//            }
-//            cursor = cursor == array.length - 1 ? 0 : cursor + 1;
-//            @SuppressWarnings("unchecked")
-//            E next = (E) array[cursor];
-//            if (tail != end || next == null) {
-//                throw new ConcurrentModificationException();
-//            }
-//            lastReturn = cursor;
-//            return next;
-//        }
-//
-//        @Override
-//        public void remove() {
-//
-//            if (lastReturn == tail) {
-//                removeLast();
-//            } else if (lastReturn == head) {
-//                removeFirst();
-//            } else {
-//                lastReturn.prev.next = lastReturn.next;
-//                lastReturn.next.prev = lastReturn.prev;
-//                size--;
-//            }
-//        }
     }
 }
