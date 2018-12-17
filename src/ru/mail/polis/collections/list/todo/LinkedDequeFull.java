@@ -589,28 +589,4 @@ public class LinkedDequeFull<E> extends LinkedDequeSimple<E> implements Deque<E>
         }
     }
 
-    private E removeNode(Node<E> node) {
-        E value = node.value;
-        Node<E> next = node.next;
-        Node<E> prev = node.prev;
-
-        if (next == null) {
-            last = prev;
-        } else {
-            next.prev = prev;
-        }
-
-        if (prev == null) {
-            first = next;
-        } else {
-            prev.next = next;
-        }
-
-        node.next = null;
-        node.prev = null;
-        node.value = null;
-
-        size--;
-        return value;
-    }
 }

@@ -215,6 +215,7 @@ public class LinkedDequeSimple<E> implements IDeque<E> {
     private class LinkedDequeIterator implements Iterator<E> {
 
         private Node<E> current = first;
+        private boolean removed = false;
 
 
         /**
@@ -240,6 +241,8 @@ public class LinkedDequeSimple<E> implements IDeque<E> {
             if (!hasNext()) throw new NoSuchElementException();
             E value = current.value;
             current = current.next;
+
+            removed = false;
             return value;
         }
 
@@ -262,7 +265,39 @@ public class LinkedDequeSimple<E> implements IDeque<E> {
          */
         @Override
         public void remove() {
-
+            if (current == first || removed) throw new IllegalStateException();
+            if (current != null) {
+                removeNode(current.prev);
+            } else {
+                removeNode(last);
+            }
+            removed = true;
         }
+    }
+
+
+    E removeNode(Node<E> node) {
+        E value = node.value;
+        Node<E> next = node.next;
+        Node<E> prev = node.prev;
+
+        if (next == null) {
+            last = prev;
+        } else {
+            next.prev = prev;
+        }
+
+        if (prev == null) {
+            first = next;
+        } else {
+            prev.next = next;
+        }
+
+        node.next = null;
+        node.prev = null;
+        node.value = null;
+
+        size--;
+        return value;
     }
 }
