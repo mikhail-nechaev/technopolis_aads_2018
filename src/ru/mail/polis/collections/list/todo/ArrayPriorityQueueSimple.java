@@ -253,9 +253,25 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
 
         @Override
         public E next() {
+            if (!hasNext()) {
+                throw new NoSuchElementException();
+            }
             pointer++;
             methodNextWasCalled = true;
             return (E) array[pointer];
+        }
+
+        @Override
+        public void remove() {
+            if (!methodNextWasCalled) {
+                throw new IllegalStateException();
+            }
+            methodNextWasCalled = false;
+            array[pointer] = array[size - 1];
+            array[size - 1] = null;
+            size--;
+            siftDown(pointer);
+            pointer--;
         }
     }
 }
