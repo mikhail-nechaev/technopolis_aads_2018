@@ -130,9 +130,16 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
 
     }
 
-
+    /**
+     * Retrieves and removes the head of this queue.
+     *
+     * Complexity = O(log(n))
+     *
+     * @return the head of this queue
+     * @throws java.util.NoSuchElementException if this queue is empty
+     */
     @Override
-    public E remove()  throws NoSuchElementException {
+    public E remove() {
         if (isEmpty()) {
             throw new NoSuchElementException();
         }
@@ -151,7 +158,7 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
 
 
     @Override
-    public E element() throws NoSuchElementException {
+    public E element() {
         if (arrayLength == 0) {
             throw new NoSuchElementException();
         }

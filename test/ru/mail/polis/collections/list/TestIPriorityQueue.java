@@ -86,7 +86,7 @@ public class TestIPriorityQueue {
     }
 
     @Test
-    public void min2() throws NoSuchMethodException {
+    public void min2() {
         testPQ.add(10);
         Assert.assertTrue(10 == testPQ.element());
         testPQ.add(1);
@@ -96,7 +96,7 @@ public class TestIPriorityQueue {
     }
 
     @Test
-    public void min3() throws NoSuchMethodException {
+    public void min3()  {
         PriorityQueue<Integer> truePQ = new PriorityQueue<>(comparator);
         testPQ.add(10);
         remove(10);
@@ -119,7 +119,7 @@ public class TestIPriorityQueue {
         isEmpty();
     }
 
-    private void remove(int min) throws NoSuchMethodException {
+    private void remove(int min) {
         Assert.assertTrue(comparator.compare(min, testPQ.element()) == 0);
         Assert.assertTrue(comparator.compare(min, testPQ.remove()) == 0);
     }

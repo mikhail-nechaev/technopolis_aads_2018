@@ -304,7 +304,7 @@ public class AVLTree<E extends Comparable<E>> implements ISelfBalancingSortedTre
 
     @Override
     public boolean isEmpty() {
-        return  root != null;
+        return  length == 0;
     }
 
 

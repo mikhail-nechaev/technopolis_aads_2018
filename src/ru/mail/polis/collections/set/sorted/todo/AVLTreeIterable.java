@@ -24,7 +24,11 @@ public class AVLTreeIterable<E extends Comparable<E>> extends AVLTree<E> impleme
         super(comparator);
     }
 
-    private class AVLTreeIterator<E extends Comparable<E>> implements Iterator{
+    private void removeValue(E value){
+            super.remove(value);
+    }
+
+    private class AVLTreeIterator implements Iterator<E> {
 
         private void inorderTraverse(AVLNode<E> currentNode) {
             if (currentNode == null) return;
@@ -32,15 +36,11 @@ public class AVLTreeIterable<E extends Comparable<E>> extends AVLTree<E> impleme
             Nodes[index++] = currentNode.value;
             inorderTraverse(currentNode.right);
         }
-       /* private void removeAtIndex(int index){
-            AVLNode currentNode = null;
-            currentNode.value = Nodes[index];
-            AVLTreeIterable.this.remove(currentNode.value);
-        }*/
+
 
         private E [] Nodes;
         private int index;
-        private int cursor;
+        private int cursor = 0;
         private int sizeIterable = size();
         private E current;
 
@@ -68,18 +68,17 @@ public class AVLTreeIterable<E extends Comparable<E>> extends AVLTree<E> impleme
         }
 
 
-       /* @Override
+       @Override
         public void remove() {
-            if(cursor < 0){
+            if(cursor == 0){
                 throw new IllegalStateException();
             }
-            removeAtIndex(index);
-            cursor--;
-        }*/
+            removeValue(Nodes[cursor-1]);
+        }
     }
 
 
-    private class AVLTreeDescendingIterator<E extends Comparable<E>> implements Iterator{
+    private class AVLTreeDescendingIterator implements Iterator<E>{
 
         private void reverseInorderTraverse(AVLNode<E> current) {
             if (current == null) return;
@@ -114,6 +113,14 @@ public class AVLTreeIterable<E extends Comparable<E>> extends AVLTree<E> impleme
             current = Nodes[cursor];
             cursor++;
             return  current;
+        }
+
+        @Override
+        public void remove() {
+            if(cursor == 0){
+                throw new IllegalStateException();
+            }
+            removeValue(Nodes[cursor-1]);
         }
     }
 

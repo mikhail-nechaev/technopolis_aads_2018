@@ -36,7 +36,6 @@ import ru.mail.polis.collections.set.sorted.TestAVLTreeIterableRemove;
         TestBalancedSortedSet.class,
         TestHastTableIteratorRemove.class,
         TestBalancedSortedSet.class,
-        TestBalancedSortedSet.class,
         TestAVLTreeIterable.class,
         TestAVLTreeIterableRemove.class
 })

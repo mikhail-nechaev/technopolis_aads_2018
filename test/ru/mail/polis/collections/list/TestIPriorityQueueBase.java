@@ -40,7 +40,7 @@ public class TestIPriorityQueueBase {
     }
 
     @Test
-    public void cons3() throws NoSuchMethodException {
+    public void cons3()  {
         List<Integer> data = IntStream.range(0, 20)
                 .boxed()
                 .collect(Collectors.toList());
