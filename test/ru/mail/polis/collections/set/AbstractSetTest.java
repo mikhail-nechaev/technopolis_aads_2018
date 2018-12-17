@@ -19,7 +19,7 @@ public class AbstractSetTest {
     }
 
     protected <E> void checkSizeAndContains(Set<E> validSet, ISet<E> testSet, E value) {
-        Assert.assertEquals("size", validSet.size(), testSet.size());
+        Assert.assertEquals("length", validSet.size(), testSet.size());
         Assert.assertEquals("contains", validSet.contains(value), testSet.contains(value));
     }
 
