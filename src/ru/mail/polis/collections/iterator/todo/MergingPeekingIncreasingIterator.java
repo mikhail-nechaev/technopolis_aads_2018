@@ -1,6 +1,9 @@
 package ru.mail.polis.collections.iterator.todo;
 
+import java.util.Arrays;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
+import java.util.PriorityQueue;
 
 /**
  * Итератор возвращающий последовательность последовательностей элементов возрастающих итераторов в порядке возрастания
@@ -15,34 +18,37 @@ import java.util.Iterator;
  */
 public class MergingPeekingIncreasingIterator implements Iterator<Integer> {
 
+    private final PriorityQueue<IntegerIncreasingSequencePeekingIterator> iterators;
+
     /**
      * Creates a {@code MergingPeekingIncreasingIterator} containing the inside all elements of this specified iterators.
-     *
+     * <p>
      * Complexity = O(n)
      *
      * @param iterators the iterators whose are to be placed into this merging peeking increasing iterator
      */
     public MergingPeekingIncreasingIterator(IntegerIncreasingSequencePeekingIterator... iterators) {
-        //todo: do some stuff with iterators
+        this.iterators = new PriorityQueue<>();
+        this.iterators.addAll(Arrays.asList(iterators));
     }
 
     /**
      * Returns {@code true} if the iteration has more elements.
      * (In other words, returns {@code true} if {@link #next} would
      * return an element rather than throwing an exception.)
-     *
+     * <p>
      * Complexity = O(1)
      *
      * @return {@code true} if the iteration has more elements
      */
     @Override
     public boolean hasNext() {
-        throw new UnsupportedOperationException("todo: implement this");
+        return iterators.size() > 0;
     }
 
     /**
      * Returns the next element in the iteration.
-     *
+     * <p>
      * Complexity = O(log(n))
      *
      * @return the next element in the iteration
@@ -50,6 +56,12 @@ public class MergingPeekingIncreasingIterator implements Iterator<Integer> {
      */
     @Override
     public Integer next() {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (!hasNext())
+            throw new NoSuchElementException();
+        IntegerIncreasingSequencePeekingIterator tmp = iterators.remove();
+        int next = tmp.next();
+        if (tmp.hasNext())
+            iterators.add(tmp);
+        return next;
     }
 }
