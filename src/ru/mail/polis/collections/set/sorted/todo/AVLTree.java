@@ -20,6 +20,12 @@ public class AVLTree<E extends Comparable<E>> implements ISelfBalancingSortedTre
         E value;
         AVLNode<E> left;
         AVLNode<E> right;
+        AVLNode<E> parent;
+
+        AVLNode(E value, AVLNode<E> parent) {
+            this.value = value;
+            this.parent = parent;
+        }
     }
 
     /**
@@ -39,6 +45,9 @@ public class AVLTree<E extends Comparable<E>> implements ISelfBalancingSortedTre
      * @throws NullPointerException if the specified comparator is null
      */
     public AVLTree(Comparator<E> comparator) {
+        if (comparator == null) {
+            throw new NullPointerException("Comporator is null");
+        }
         this.comparator = comparator;
     }
 
@@ -54,7 +63,26 @@ public class AVLTree<E extends Comparable<E>> implements ISelfBalancingSortedTre
      */
     @Override
     public boolean add(E value) {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (value == null) {
+            throw new NullPointerException();
+        }
+        AVLNode<E> i = root;
+        AVLNode<E> temp = null;
+        int compRes = 0;
+        while ((compRes = i.value.compareTo(value)) != 0) {
+            if (i == null) {
+                i = new AVLNode<E>(value, temp);
+                if (compRes > 0) {
+                    temp.left = i;
+                } else {
+                    temp.right = i;
+                }
+                return true;
+            }
+            temp = i;
+            i = compRes > 0 ? i.left : i.right;
+        }
+        return false;
     }
 
     /**
@@ -83,7 +111,16 @@ public class AVLTree<E extends Comparable<E>> implements ISelfBalancingSortedTre
      */
     @Override
     public boolean contains(E value) {
-        throw new UnsupportedOperationException("todo: implement this");
+        AVLNode<E> i = root;
+        while (i != null) {
+            int compRes = i.value.compareTo(value);
+            if (compRes == 0) {
+                return true;
+            } else {
+                i =  compRes > 0 ? i.left : i.right;
+            }
+        }
+        return false;
     }
 
     /**
@@ -163,5 +200,9 @@ public class AVLTree<E extends Comparable<E>> implements ISelfBalancingSortedTre
                     leftHeight, rightHeight, curr.toString());
         }
         return Math.max(leftHeight, rightHeight) + 1;
+    }
+
+    private void leftRotate(AVLNode<E> start) {
+
     }
 }
