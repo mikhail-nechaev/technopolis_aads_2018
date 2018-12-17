@@ -53,7 +53,7 @@ public class RedBlackTree<E extends Comparable<E>> implements ISelfBalancingSort
      * The comparator used to maintain order in this tree sett.
      */
     protected final Comparator<E> comparator;
-    protected RBNode root;
+    protected RBNode<E> root, nonItem;
     protected int size, modCount;
 
 
@@ -72,20 +72,21 @@ public class RedBlackTree<E extends Comparable<E>> implements ISelfBalancingSort
             throw new NullPointerException();
         }
         this.comparator = comparator;
+        nonItem = new RBNode<>(null);
     }
 
     @SuppressWarnings("SuspiciousNameCombination")
     private void leftRotate(RBNode<E> x) {
-        if (x.right == null) {
+        if (x.right == nonItem) {
             return;
         }
         RBNode<E> y = x.right;
         x.right = y.left;
-        if (y.left != null) {
+        if (y.left != nonItem) {
             y.left.parent = x;
         }
         y.parent = x.parent;
-        if (x.parent == null) {
+        if (x.parent == nonItem) {
             root = y;
         } else if (x == x.parent.left) {
             x.parent.left = y;
@@ -98,16 +99,16 @@ public class RedBlackTree<E extends Comparable<E>> implements ISelfBalancingSort
 
     @SuppressWarnings("SuspiciousNameCombination")
     private void rightRotate(RBNode<E> x) {
-        if (x.left == null) {
+        if (x.left == nonItem) {
             return;
         }
         RBNode<E> y = x.left;
         x.left = y.right;
-        if (y.right != null) {
+        if (y.right != nonItem) {
             y.right.parent = x;
         }
         y.parent = x.parent;
-        if (x.parent == null) {
+        if (x.parent == nonItem) {
             root = y;
         } else if (x == x.parent.right) {
             x.parent.right = y;
@@ -234,20 +235,20 @@ public class RedBlackTree<E extends Comparable<E>> implements ISelfBalancingSort
     protected boolean delete(RBNode<E> z) {
         RBNode<E> y;
         RBNode<E> x;
-        if (z.left == null || z.right == null) {
+        if (z.left == nonItem || z.right == nonItem) {
             y = z;
         } else {
             y = treeSuccessor(z);
         }
 
-        if (y.left != null) {
+        if (y.left != nonItem) {
             x = y.left;
         } else {
             x = y.right;
         }
 
         x.parent = y.parent;
-        if (y.parent == null) {
+        if (y.parent == nonItem) {
             root = x;
         } else {
             if (y == y.parent.left) {
