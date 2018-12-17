@@ -464,6 +464,9 @@ public class ArrayDequeFull<E> extends ArrayDequeSimple<E> implements Deque<E> {
      */
     @Override
     public boolean removeAll(Collection<?> c) {
+        if (c == null) throw new NullPointerException();
+        if (c.isEmpty()) return false;
+
         boolean result = false;
         for (Object e : c) {
             while (remove(e)) {
@@ -497,7 +500,18 @@ public class ArrayDequeFull<E> extends ArrayDequeSimple<E> implements Deque<E> {
      */
     @Override
     public boolean retainAll(Collection<?> c) {
-        return false;
+        if (c == null) throw new NullPointerException();
+
+        boolean result = false;
+        Iterator<E> iterator = this.iterator();
+        while (iterator.hasNext()) {
+            Object value = iterator.next();
+            if (!c.contains(value)) {
+                iterator.remove();
+                result = true;
+            }
+        }
+        return result;
     }
 
     /**
@@ -542,8 +556,8 @@ public class ArrayDequeFull<E> extends ArrayDequeSimple<E> implements Deque<E> {
     public Object[] toArray() {
         Object[] result = new Object[size()];
         int i = 0;
-        for (Object o : data) {
-            result[i++] = o;
+        for (E value : this) {
+            result[i++] = value;
         }
         return result;
     }
@@ -596,10 +610,10 @@ public class ArrayDequeFull<E> extends ArrayDequeSimple<E> implements Deque<E> {
         if (a == null) throw new NullPointerException();
 
         Object[] result = a.length < size() ? new Object[size()] : a;
-        int i = 0;
 
-        for (Object o : data) {
-            result[i++] = o;
+        int i = 0;
+        for (E value : this) {
+            result[i++] = value;
         }
         return (T[])result;
     }

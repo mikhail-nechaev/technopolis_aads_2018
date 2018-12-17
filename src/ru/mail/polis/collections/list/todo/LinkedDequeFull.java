@@ -351,7 +351,12 @@ public class LinkedDequeFull<E> extends LinkedDequeSimple<E> implements Deque<E>
      */
     @Override
     public boolean containsAll(Collection<?> c) {
-        return false;
+        if (c == null) throw new NullPointerException();
+
+        for (Object value : c) {
+            if (!contains(value)) return false;
+        }
+        return true;
     }
 
     /**
@@ -426,7 +431,16 @@ public class LinkedDequeFull<E> extends LinkedDequeSimple<E> implements Deque<E>
      */
     @Override
     public boolean removeAll(Collection<?> c) {
-        return false;
+        if (c == null) throw new NullPointerException();
+        if (c.isEmpty()) return false;
+
+        boolean result = false;
+        for (Object value : c) {
+            while (remove(value)) {
+                result = true;
+            }
+        }
+        return result;
     }
 
     /**
@@ -453,7 +467,18 @@ public class LinkedDequeFull<E> extends LinkedDequeSimple<E> implements Deque<E>
      */
     @Override
     public boolean retainAll(Collection<?> c) {
-        return false;
+        if (c == null) throw new NullPointerException();
+
+        boolean result = false;
+        Iterator<E> iterator = this.iterator();
+        while (iterator.hasNext()) {
+            Object value = iterator.next();
+            if (!c.contains(value)) {
+                iterator.remove();
+                result = true;
+            }
+        }
+        return result;
     }
 
     /**
@@ -495,7 +520,12 @@ public class LinkedDequeFull<E> extends LinkedDequeSimple<E> implements Deque<E>
      */
     @Override
     public Object[] toArray() {
-        return new Object[0];
+        Object[] result = new Object[size];
+        int i = 0;
+        for (E value : this) {
+            result[i++] = value;
+        }
+        return result;
     }
 
     /**
@@ -540,9 +570,18 @@ public class LinkedDequeFull<E> extends LinkedDequeSimple<E> implements Deque<E>
      *                              this collection
      * @throws NullPointerException if the specified array is null
      */
+    @SuppressWarnings("unchecked")
     @Override
     public <T> T[] toArray(T[] a) {
-        return null;
+        if (a == null) throw new NullPointerException();
+
+        Object[] result = a.length < size ? new Object[size] : a;
+
+        int i = 0;
+        for (E value : this) {
+            result[i++] = value;
+        }
+        return (T[])result;
     }
 
     /**
@@ -561,6 +600,7 @@ public class LinkedDequeFull<E> extends LinkedDequeSimple<E> implements Deque<E>
     private class LinkedDequeDescendingIterator implements Iterator<E> {
 
         private Node<E> current = last;
+        boolean removed = false;
 
         /**
          * Returns {@code true} if the iteration has more elements.
@@ -585,7 +625,37 @@ public class LinkedDequeFull<E> extends LinkedDequeSimple<E> implements Deque<E>
             if (!hasNext()) throw new NoSuchElementException();
             E value = current.value;
             current = current.prev;
+
+            removed = false;
             return value;
+        }
+
+        /**
+         * Removes from the underlying collection the last element returned
+         * by this iterator (optional operation).  This method can be called
+         * only once per call to {@link #next}.  The behavior of an iterator
+         * is unspecified if the underlying collection is modified while the
+         * iteration is in progress in any way other than by calling this
+         * method.
+         *
+         * @throws UnsupportedOperationException if the {@code remove}
+         *                                       operation is not supported by this iterator
+         * @throws IllegalStateException         if the {@code next} method has not
+         *                                       yet been called, or the {@code remove} method has already
+         *                                       been called after the last call to the {@code next}
+         *                                       method
+         * @implSpec The default implementation throws an instance of
+         * {@link UnsupportedOperationException} and performs no other action.
+         */
+        @Override
+        public void remove() {
+            if (current == last || removed) throw new IllegalStateException();
+            if (current != null) {
+                removeNode(current.next);
+            } else {
+                removeNode(first);
+            }
+            removed = true;
         }
     }
 
