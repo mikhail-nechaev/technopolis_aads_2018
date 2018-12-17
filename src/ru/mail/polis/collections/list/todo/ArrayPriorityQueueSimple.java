@@ -262,7 +262,8 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
             if (!canRemove) {
                 throw new IllegalStateException();
             }
-            queue[lastReturned] = queue[size--];
+            canRemove = false;
+            queue[lastReturned] = queue[--size];
             siftDown(lastReturned, (E) queue[lastReturned]);
         }
     }

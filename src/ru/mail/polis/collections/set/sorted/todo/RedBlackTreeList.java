@@ -3,7 +3,9 @@ package ru.mail.polis.collections.set.sorted.todo;
 import ru.mail.polis.collections.set.sorted.ISelfBalancingSortedTreeSet;
 import ru.mail.polis.collections.set.sorted.UnbalancedTreeException;
 
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 /**
@@ -18,7 +20,7 @@ import java.util.NoSuchElementException;
  *
  * @param <E> the type of elements maintained by this set
  */
-public class RedBlackTree<E extends Comparable<E>> implements ISelfBalancingSortedTreeSet<E> {
+public class RedBlackTreeList<E extends Comparable<E>> implements ISelfBalancingSortedTreeSet<E> {
 
     //todo: update it if required
     enum RBColor {
@@ -36,8 +38,6 @@ public class RedBlackTree<E extends Comparable<E>> implements ISelfBalancingSort
         RBNode<E> left;
         RBNode<E> right;
         RBNode<E> parent;
-        int numRight;
-        int numLeft;
         RBColor color = RBColor.BLACK;
 
         @Override
@@ -57,9 +57,9 @@ public class RedBlackTree<E extends Comparable<E>> implements ISelfBalancingSort
     protected final Comparator<E> comparator;
     protected RBNode<E> nil;
     protected RBNode<E> root;
-    protected int length;
+    protected List<RBNode<E>> nodeList;
 
-    public RedBlackTree() {
+    public RedBlackTreeList() {
         this(Comparator.naturalOrder());
     }
 
@@ -69,11 +69,12 @@ public class RedBlackTree<E extends Comparable<E>> implements ISelfBalancingSort
      * @param comparator comparator the comparator that will be used to order this priority queue.
      * @throws NullPointerException if the specified comparator is null
      */
-    public RedBlackTree(Comparator<E> comparator) {
+    public RedBlackTreeList(Comparator<E> comparator) {
         if (comparator == null) {
             throw new NullPointerException();
         }
         this.comparator = comparator;
+        nodeList = new ArrayList<>();
         nil = new RBNode<>(null);
         nil.color = RBColor.BLACK;
         root = nil;
@@ -186,6 +187,7 @@ public class RedBlackTree<E extends Comparable<E>> implements ISelfBalancingSort
         z.right = (nil);
         z.color = RBColor.RED;
         insertFixup(z);
+        nodeList.add(z);
     }
 
     private void insertFixup(RBNode<E> z) {
@@ -226,17 +228,17 @@ public class RedBlackTree<E extends Comparable<E>> implements ISelfBalancingSort
     }
 
     private RBNode<E> findNode(E value) {
-        RBNode<E> current = root;
-
-        while (current != nil){
-            if (comparator.compare(current.value, value) == 0)
-                return current;
-            else if (comparator.compare(current.value, value) < 0)
-                current = current.right;
-            else
-                current = current.left;
+        if (value == null) {
+            throw new NullPointerException();
         }
-
+        if (root != nil && comparator.compare(root.value, value) == 0) {
+            return root;
+        }
+        for (RBNode<E> node : nodeList) {
+            if (comparator.compare(node.value, value) == 0) {
+                return node;
+            }
+        }
         return null;
     }
 
@@ -264,42 +266,11 @@ public class RedBlackTree<E extends Comparable<E>> implements ISelfBalancingSort
         if (y != z) {
             z.value = y.value;
         }
-        fixNodeData(x,y);
         if (y.color == RBColor.BLACK) {
             deleteFixup(x);
         }
+        nodeList.remove(y);
         return y;
-    }
-
-    private void fixNodeData(RBNode<E> x, RBNode<E> y) {
-        RBNode<E> current = x == nil ? y.parent : x.parent;
-        RBNode<E> track = x == nil ? y : x;
-
-        while (current != nil) {
-            if (comparator.compare(y.value, current.value) != 0) {
-
-                if (comparator.compare(y.value, current.value) > 0)
-                    current.numRight--;
-
-                if (comparator.compare(y.value, current.value) < 0)
-                    current.numLeft--;
-            } else {
-
-                if (current.left == nil)
-                    current.numLeft--;
-                else if (current.right == nil)
-                    current.numRight--;
-
-                else if (track == current.right)
-                    current.numRight--;
-                else if (track == current.left)
-                    current.numLeft--;
-            }
-
-            track = current;
-            current = current.parent;
-
-        }
     }
 
     private void deleteFixup(RBNode<E> x) {
@@ -363,7 +334,7 @@ public class RedBlackTree<E extends Comparable<E>> implements ISelfBalancingSort
 
 
     private RBNode<E> treeSuccessor(RBNode<E> x) {
-        if (x.left != nil) {
+        if (x.right != nil) {
             return minNode(x.right);
         }
 
@@ -391,7 +362,6 @@ public class RedBlackTree<E extends Comparable<E>> implements ISelfBalancingSort
         }
         if (!contains(value)) {
             insert(value);
-            length++;
             return true;
         } else {
             return false;
@@ -413,7 +383,6 @@ public class RedBlackTree<E extends Comparable<E>> implements ISelfBalancingSort
         }
         if (contains(value)) {
             delete(value);
-            length--;
             return true;
         } else {
             return false;
@@ -430,15 +399,15 @@ public class RedBlackTree<E extends Comparable<E>> implements ISelfBalancingSort
      */
     @Override
     public boolean contains(E value) {
-        if(value == null){
+        if (value == null) {
             throw new NullPointerException();
         }
-
-        RBNode current = findNode(value);
-        if(current == nil || current == null){
-            return false;
+        for (RBNode<E> node : nodeList) {
+            if (comparator.compare(node.value, value) == 0) {
+                return true;
+            }
         }
-        return true;
+        return false;
     }
 
     /**
@@ -476,7 +445,7 @@ public class RedBlackTree<E extends Comparable<E>> implements ISelfBalancingSort
      */
     @Override
     public int size() {
-        return length;
+        return nodeList.size();
     }
 
     /**
@@ -495,10 +464,10 @@ public class RedBlackTree<E extends Comparable<E>> implements ISelfBalancingSort
      */
     @Override
     public void clear() {
+        nodeList.clear();
         root = nil;
         root.left = nil;
         root.right = nil;
-        length = 0;
     }
 
     /**
@@ -512,7 +481,7 @@ public class RedBlackTree<E extends Comparable<E>> implements ISelfBalancingSort
      */
     @Override
     public void checkBalance() throws UnbalancedTreeException {
-        if (root != null || root != nil) {
+        if (root != null) {
             if (root.color != RBColor.BLACK) {
                 throw new UnbalancedTreeException("Root must be black");
             }
