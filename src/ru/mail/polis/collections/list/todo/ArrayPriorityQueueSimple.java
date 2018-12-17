@@ -232,6 +232,7 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
 
     private void removeElement(int index) {
         size--;
+        array[index] = swap(array[size], array[size] = array[index]);
         siftDown(index);
     }
 
@@ -246,11 +247,11 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
         return new Iterator<E>() {
             private int nextIndex = 0;
             private int lastNextIndex = -1;
-            private int size = size();
+            private int rest = size();
 
             @Override
             public boolean hasNext() {
-                return nextIndex < size;
+                return rest > 0;
             }
 
             @Override
@@ -258,7 +259,9 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
                 if(!hasNext()){
                     throw new NoSuchElementException();
                 }
+                rest--;
                 lastNextIndex = nextIndex++;
+                siftDown(nextIndex);
                 return (E) array[lastNextIndex];
             }
 
@@ -268,6 +271,7 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
                     throw new IllegalStateException();
                 }
                 removeElement(lastNextIndex);
+                nextIndex--;
                 lastNextIndex = -1;
             }
         };
