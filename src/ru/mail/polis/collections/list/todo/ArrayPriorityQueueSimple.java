@@ -23,7 +23,6 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
     private final int DEFAULT_SIZE = 10;
     private Object[] a;
     private final Comparator<E> comparator;
-    private int[] powers;
 
     public ArrayPriorityQueueSimple() {
         this(Comparator.naturalOrder());
@@ -72,7 +71,6 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
         }
         this.comparator = Objects.requireNonNull(comparator, "comparator");
         a = collection.toArray();
-        powers = new int[30];
         int index = 1;
         while (a.length > index) {
             index *= 2;
@@ -162,13 +160,13 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
         if (value == null) {
             throw new NullPointerException();
         }
+        if(isFull()){
+            increaseHeap();
+        }
         a[size] = value;
         siftUp(size);
         size++;
 
-        if (isFull()) {
-            increaseHeap();
-        }
     }
 
     private void increaseHeap() {

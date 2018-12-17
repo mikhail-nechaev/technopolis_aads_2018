@@ -23,8 +23,8 @@ public class TestBalancedSortedSet extends AbstractTestBalancedSortedSet {
 
     private static final Object[][] classes = new Object[][]{
             {AVLTree.class, Boolean.TRUE},
-           // {RedBlackTree.class, Boolean.FALSE},
-            //{RedBlackTree.class, Boolean.TRUE},
+            {RedBlackTree.class, Boolean.FALSE},
+            {RedBlackTree.class, Boolean.TRUE},
     };
 
     @Parameterized.Parameter()
