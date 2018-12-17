@@ -115,6 +115,7 @@ public class AVLTreeIterable<E extends Comparable<E>> extends AVLTree<E> impleme
             return  current;
         }
 
+        //remove on index
         @Override
         public void remove() {
             if(cursor == 0){
