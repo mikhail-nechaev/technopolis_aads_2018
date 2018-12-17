@@ -27,6 +27,26 @@ public class AVLTreeIterable<E extends Comparable<E>> extends AVLTree<E> impleme
         super(comparator);
     }
 
+    public Stack<AVLNode<E>> makeAscStack(AVLNode<E> cur, Stack<AVLNode<E>> stack) {
+        if (cur == null) {
+            return stack;
+        }
+        makeAscStack(cur.left, stack);
+        stack.push(cur);
+        makeAscStack(cur.right, stack);
+        return stack;
+    }
+
+    public Stack<AVLNode<E>> makeDescStack(AVLNode<E> cur, Stack<AVLNode<E>> stack) {
+        if (cur == null) {
+            return stack;
+        }
+        makeDescStack(cur.right, stack);
+        stack.push(cur);
+        makeDescStack(cur.left, stack);
+        return stack;
+    }
+
     /**
      * Returns an iterator over the elements in this set in ascending order.
      *

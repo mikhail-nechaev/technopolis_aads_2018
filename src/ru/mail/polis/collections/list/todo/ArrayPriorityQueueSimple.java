@@ -246,7 +246,7 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
     public Iterator<E> iterator() {
         return new Iterator<E>() {
             private int nextIndex = 0;
-            private int lastNextIndex = -1;
+            private int lastNextIndex = -1
             private int rest = size();
 
             @Override
@@ -262,6 +262,7 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
                 rest--;
                 lastNextIndex = nextIndex++;
                 siftDown(nextIndex);
+
                 return (E) array[lastNextIndex];
             }
 
