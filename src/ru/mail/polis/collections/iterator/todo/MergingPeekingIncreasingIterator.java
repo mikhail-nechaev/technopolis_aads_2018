@@ -10,7 +10,7 @@ import java.util.Iterator;
  * result = 0,1,2,3,4,4,5,6,7,8
  * <p>
  * Суммарное время работы = O(n + k * log n),
- * n — количество итераторов
+ * n — количество итераторов
  * k — суммарное количество элементов
  */
 public class MergingPeekingIncreasingIterator implements Iterator<Integer> {
