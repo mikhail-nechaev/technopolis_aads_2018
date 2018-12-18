@@ -2,7 +2,7 @@ package ru.mail.polis.collections.list.todo;
 
 import ru.mail.polis.collections.list.IDeque;
 
-import java.util.ListIterator;
+import java.util.*;
 
 /**
  * Linked list implementation of the {@link IDeque} interface with no capacity restrictions.
@@ -17,9 +17,38 @@ public class LinkedDequeSimple<E> implements IDeque<E> {
      * @param value the element to add
      * @throws NullPointerException if the specified element is null
      */
+    private int linkedSize = 0;
+    private Node<E> head;
+    private Node<E> tail;
+    private int modCount = 0;
+
+    public class Node<E> {
+        E element;
+        Node<E> next;
+        Node<E> prev;
+
+        public Node(Node<E> prev, E element, Node<E> next) {
+            this.element = element;
+            this.next = next;
+            this.prev = prev;
+        }
+    }
+    public LinkedDequeSimple() {
+        this.head = null;
+        this.tail = null;
+    }
     @Override
     public void addFirst(E value) {
-        throw new UnsupportedOperationException("todo: implement this");
+        Objects.requireNonNull(value);
+        Node<E> h = head;
+        Node<E> newNode = new Node<>(null, value, h);
+        head = newNode;
+        if (h == null)
+            tail = newNode;
+        else
+            h.prev = newNode;
+        linkedSize++;
+        modCount++;
     }
 
     /**
@@ -30,7 +59,21 @@ public class LinkedDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public E removeFirst() {
-        throw new UnsupportedOperationException("todo: implement this");
+        if(isEmpty()) {
+            throw new NoSuchElementException();
+        }
+        E element = head.element;
+        Node<E> next = head.next;
+        head.element = null;
+        head.next = null;
+        head = next;
+        if (next == null)
+            tail = null;
+        else
+            next.prev = null;
+        linkedSize--;
+        modCount++;
+        return element;
     }
 
     /**
@@ -41,7 +84,10 @@ public class LinkedDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public E getFirst() {
-        throw new UnsupportedOperationException("todo: implement this");
+        if(isEmpty()) {
+            throw new NoSuchElementException();
+        }
+        return head.element;
     }
 
     /**
@@ -52,7 +98,16 @@ public class LinkedDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public void addLast(E value) {
-        throw new UnsupportedOperationException("todo: implement this");
+        Objects.requireNonNull(value);
+        Node<E> node = tail;
+        Node<E> node1 = new Node<>(node, value, null);
+        tail = node1;
+        if (node == null)
+            head = node1;
+        else
+            node.next = node1;
+        linkedSize++;
+        modCount++;
     }
 
     /**
@@ -63,7 +118,21 @@ public class LinkedDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public E removeLast() {
-        throw new UnsupportedOperationException("todo: implement this");
+        if(isEmpty()) {
+            throw new NoSuchElementException();
+        }
+        E element = tail.element;
+        Node<E> prev = tail.prev;
+        tail.element = null;
+        tail.prev = null;
+        tail = prev;
+        if (prev == null)
+            head = null;
+        else
+            prev.next = null;
+        linkedSize--;
+        modCount++;
+        return element;
     }
 
     /**
@@ -74,7 +143,10 @@ public class LinkedDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public E getLast() {
-        throw new UnsupportedOperationException("todo: implement this");
+        if(isEmpty()) {
+            throw new NoSuchElementException();
+        }
+        return tail.element;
     }
 
     /**
@@ -87,7 +159,12 @@ public class LinkedDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public boolean contains(E value) {
-        throw new UnsupportedOperationException("todo: implement this");
+        Objects.requireNonNull(value);
+        for (Node<E> x = head; x != null; x = x.next) {
+            if (value.equals(x.element))
+                return true;
+        }
+        return false;
     }
 
     /**
@@ -97,7 +174,7 @@ public class LinkedDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public int size() {
-        throw new UnsupportedOperationException("todo: implement this");
+        return linkedSize;
     }
 
     /**
@@ -107,7 +184,7 @@ public class LinkedDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public boolean isEmpty() {
-        throw new UnsupportedOperationException("todo: implement this");
+        return size() == 0;
     }
 
     /**
@@ -116,7 +193,9 @@ public class LinkedDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public void clear() {
-        throw new UnsupportedOperationException("todo: implement this");
+        linkedSize = 0;
+        head = null;
+        tail = null;
     }
 
     /**
@@ -126,7 +205,96 @@ public class LinkedDequeSimple<E> implements IDeque<E> {
      * @return an iterator over the elements in this collection in proper sequence
      */
     @Override
-    public ListIterator<E> iterator() {
-        throw new UnsupportedOperationException("todo: implement this");
+    public Iterator<E> iterator() {
+        return new LinkedDequeSimpleIterator();
+    }
+    class LinkedDequeSimpleIterator implements Iterator<E> {
+        private Node<E> lastReturned;
+        private Node<E> next;
+        private int nextIndex = 0;
+        private int expectedModCount = modCount;
+
+        public LinkedDequeSimpleIterator() {
+            next = head;
+        }
+
+        @Override
+        public boolean hasNext() {
+            return nextIndex < size();
+        }
+
+        @Override
+        public E next() {
+            if (modCount != expectedModCount)
+                throw new ConcurrentModificationException();
+            if (!hasNext())
+                throw new NoSuchElementException();
+            lastReturned = next;
+            next = next.next;
+            nextIndex++;
+            return lastReturned.element;
+        }
+
+        @Override
+        public void remove() {
+            if (modCount != expectedModCount)
+                throw new ConcurrentModificationException();
+            if (lastReturned == null)
+                throw new IllegalStateException();
+
+            Node<E> lastNext = lastReturned.next;
+            unlink(lastReturned);
+            if (next == lastReturned)
+                next = lastNext;
+            else
+                nextIndex--;
+            lastReturned = null;
+            expectedModCount++;
+        }
+
+        public boolean hasPrevious() {
+            return nextIndex > 0;
+        }
+
+        public E previous() {
+            if (modCount != expectedModCount)
+                throw new ConcurrentModificationException();
+            if (!hasPrevious())
+                throw new NoSuchElementException();
+            if (next == null){
+                lastReturned = tail;
+                next = tail;
+            } else{
+                lastReturned = next.prev;
+                next = next.prev;
+            }
+            nextIndex--;
+            return lastReturned.element;
+        }
+
+        E unlink(Node<E> x) {
+            E element = x.element;
+            Node<E> next = x.next;
+            Node<E> prev = x.prev;
+
+            if (prev == null) {
+                head = next;
+            } else {
+                prev.next = next;
+                x.prev = null;
+            }
+
+            if (next == null) {
+                tail = prev;
+            } else {
+                next.prev = prev;
+                x.next = null;
+            }
+
+            x.element = null;
+            linkedSize--;
+            modCount++;
+            return element;
+        }
     }
 }
