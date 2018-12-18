@@ -144,11 +144,10 @@ public class ArrayDequeFull<E> extends ArrayDequeSimple<E> implements Deque<E> {
         if (isEmpty()) {
             return result;
         }
-        Iterator<E> iterator = iterator();
-        for (Object o : c) {
-            while (iterator.hasNext()) {
-                if (!iterator.next().equals(o)) {
-                    iterator.remove();
+        for (E o : this) {
+            for (Object e : c) {
+                if (!o.equals(e)) {
+                    remove(o);
                     result = true;
                 }
             }
