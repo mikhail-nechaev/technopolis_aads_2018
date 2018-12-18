@@ -29,6 +29,10 @@ public class AVLTreeIterable<E extends Comparable<E>> extends AVLTree<E> impleme
         super(comparator);
     }
 
+    public void removeByValue(E value) {
+        super.remove(value);
+    }
+
     /**
      * Returns an iterator over the elements in this set in ascending order.
      *
@@ -44,6 +48,7 @@ public class AVLTreeIterable<E extends Comparable<E>> extends AVLTree<E> impleme
         private int index = 0;
         private E next;
         private E lastReturned;
+        private int startSize = size();
         private int nextIndex = 0;
         private int expectedModCount = modCount;
         AVLTreeIterator() {
@@ -53,7 +58,7 @@ public class AVLTreeIterable<E extends Comparable<E>> extends AVLTree<E> impleme
         }
         @Override
         public boolean hasNext() {
-            return nextIndex < size();
+            return nextIndex < startSize;
         }
 
         @Override
@@ -67,6 +72,16 @@ public class AVLTreeIterable<E extends Comparable<E>> extends AVLTree<E> impleme
                 next = values[nextIndex];
             }
             return lastReturned;
+        }
+
+        @Override
+        public void remove() {
+            checkForComodification();
+            if (lastReturned == null)
+                throw new IllegalStateException();
+            removeByValue(lastReturned);
+            expectedModCount++;
+            lastReturned = null;
         }
 
         public void inorderTraverse(AVLNode<E> curr) {
@@ -95,6 +110,7 @@ public class AVLTreeIterable<E extends Comparable<E>> extends AVLTree<E> impleme
         private int index = 0;
         private E next;
         private E lastReturned;
+        private int startSize = size();
         private int nextIndex = 0;
         private int expectedModCount = modCount;
         AVLTreeDescendingIterator() {
@@ -104,7 +120,7 @@ public class AVLTreeIterable<E extends Comparable<E>> extends AVLTree<E> impleme
         }
         @Override
         public boolean hasNext() {
-            return nextIndex < size();
+            return nextIndex < startSize;
         }
 
         @Override
@@ -118,6 +134,16 @@ public class AVLTreeIterable<E extends Comparable<E>> extends AVLTree<E> impleme
                 next = values[nextIndex];
             }
             return lastReturned;
+        }
+
+        @Override
+        public void remove() {
+            checkForComodification();
+            if (lastReturned == null)
+                throw new IllegalStateException();
+            removeByValue(lastReturned);
+            expectedModCount++;
+            lastReturned = null;
         }
 
         public void inorderReverse(AVLNode<E> curr) {

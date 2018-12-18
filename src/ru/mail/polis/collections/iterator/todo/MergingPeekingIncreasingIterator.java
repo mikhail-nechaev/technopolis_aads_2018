@@ -1,8 +1,8 @@
 package ru.mail.polis.collections.iterator.todo;
 
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+
 
 /**
  * Итератор возвращающий последовательность последовательностей элементов возрастающих итераторов в порядке возрастания
