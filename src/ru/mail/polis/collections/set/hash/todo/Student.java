@@ -49,20 +49,40 @@ public class Student extends AbstractOpenHashTableEntity {
 
     @Override
     public int hashCode(int tableSize, int probId) throws IllegalArgumentException {
-        //todo: see IOpenHashTableEntity contract
-        //todo: use this in OpenHashTable
-        throw new UnsupportedOperationException("todo: implement this");
+        if(probId < 0 || probId >= tableSize)
+            throw new IllegalArgumentException();
+        int hash1 = Math.abs(hashCode())%tableSize;
+        int hash2 = Math.abs(hashCode2()) % (tableSize);
+        if (hash2 % 2 == 0) {
+            hash2++;
+        }
+        if(hash2 == 0)
+            hash2++;
+        return (hash1 + probId * hash2) % tableSize;
     }
 
     @Override
     public int hashCode() {
-        //todo: don't forget [hashCode - equals] contract
-        throw new UnsupportedOperationException("todo: implement this");
+        int hash = 11;
+        hash = 17 * hash + Long.valueOf(id).hashCode();
+        hash = 17 * hash + firstName.hashCode();
+        hash = 17 * hash + lastName.hashCode();
+        hash = 17 * hash + gender.hashCode();
+        hash = 17 * hash + birthday.hashCode();
+        hash = 17 * hash + groupId;
+        return hash;
     }
 
     @Override
     protected int hashCode2() {
-        throw new UnsupportedOperationException("todo: implement this");
+        int hash = 13;
+        hash = 17 * hash + (Long.valueOf(id).hashCode())<<3;
+        hash = 17 * hash + (firstName.hashCode())<<3;
+        hash = 17 * hash + (lastName.hashCode())<<3;
+        hash = 17 * hash + (gender.hashCode())<<3;
+        hash = 17 * hash + (birthday.hashCode())<<3;
+        hash = 17 * hash + (groupId)<<3;
+        return hash;
     }
 
     @Override
