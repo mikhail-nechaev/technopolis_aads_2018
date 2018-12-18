@@ -126,13 +126,16 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
      * @throws NullPointerException if the specified collection or comparator is null
      */
     public ArrayPriorityQueueSimple(Collection<E> collection, Comparator<E> comparator) {
+        this.comparator = Objects.requireNonNull(comparator, "comparator");
         arraySize = collection.size();
         size = 0;
         heap = new Object[arraySize];
         for (E e: collection) {
-            add(e);
+            heap[size++] = e;
         }
-        this.comparator = Objects.requireNonNull(comparator, "comparator");
+        for (int i = size / 2; i >= 0; i--) {
+            siftDown(i);
+        }
 
     }
 
@@ -251,15 +254,69 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
     @Override
     public Iterator<E> iterator() {
         return new Iterator<E>() {
-
+            int cursor = 0;
+            boolean doNext = false;
             @Override
             public boolean hasNext() {
-                return !isEmpty();
+                return cursor < size;
             }
 
             @Override
             public E next() {
-                return ArrayPriorityQueueSimple.this.remove();
+                if (!hasNext()) {
+                    throw new NoSuchElementException();
+                }
+                doNext = true;
+                E e = (E) heap[cursor];
+                incCursor();
+                return e;
+            }
+
+            /**
+             * Removes from the underlying collection the last element returned
+             * by this iterator (optional operation).  This method can be called
+             * only once per call to {@link #next}.
+             * <p>
+             * The behavior of an iterator is unspecified if the underlying collection
+             * is modified while the iteration is in progress in any way other than by
+             * calling this method, unless an overriding class has specified a
+             * concurrent modification policy.
+             * <p>
+             * The behavior of an iterator is unspecified if this method is called
+             * after a call to the {@link #forEachRemaining forEachRemaining} method.
+             *
+             * @throws UnsupportedOperationException if the {@code remove}
+             *                                       operation is not supported by this iterator
+             * @throws IllegalStateException         if the {@code next} method has not
+             *                                       yet been called, or the {@code remove} method has already
+             *                                       been called after the last call to the {@code next}
+             *                                       method
+             * @implSpec The default implementation throws an instance of
+             * {@link UnsupportedOperationException} and performs no other action.
+             */
+            @Override
+            public void remove() {
+                if (!doNext) {
+                    throw new IllegalStateException();
+                }
+                doNext = false;
+                heap[decCursor()] = heap[--size];
+                //heap[size] = null;
+                siftDown(cursor);
+            }
+
+            private int incCursor() {
+                int c = cursor * 2 + 1;
+                if (c > size) {
+                    decCursor();
+                    c = cursor * 2 + 2;
+                }
+                cursor = c;
+                return cursor;
+            }
+            private int decCursor() {
+                cursor = cursor / 2;
+                return cursor;
             }
         };
     }
