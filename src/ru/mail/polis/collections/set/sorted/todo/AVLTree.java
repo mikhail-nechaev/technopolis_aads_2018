@@ -137,28 +137,6 @@ public class AVLTree<E extends Comparable<E>> implements ISelfBalancingSortedTre
         }
         return min;
     }
-    private AVLNode<E> remove(E value, AVLNode<E> cur){
-        if(cur == null){
-            return null;
-        }
-        int cmp = comparator.compare(value, cur.value);
-        if (cmp < 0) {
-            cur.left = remove(value, cur.left);
-        } else if (cmp > 0){
-            cur.right = remove(value, cur.right);
-        } else{
-            size--;
-            AVLNode<E> leftChild = cur.left;
-            AVLNode<E> rightChild = cur.right;
-            if(rightChild == null){
-                return leftChild;
-            }
-            if(leftChild == null){
-                return rightChild;
-            }
-            AVLNode<E> min = findMin(rightChild);
-            min.right = removeMin(rightChild);
-            min.left = leftChild;
 
     private AVLNode<E> removeMin(AVLNode<E> cur){
         if(cur.left == null){
