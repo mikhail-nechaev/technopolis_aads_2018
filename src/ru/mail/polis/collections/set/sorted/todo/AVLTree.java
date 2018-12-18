@@ -16,7 +16,6 @@ import java.util.Objects;
  */
 public class AVLTree<E extends Comparable<E>> implements ISelfBalancingSortedTreeSet<E> {
 
-    //todo: update it if required
     static class AVLNode<E> {
         E value;
         AVLNode<E> left;
@@ -46,6 +45,7 @@ public class AVLTree<E extends Comparable<E>> implements ISelfBalancingSortedTre
 
     }
 
+    @SuppressWarnings("Duplicates")
     private AVLNode<E> rotateLeft(AVLNode<E> node) {
         AVLNode<E> rightChild = node.right;
         node.right = rightChild.left;
@@ -71,6 +71,7 @@ public class AVLTree<E extends Comparable<E>> implements ISelfBalancingSortedTre
         return rightChild;
     }
 
+    @SuppressWarnings("Duplicates")
     private AVLNode<E> rotateRight(AVLNode<E> node) {
         AVLNode<E> leftChild = node.left;
         node.left = leftChild.right;
@@ -97,6 +98,7 @@ public class AVLTree<E extends Comparable<E>> implements ISelfBalancingSortedTre
         return leftChild;
     }
 
+    @SuppressWarnings("Duplicates")
     private boolean insert(AVLNode<E> node) {
         if (root == null) {
             root = node;
@@ -212,6 +214,7 @@ public class AVLTree<E extends Comparable<E>> implements ISelfBalancingSortedTre
      * @return {@code true} if this set contained the specified element
      * @throws NullPointerException if the specified element is null
      */
+    @SuppressWarnings("Duplicates")
     @Override
     public boolean remove(E value) {
         Objects.requireNonNull(value);
@@ -270,6 +273,7 @@ public class AVLTree<E extends Comparable<E>> implements ISelfBalancingSortedTre
      * @return {@code true} if this collection contains the specified element
      * @throws NullPointerException if the specified element is null
      */
+    @SuppressWarnings("Duplicates")
     @Override
     public boolean contains(E value) {
         Objects.requireNonNull(value);

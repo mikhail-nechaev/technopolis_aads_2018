@@ -43,6 +43,7 @@ public class RedBlackTreeIterable<E extends Comparable<E>> extends RedBlackTree<
         RBNode<E> lastReturned;
         int remaining;
 
+        @SuppressWarnings("Duplicates")
         private RBNode<E> findInorderSuccessor(RBNode<E> node) {
             RBNode<E> successor;
             if (node.right != null) {
@@ -76,6 +77,7 @@ public class RedBlackTreeIterable<E extends Comparable<E>> extends RedBlackTree<
             return remaining > 0;
         }
 
+        @SuppressWarnings("Duplicates")
         @Override
         public E next() {
             if (!hasNext()) {
@@ -115,6 +117,7 @@ public class RedBlackTreeIterable<E extends Comparable<E>> extends RedBlackTree<
         RBNode<E> lastReturned;
         int remaining;
 
+        @SuppressWarnings("Duplicates")
         private RBNode<E> findDescendingInorderSuccessor(RBNode<E> node) {
             RBNode<E> successor;
             if (node.left != null) {
@@ -148,6 +151,7 @@ public class RedBlackTreeIterable<E extends Comparable<E>> extends RedBlackTree<
             return remaining > 0;
         }
 
+        @SuppressWarnings("Duplicates")
         @Override
         public E next() {
             if (!hasNext()) {

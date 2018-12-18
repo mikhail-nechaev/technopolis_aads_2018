@@ -107,6 +107,7 @@ public class RedBlackTree<E extends Comparable<E>> implements ISelfBalancingSort
         return n;
     }
 
+    @SuppressWarnings("Duplicates")
     private void rotateLeft(RBNode<E> node) {
         RBNode<E> rightChild = node.right;
         node.right = rightChild.left;
@@ -128,6 +129,7 @@ public class RedBlackTree<E extends Comparable<E>> implements ISelfBalancingSort
         node.parent = rightChild;
     }
 
+    @SuppressWarnings("Duplicates")
     private void rotateRight(RBNode<E> node) {
         RBNode<E> leftChild = node.left;
         node.left = leftChild.right;
@@ -248,6 +250,7 @@ public class RedBlackTree<E extends Comparable<E>> implements ISelfBalancingSort
         setColor(node, RBColor.BLACK);
     }
 
+    @SuppressWarnings("Duplicates")
     private boolean insert(RBNode<E> node) {
         if (root == null) {
             root = node;
@@ -322,6 +325,7 @@ public class RedBlackTree<E extends Comparable<E>> implements ISelfBalancingSort
      * @return {@code true} if this set contained the specified element
      * @throws NullPointerException if the specified element is null
      */
+    @SuppressWarnings("Duplicates")
     @Override
     public boolean remove(E value) {
         Objects.requireNonNull(value);
@@ -379,6 +383,7 @@ public class RedBlackTree<E extends Comparable<E>> implements ISelfBalancingSort
      * @return {@code true} if this collection contains the specified element
      * @throws NullPointerException if the specified element is null
      */
+    @SuppressWarnings("Duplicates")
     @Override
     public boolean contains(E value) {
         Objects.requireNonNull(value);

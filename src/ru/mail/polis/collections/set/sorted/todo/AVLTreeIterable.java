@@ -43,6 +43,7 @@ public class AVLTreeIterable<E extends Comparable<E>> extends AVLTree<E> impleme
         AVLNode<E> lastReturned;
         int remaining;
 
+        @SuppressWarnings("Duplicates")
         private AVLNode<E> findInorderSuccessor(AVLNode<E> node) {
             AVLNode<E> successor;
             if (node.right != null) {
@@ -76,6 +77,7 @@ public class AVLTreeIterable<E extends Comparable<E>> extends AVLTree<E> impleme
             return remaining > 0;
         }
 
+        @SuppressWarnings("Duplicates")
         @Override
         public E next() {
             if (!hasNext()) {
@@ -115,6 +117,7 @@ public class AVLTreeIterable<E extends Comparable<E>> extends AVLTree<E> impleme
         AVLNode<E> lastReturned;
         int remaining;
 
+        @SuppressWarnings("Duplicates")
         private AVLNode<E> findDescendingInorderSuccessor(AVLNode<E> node) {
             AVLNode<E> successor;
             if (node.left != null) {
@@ -148,6 +151,7 @@ public class AVLTreeIterable<E extends Comparable<E>> extends AVLTree<E> impleme
             return remaining > 0;
         }
 
+        @SuppressWarnings("Duplicates")
         @Override
         public E next() {
             if (!hasNext()) {

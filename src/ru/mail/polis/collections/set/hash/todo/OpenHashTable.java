@@ -13,23 +13,23 @@ import java.util.NoSuchElementException;
  * <p>
  * Use {@link IOpenHashTableEntity#hashCode(int, int)} for hash code calculating
  * <p>
- * Use loadFactor = from 0.5f to 0.75f included
+ * Use load = from 0.5f to 0.75f included
  *
  * @param <E> the type of elements maintained by this hash table
  */
 @SuppressWarnings("ALL")
 public class OpenHashTable<E extends IOpenHashTableEntity> implements IOpenHashTable<E> {
 
-    private Object[] hashTable;
+    private Object[] data;
     private boolean[] deleted;
-    private final float loadFactor = 0.5f;
+    private final float load = 0.5f;
     private int length = 0;
 
-    private final int DEFAULT_LENGTH = 16;
+    private final int DEFAULT = 16;
 
     public OpenHashTable() {
-        this.hashTable = new Object[DEFAULT_LENGTH];
-        this.deleted = new boolean[DEFAULT_LENGTH];
+        this.data = new Object[DEFAULT];
+        this.deleted = new boolean[DEFAULT];
     }
 
     /**
@@ -47,17 +47,17 @@ public class OpenHashTable<E extends IOpenHashTableEntity> implements IOpenHashT
         if (value == null) {
             throw new NullPointerException();
         }
-        if (length >= loadFactor * tableSize()) {
+        if (length >= load * tableSize()) {
             resize();
         }
         for (int i = 0; i < tableSize(); i++) {
             int hash = value.hashCode(tableSize(), i);
-            if (hashTable[hash] == null || deleted[hash]) {
+            if (data[hash] == null || deleted[hash]) {
                 length++;
-                hashTable[hash] = value;
+                data[hash] = value;
                 return true;
             }
-            if (value.equals(hashTable[hash])) {
+            if (value.equals(data[hash])) {
                 return false;
             }
         }
@@ -65,8 +65,8 @@ public class OpenHashTable<E extends IOpenHashTableEntity> implements IOpenHashT
     }
 
     private void resize() {
-        Object[] oldTable = hashTable;
-        hashTable = new Object[tableSize() * 2];
+        Object[] oldTable = data;
+        data = new Object[tableSize() * 2];
         deleted = new boolean[tableSize() * 2];
         int oldSize = length;
         for (int i = 0; i < oldTable.length; i++) {
@@ -93,10 +93,10 @@ public class OpenHashTable<E extends IOpenHashTableEntity> implements IOpenHashT
         }
         for (int i = 0; i < tableSize(); i++) {
             int hash = value.hashCode(tableSize(), i);
-            if (hashTable[hash] == null) {
+            if (data[hash] == null) {
                 return false;
             }
-            if (value.equals(hashTable[hash]) && !deleted[hash]) {
+            if (value.equals(data[hash]) && !deleted[hash]) {
                 length--;
                 deleted[hash] = true;
                 return true;
@@ -122,10 +122,10 @@ public class OpenHashTable<E extends IOpenHashTableEntity> implements IOpenHashT
         }
         for (int i = 0; i < tableSize(); i++) {
             int hash = value.hashCode(tableSize(), i);
-            if (hashTable[hash] == null) {
+            if (data[hash] == null) {
                 return false;
             }
-            if (value.equals(hashTable[hash]) && !deleted[hash]) {
+            if (value.equals(data[hash]) && !deleted[hash]) {
                 return true;
             }
         }
@@ -159,8 +159,8 @@ public class OpenHashTable<E extends IOpenHashTableEntity> implements IOpenHashT
     @Override
     public void clear() {
         this.length = 0;
-        this.hashTable = new Object[DEFAULT_LENGTH];
-        this.deleted = new boolean[DEFAULT_LENGTH];
+        this.data = new Object[DEFAULT];
+        this.deleted = new boolean[DEFAULT];
     }
 
     /**
@@ -185,12 +185,12 @@ public class OpenHashTable<E extends IOpenHashTableEntity> implements IOpenHashT
                 if (!hasNext()) {
                     throw new NoSuchElementException();
                 }
-                while (hashTable[next] == null || deleted[next]) {
+                while (data[next] == null || deleted[next]) {
                     next++;
                 }
                 p--;
                 lastNext = next++;
-                return (E) hashTable[lastNext];
+                return (E) data[lastNext];
             }
 
             @Override
@@ -207,6 +207,6 @@ public class OpenHashTable<E extends IOpenHashTableEntity> implements IOpenHashT
 
     @Override
     public int tableSize() {
-        return hashTable.length;
+        return data.length;
     }
 }

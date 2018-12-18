@@ -5,7 +5,6 @@ import java.util.Deque;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-@SuppressWarnings("ALL")
 public class LinkedDequeFull<E> extends LinkedDequeSimple<E> implements Deque<E> {
 
     @Override
@@ -120,6 +119,7 @@ public class LinkedDequeFull<E> extends LinkedDequeSimple<E> implements Deque<E>
         return true;
     }
 
+    @SuppressWarnings("Duplicates")
     @Override
     public boolean removeAll(Collection<?> c) {
         if (c == null || c.contains(null)) {
@@ -141,6 +141,8 @@ public class LinkedDequeFull<E> extends LinkedDequeSimple<E> implements Deque<E>
         return result;
     }
 
+
+    @SuppressWarnings("Duplicates")
     @Override
     public boolean retainAll(Collection<?> c) {
         if (c == null || c.contains(null)) {
@@ -195,6 +197,7 @@ public class LinkedDequeFull<E> extends LinkedDequeSimple<E> implements Deque<E>
         return true;
     }
 
+    @SuppressWarnings("Duplicates")
     @Override
     public boolean contains(Object o) {
         if (o == null) {

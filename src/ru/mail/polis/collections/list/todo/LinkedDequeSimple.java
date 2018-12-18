@@ -13,18 +13,18 @@ import java.util.NoSuchElementException;
 public class LinkedDequeSimple<E> implements IDeque<E> {
 
     protected class Node {
-        public Node previous;
+        Node previous;
         public Node next;
         public E value;
 
-        public Node(E value) {
+        Node(E value) {
             this.value = value;
         }
     }
 
     protected Node first;
     protected Node last;
-    protected int length;
+    int length;
 
     public LinkedDequeSimple() {
         this.first = null;
@@ -159,6 +159,7 @@ public class LinkedDequeSimple<E> implements IDeque<E> {
      * @return {@code true} if this collection contains the specified element
      * @throws NullPointerException if the specified element is null
      */
+    @SuppressWarnings("Duplicates")
     @Override
     public boolean contains(E value) {
         if (value == null) {

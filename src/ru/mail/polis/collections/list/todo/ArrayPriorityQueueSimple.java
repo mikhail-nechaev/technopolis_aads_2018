@@ -5,7 +5,7 @@ import ru.mail.polis.collections.list.IPriorityQueue;
 import java.util.*;
 
 /**
- * Resizable array implementation of the {@link IPriorityQueue} interface based on a priority heap.
+ * Resizable array implementation of the {@link IPriorityQueue} interface based on data priority heap.
  * - no capacity restrictions
  * - grow as necessary to support
  *
@@ -13,10 +13,9 @@ import java.util.*;
  */
 public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPriorityQueue<E> {
 
-    private int size;
-    private final E VAL = null;
-    private final int DEFAULT_SIZE = 10;
-    private Object[] a;
+    private int count;
+    private Object[] data;
+    private final int DEFAULT = 16;
     private final Comparator<E> comparator;
 
     public ArrayPriorityQueueSimple() {
@@ -24,9 +23,9 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
     }
 
     /**
-     * Creates a {@code IPriorityQueue} containing the elements in the specified collection.
+     * Creates data {@code IPriorityQueue} containing the elements in the specified collection.
      * <p>
-     * You may consider that all elements in collection is not a null.
+     * You may consider that all elements in collection is not data null.
      * <p>
      * Complexity = O(n)
      *
@@ -38,7 +37,7 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
     }
 
     /**
-     * Creates a {@code IPriorityQueue} that orders its elements according to the specified comparator.
+     * Creates data {@code IPriorityQueue} that orders its elements according to the specified comparator.
      *
      * @param comparator comparator the comparator that will be used to order this priority queue.
      * @throws NullPointerException if the specified comparator is null
@@ -48,15 +47,15 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
             throw new NullPointerException();
         }
         this.comparator = Objects.requireNonNull(comparator, "comparator");
-        a = new Object[DEFAULT_SIZE];
-        size = 0;
+        data = new Object[DEFAULT];
+        count = 0;
     }
 
     /**
-     * Creates a {@code IPriorityQueue} containing the elements in the specified collection
+     * Creates data {@code IPriorityQueue} containing the elements in the specified collection
      * that orders its elements according to the specified comparator.
      * <p>
-     * You may consider that all elements in collection is not a null.
+     * You may consider that all elements in collection is not data null.
      * <p>
      * Complexity = O(n)
      *
@@ -69,24 +68,23 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
             throw new NullPointerException();
         }
         this.comparator = Objects.requireNonNull(comparator, "comparator");
-        a = collection.toArray();
+        data = collection.toArray();
         int index = 1;
-        while (a.length > index) {
+        while (data.length > index) {
             index *= 2;
         }
-
         index /= 2;
-        int beginIndex = index >= a.length ? a.length - 1 : index;
+        int beginIndex = index >= data.length ? data.length - 1 : index;
         for (int i = beginIndex; i > -1; i--) {
             siftDown(i);
         }
-        size = a.length;
+        count = data.length;
     }
 
     private void swap(int i, int j) {
-        Object tmp = a[i];
-        a[i] = a[j];
-        a[j] = tmp;
+        Object tmp = data[i];
+        data[i] = data[j];
+        data[j] = tmp;
     }
 
     private int compare(Object o1, Object o2) {
@@ -95,14 +93,14 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
 
     @SuppressWarnings("Duplicates")
     private void siftDown(int i) {
-        int first = 2 * i + 1 < a.length && a[2 * i + 1] != VAL ? 2 * i + 1 : -1;
-        int sec = 2 * i + 2 < a.length && a[2 * i + 2] != VAL ? 2 * i + 2 : -1;
+        int first = 2 * i + 1 < data.length && data[2 * i + 1] != null ? 2 * i + 1 : -1;
+        int sec = 2 * i + 2 < data.length && data[2 * i + 2] != null ? 2 * i + 2 : -1;
         if (first == -1 && sec == -1) {
             return;
         }
 
         if (first == -1) {
-            if (compare(a[i], a[sec]) > 0) {
+            if (compare(data[i], data[sec]) > 0) {
                 swap(i, sec);
                 siftDown(sec);
             }
@@ -110,15 +108,15 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
         }
 
         if (sec == -1) {
-            if (compare(a[i], a[first]) > 0) {
+            if (compare(data[i], data[first]) > 0) {
                 swap(i, first);
                 siftDown(first);
             }
             return;
         }
 
-        int minIndex = compare(a[first], a[sec]) > 0 ? sec : first;
-        if (compare(a[i], a[minIndex]) > 0) {
+        int minIndex = compare(data[first], data[sec]) > 0 ? sec : first;
+        if (compare(data[i], data[minIndex]) > 0) {
             swap(i, minIndex);
             siftDown(minIndex);
         }
@@ -130,7 +128,7 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
             return;
         }
         int parent = i % 2 == 0 ? (i - 2) / 2 : (i - 1) / 2;
-        if (compare(a[parent], a[i]) > 0) {
+        if (compare(data[parent], data[i]) > 0) {
             swap(i, parent);
             siftUp(parent);
         }
@@ -149,12 +147,12 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
         if (value == null) {
             throw new NullPointerException();
         }
-        if (size == a.length) {
-            a = Arrays.copyOf(a, a.length << 1);
+        if (count == data.length) {
+            data = Arrays.copyOf(data, data.length << 1);
         }
-        a[size] = value;
-        siftUp(size);
-        size++;
+        data[count] = value;
+        siftUp(count);
+        count++;
     }
 
     /**
@@ -171,14 +169,14 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
             throw new NoSuchElementException();
         }
         E root = element();
-        size--;
+        count--;
 
-        a[0] = a[size];
-        a[size] = VAL;
+        data[0] = data[count];
+        data[count] = null;
         siftDown(0);
 
-        if (size <= a.length / 2 && size > 10) {
-            a = Arrays.copyOf(a, size);
+        if (count <= data.length / 2 && count > 10) {
+            data = Arrays.copyOf(data, count);
         }
         return root;
     }
@@ -196,12 +194,12 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
         if (isEmpty()) {
             throw new NoSuchElementException();
         }
-        return (E) a[0];
+        return (E) data[0];
     }
 
     /**
      * Returns {@code true} if this collection contains the specified element.
-     * aka collection contains element el such that {@code Objects.equals(el, value) == true}
+     * aka collection contains element el such that {@code Objects.equals(el, NULVAL) == true}
      * <p>
      * Complexity = O(n)
      *
@@ -214,7 +212,7 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
         if (value == null) {
             throw new NullPointerException();
         }
-        for (Object o : a) {
+        for (Object o : data) {
             if (value.equals(o)) {
                 return true;
             }
@@ -229,7 +227,7 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
      */
     @Override
     public int size() {
-        return size;
+        return count;
     }
 
     /**
@@ -239,7 +237,7 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
      */
     @Override
     public boolean isEmpty() {
-        return size == 0;
+        return count == 0;
     }
 
     /**
@@ -248,8 +246,8 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
      */
     @Override
     public void clear() {
-        a = new Object[DEFAULT_SIZE];
-        size = 0;
+        data = new Object[DEFAULT];
+        count = 0;
     }
 
     /**
@@ -268,7 +266,7 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
 
             @Override
             public boolean hasNext() {
-                return nextIndex < size;
+                return nextIndex < count;
             }
 
             @Override
@@ -276,7 +274,7 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
                 lastReturnedIndex = nextIndex;
                 nextIndex++;
                 canRemove = true;
-                return (E) a[lastReturnedIndex];
+                return (E) data[lastReturnedIndex];
             }
 
             @Override
@@ -285,9 +283,9 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
                     throw new IllegalStateException();
                 }
                 canRemove = false;
-                size--;
-                a[lastReturnedIndex] = a[size];
-                a[size] = VAL;
+                count--;
+                data[lastReturnedIndex] = data[count];
+                data[count] = null;
                 siftDown(lastReturnedIndex);
                 nextIndex = lastReturnedIndex;
             }

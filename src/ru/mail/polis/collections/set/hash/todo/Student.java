@@ -57,12 +57,12 @@ public class Student extends AbstractOpenHashTableEntity {
     @Override
     public int hashCode() {
         int hash = 7;
-        hash = 69 * hash + (int) (this.id ^ (this.id >>> 32));
-        hash = 69 * hash + Objects.hashCode(this.firstName);
-        hash = 69 * hash + Objects.hashCode(this.lastName);
-        hash = 69 * hash + Objects.hashCode(this.gender);
-        hash = 69 * hash + Objects.hashCode(this.groupId);
-        hash = 69 * hash + Objects.hashCode(this.birthday);
+        hash = 67 * hash + (int) (this.id ^ (this.id >>> 32));
+        hash = 67 * hash + Objects.hashCode(this.firstName);
+        hash = 67 * hash + Objects.hashCode(this.lastName);
+        hash = 67 * hash + Objects.hashCode(this.gender);
+        hash = 67 * hash + Objects.hashCode(this.groupId);
+        hash = 67 * hash + Objects.hashCode(this.birthday);
         return hash;
     }
 
