@@ -14,10 +14,6 @@ public class ArrayDequeFull<E> extends ArrayDequeSimple<E> implements Deque<E> {
         super();
     }
 
-    public ArrayDequeFull(int numElements) {
-        super(numElements);
-    }
-
 
     @Override
     public void addFirst(E value)  {

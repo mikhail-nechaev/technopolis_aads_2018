@@ -15,16 +15,12 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
     protected E [] arrayDeque;
     protected int head;
     protected int tail;
-    protected static final int MIN_INITIAL_CAPACITY = 8;
 
 
     public ArrayDequeSimple(){
-        arrayDeque = (E[])new Object[16];
+        arrayDeque = (E[])new Object[32];
     }
 
-    public ArrayDequeSimple(int numElements){
-        allocateElements(numElements);
-    }
 
     private void checkInvariants() {
         assert arrayDeque[tail] == null;
@@ -75,23 +71,6 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
     }
 
 
-    private static int calculateSize(int numElements){
-        int initialCapacity =  MIN_INITIAL_CAPACITY;
-        if(numElements >= initialCapacity){
-            initialCapacity = numElements;
-            initialCapacity = initialCapacity | (initialCapacity >>> 1);
-            initialCapacity = initialCapacity | (initialCapacity >>> 2);
-            initialCapacity = initialCapacity | (initialCapacity >>> 4);
-            initialCapacity = initialCapacity | (initialCapacity >>> 8);
-            initialCapacity = initialCapacity | (initialCapacity >>> 16);
-            initialCapacity++;
-        }
-        return initialCapacity;
-    }
-
-    private void allocateElements(int numElements){
-        arrayDeque = (E[]) new Object[calculateSize(numElements)];
-    }
     private void doubleCapacity(){
         assert head == tail;
         int p = head;

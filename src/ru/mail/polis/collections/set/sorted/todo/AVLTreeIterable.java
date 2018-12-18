@@ -1,5 +1,6 @@
 package ru.mail.polis.collections.set.sorted.todo;
 
+import ru.mail.polis.collections.list.todo.ArrayDequeSimple;
 import ru.mail.polis.collections.set.sorted.ISortedSetIterable;
 
 import java.util.Comparator;
@@ -30,29 +31,26 @@ public class AVLTreeIterable<E extends Comparable<E>> extends AVLTree<E> impleme
 
     private class AVLTreeIterator implements Iterator<E> {
 
-        private void inorderTraverse(AVLNode<E> currentNode) {
+        private void inorderTraverse(AVLNode<E> currentNode) { // кидаем в дек все левые поддеревья от root
             if (currentNode == null) return;
+            avlNodeArrayDequeSimple.addLast(currentNode);
             inorderTraverse(currentNode.left);
-            Nodes[index++] = currentNode.value;
-            inorderTraverse(currentNode.right);
         }
 
 
-        private E [] Nodes;
-        private int index;
-        private int cursor = 0;
-        private int sizeIterable = size();
-        private E current;
+        protected ArrayDequeSimple <AVLNode<E>> avlNodeArrayDequeSimple;
+        E currentValue;
+        int cursor = 0;
 
 
         AVLTreeIterator(){
-            Nodes =(E[]) new Comparable[sizeIterable];
+            avlNodeArrayDequeSimple = new ArrayDequeSimple<>();
             inorderTraverse((AVLNode<E>) root);
         }
 
         @Override
         public boolean hasNext() {
-            return cursor < sizeIterable;
+            return !avlNodeArrayDequeSimple.isEmpty();
         }
 
 
@@ -62,9 +60,17 @@ public class AVLTreeIterable<E extends Comparable<E>> extends AVLTree<E> impleme
             if(!hasNext()){
                 throw new NoSuchElementException();
             }
-            current = Nodes[cursor];
+            AVLNode current = avlNodeArrayDequeSimple.removeLast(); // достаем последний
+            currentValue = (E) current.value; // запоминаем значение
+            if(current.right != null){ // если последнего есть справа
+                current = current.right; // идем по ним
+                while (current != null){ // пока он не null
+                    avlNodeArrayDequeSimple.addLast(current); //добавляем в конец
+                    current = current.left; // потом идем в левые ветки от текущего
+                }
+            }
             cursor++;
-            return  current;
+            return currentValue;
         }
 
 
@@ -73,35 +79,33 @@ public class AVLTreeIterable<E extends Comparable<E>> extends AVLTree<E> impleme
             if(cursor == 0){
                 throw new IllegalStateException();
             }
-            removeValue(Nodes[cursor-1]);
+            cursor--;
+            removeValue(currentValue);
         }
     }
 
 
     private class AVLTreeDescendingIterator implements Iterator<E>{
 
-        private void reverseInorderTraverse(AVLNode<E> current) {
-            if (current == null) return;
-            reverseInorderTraverse(current.right);
-            Nodes[index++] = current.value;
-            reverseInorderTraverse(current.left);
+        private void reverseInorderTraverse(AVLNode<E> currentNode) {
+            if (currentNode == null) return;
+            avlNodeArrayDequeSimple.addLast(currentNode);
+            reverseInorderTraverse(currentNode.right);
         }
 
-        private E [] Nodes;
-        private int index;
-        private int cursor;
-        private int sizeIterable = size();
-        private E current;
+        protected ArrayDequeSimple <AVLNode<E>> avlNodeArrayDequeSimple;
+        E currentValue;
+        int cursor = 0;
 
 
         AVLTreeDescendingIterator(){
-            Nodes =(E[]) new Comparable[sizeIterable];
+            avlNodeArrayDequeSimple = new ArrayDequeSimple<>();
             reverseInorderTraverse((AVLNode<E>) root);
         }
 
         @Override
         public boolean hasNext() {
-            return cursor < sizeIterable;
+            return !avlNodeArrayDequeSimple.isEmpty();
         }
 
 
@@ -110,18 +114,27 @@ public class AVLTreeIterable<E extends Comparable<E>> extends AVLTree<E> impleme
             if(!hasNext()){
                 throw new NoSuchElementException();
             }
-            current = Nodes[cursor];
+            AVLNode current = avlNodeArrayDequeSimple.removeLast(); // достаем последний
+            currentValue = (E) current.value; // запоминаем значение
+            if(current.left != null){ // если последнего есть справа
+                current = current.left; // идем по ним
+                while (current != null){ // пока он не null
+                    avlNodeArrayDequeSimple.addLast(current); //добавляем в конец
+                    current = current.right; // потом идем в левые ветки от текущего
+                }
+            }
             cursor++;
-            return  current;
+            return currentValue;
         }
 
-        //remove at index
+
         @Override
         public void remove() {
             if(cursor == 0){
                 throw new IllegalStateException();
             }
-            removeValue(Nodes[cursor-1]);
+            cursor--;
+            removeValue(currentValue);
         }
     }
 
