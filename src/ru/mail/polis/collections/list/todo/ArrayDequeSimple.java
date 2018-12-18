@@ -13,6 +13,8 @@ import java.util.ListIterator;
  */
 public class ArrayDequeSimple<E> implements IDeque<E> {
 
+
+    
     /**
      * Inserts the specified element at the front of this deque.
      *

@@ -2,10 +2,7 @@ package ru.mail.polis.collections.list.todo;
 
 import ru.mail.polis.collections.list.IPriorityQueue;
 
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * Resizable array implementation of the {@link IPriorityQueue} interface based on a priority heap.
@@ -17,6 +14,9 @@ import java.util.Objects;
 public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPriorityQueue<E> {
 
     private final Comparator<E> comparator;
+    private final int CAPACITY = 10;
+    private Object[] data;
+    int size;
 
     public ArrayPriorityQueueSimple() {
         this(Comparator.naturalOrder());
@@ -42,6 +42,8 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
      */
     public ArrayPriorityQueueSimple(Comparator<E> comparator) {
         this.comparator = Objects.requireNonNull(comparator, "comparator");
+        data = new Object[CAPACITY];
+        size = 0;
     }
 
     /**
@@ -54,9 +56,13 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
      * @param comparator comparator the comparator that will be used to order this priority queue.
      * @throws NullPointerException if the specified collection or comparator is null
      */
-    public ArrayPriorityQueueSimple(Collection<E> collection, Comparator<E> comparator) {
+    public ArrayPriorityQueueSimple(Collection<E> collection, Comparator<E> comparator)
+    {
         this.comparator = Objects.requireNonNull(comparator, "comparator");
-        //todo: do some stuff with collection
+        Objects.requireNonNull(collection, "collection");
+        data = new Object[CAPACITY];
+        size = 0;
+        collection.forEach(this::add);
     }
 
     /**
@@ -69,7 +75,13 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
      */
     @Override
     public void add(E value) {
-        throw new UnsupportedOperationException("todo: implement this");
+        data[size] = Objects.requireNonNull(value);
+        siftUp(size);
+        ++size;
+        if (size == data.length)
+        {
+            data = Arrays.copyOf(data, data.length + 10);
+        }
     }
 
     /**
@@ -82,7 +94,24 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
      */
     @Override
     public E remove() {
-        throw new UnsupportedOperationException("todo: implement this");
+        E head;
+        if (isEmpty())
+        {
+            throw new NoSuchElementException();
+        }
+        else
+        {
+            head = element();
+            --size;
+            data[0] = data[size];
+            data[size] = null;
+            siftDown(0);
+            if (size < data.length - 10)
+            {
+                data = Arrays.copyOf(data, data.length - 10);
+            }
+        }
+        return head;
     }
 
     /**
@@ -93,9 +122,17 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
      * @return the head of this queue
      * @throws java.util.NoSuchElementException if this queue is empty
      */
+    @SuppressWarnings("unchecked")
     @Override
     public E element() {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (isEmpty())
+        {
+            throw new NoSuchElementException();
+        }
+        else
+        {
+            return (E)data[0];
+        }
     }
 
     /**
@@ -110,7 +147,21 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
      */
     @Override
     public boolean contains(E value) {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (value == null)
+        {
+            throw new NullPointerException();
+        }
+        else
+        {
+            for(Object o: data)
+            {
+                if(o.equals(value))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
     }
 
     /**
@@ -120,7 +171,7 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
      */
     @Override
     public int size() {
-        throw new UnsupportedOperationException("todo: implement this");
+        return size;
     }
 
     /**
@@ -130,7 +181,7 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
      */
     @Override
     public boolean isEmpty() {
-        throw new UnsupportedOperationException("todo: implement this");
+        return size == 0;
     }
 
     /**
@@ -139,7 +190,8 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
      */
     @Override
     public void clear() {
-        throw new UnsupportedOperationException("todo: implement this");
+        data = Arrays.copyOf(data, 0);
+        size = 0;
     }
 
     /**
@@ -150,6 +202,153 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
      */
     @Override
     public Iterator<E> iterator() {
-        throw new UnsupportedOperationException("todo: implement this");
+      return new Iterator<E>()
+      {
+          int current = 0;
+          boolean rm = false;
+
+          @Override
+          public boolean hasNext()
+          {
+              if (current < size - 1)
+              {
+                  return true;
+              }
+              else
+              {
+                  return false;
+              }
+          }
+
+          @Override
+          public E next()
+          {
+              if (hasCurrent())
+              {
+                  current++;
+                  rm = true;
+                  return (E) data[current - 1];
+              }
+              else
+              {
+                  throw new NoSuchElementException();
+              }
+          }
+
+          @Override
+          public void remove()
+          {
+              if (!rm)
+              {
+                  throw new IllegalStateException();
+              }
+              --size;
+              data[current - 1] = data[size];
+              data[size] = null;
+              siftDown(current - 1);
+              rm = false;
+          }
+
+          private boolean hasCurrent()
+          {
+              if (current < size)
+              {
+                  return true;
+              }
+              else
+              {
+                  return false;
+              }
+          }
+      };
+
+    }
+
+    /**
+     * Code from "Хипуй"
+     * @param k
+     */
+    @SuppressWarnings("unchecked")
+    private void siftDown(int k)
+    {
+        int child_1, child_2;
+        if (k * 2 + 1 < data.length && data[k * 2 + 1] != null)
+        {
+            child_1 = k * 2 + 1;
+        }
+        else
+        {
+            child_1 = -1;
+        }
+
+        if (k * 2 + 2 < data.length && data[k * 2 + 2] != null)
+        {
+            child_2 = k * 2 + 2;
+        }
+        else
+        {
+            child_2 = -1;
+        }
+
+        if (child_1 == -1 && child_2 == -1)
+        {
+            return;
+        }
+
+        if (child_1 == -1)
+        {
+            if (compare(data[k], data[child_2]) > 0)
+            {
+                E tmp = (E)data[k];
+                data[k] = data[child_2];
+                data[child_2] = tmp;
+                siftDown(child_2);
+            }
+            return;
+        }
+
+        if (child_2 == -1)
+        {
+            if (compare(data[k], data[child_1]) > 0)
+            {
+                E tmp = (E)data[k];
+                data[k] = data[child_1];
+                data[child_1] = tmp;
+                siftDown(child_1);
+            }
+            return;
+        }
+
+        int child_min = compare(data[child_1], data[child_2]) > 0 ? child_2 : child_1;
+        if (compare(data[k], data[child_min]) > 0)
+        {
+            E tmp = (E)data[k];
+            data[k] = data[child_min];
+            data[child_min] = tmp;
+            siftDown(child_min);
+        }
+    }
+
+    @SuppressWarnings("unckecked")
+    private void siftUp(int k)
+    {
+        if (k == 0)
+        {
+            return;
+        }
+        int parent = k % 2 == 0 ? (k - 2) / 2 : (k - 1) / 2;
+        if (compare(data[k], data[parent]) < 0)
+        {
+            E tmp = (E)data[k];
+            data[k] = data[parent];
+            data[parent] = tmp;
+            siftUp(parent);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private int compare(Object o1, Object o2)
+    {
+        return comparator.compare((E) o1, (E) o2);
     }
 }

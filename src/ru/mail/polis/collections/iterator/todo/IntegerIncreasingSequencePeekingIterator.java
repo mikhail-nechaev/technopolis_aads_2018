@@ -10,6 +10,10 @@ import java.util.NoSuchElementException;
  */
 public class IntegerIncreasingSequencePeekingIterator implements IIncreasingSequenceIterator<Integer> {
 
+    int current;
+    boolean wasLast, wasOverflow;
+    int first, last, maxStep;
+
     /**
      * minStep = 1
      *
@@ -22,8 +26,22 @@ public class IntegerIncreasingSequencePeekingIterator implements IIncreasingSequ
      * @param maxStep — max diff between adjacent values
      * @throws IllegalArgumentException if arguments is invalid
      */
-    public IntegerIncreasingSequencePeekingIterator(int first, int last, int maxStep) {
 
+    public IntegerIncreasingSequencePeekingIterator(int first, int last, int maxStep)
+    {
+        if ((first <= last) && (maxStep > 0))
+        {
+            this.first = first;
+            this.last = last;
+            this.maxStep = maxStep;
+            this.current = first;
+            wasLast = false;
+            wasOverflow = false;
+        }
+        else
+        {
+            throw new IllegalArgumentException();
+        }
     }
 
 
@@ -36,7 +54,18 @@ public class IntegerIncreasingSequencePeekingIterator implements IIncreasingSequ
      */
     @Override
     public boolean hasNext() {
-        throw new UnsupportedOperationException("todo: implement this");
+        if ((current >= last) && (wasLast))
+        {
+            return false;
+        }
+        else
+        {
+            if (wasOverflow && wasLast)
+            {
+                return false;
+            }
+            return true;
+        }
     }
 
     /**
@@ -47,7 +76,44 @@ public class IntegerIncreasingSequencePeekingIterator implements IIncreasingSequ
      */
     @Override
     public Integer next() {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (current >= last)
+        {
+            if (!wasLast)
+            {
+                wasLast = true;
+                return last;
+            }
+            else
+            {
+                throw new NoSuchElementException();
+            }
+        }
+        else
+        {
+            if (wasOverflow)
+            {
+                if (!wasLast)
+                {
+                    wasLast = true;
+                    return last;
+                }
+                else
+                {
+                    throw new NoSuchElementException();
+                }
+            }
+            int prev = current;
+            current = current + (int) (Math.random() * maxStep);
+            if (current == prev)
+            {
+                ++current;
+            }
+            if (current < prev)
+            {
+                wasOverflow = true;
+            }
+            return prev;
+        }
     }
 
     /**
@@ -58,7 +124,29 @@ public class IntegerIncreasingSequencePeekingIterator implements IIncreasingSequ
      */
     @Override
     public Integer peek() {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (current >= last)
+        {
+            if (!wasLast)
+            {
+                return last;
+            }
+            else
+            {
+                throw new NoSuchElementException();
+            }
+        }
+        else
+        {
+            if (wasOverflow && !wasLast)
+            {
+                return last;
+            }
+            if (wasOverflow && wasLast)
+            {
+                throw new NoSuchElementException();
+            }
+            return current;
+        }
     }
 
     /**
@@ -74,6 +162,21 @@ public class IntegerIncreasingSequencePeekingIterator implements IIncreasingSequ
      */
     @Override
     public int compareTo(IPeekingIterator<Integer> other) {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (this.hasNext() && other.hasNext())
+        {
+            return this.peek() - other.peek();
+        }
+        else
+        {
+            if (this.hasNext())
+            {
+                return 1;
+            }
+            if (other.hasNext())
+            {
+                return -1;
+            }
+            return 0;
+        }
     }
 }
