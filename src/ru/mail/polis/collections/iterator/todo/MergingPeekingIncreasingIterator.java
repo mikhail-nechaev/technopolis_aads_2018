@@ -17,7 +17,8 @@ import java.util.NoSuchElementException;
  */
 public class MergingPeekingIncreasingIterator implements Iterator<Integer> {
     private IntegerIncreasingSequencePeekingIterator [] iterators;
-      /**
+
+    /**
      * Creates a {@code MergingPeekingIncreasingIterator} containing the inside all elements of this specified iterators.
      *
      * Complexity = O(n)
