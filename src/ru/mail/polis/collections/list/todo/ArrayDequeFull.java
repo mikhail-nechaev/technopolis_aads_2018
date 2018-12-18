@@ -183,6 +183,8 @@ public class ArrayDequeFull<E> extends ArrayDequeSimple<E> implements Deque<E> {
 
     @Override
     public boolean contains(Object o) {
+        if (o == null)
+            throw new NullPointerException();
         if (isEmpty()) {
             return false;
         }

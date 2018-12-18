@@ -56,15 +56,19 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
 
     private void resize() {
         Object[] newArray = new Object[data.length * 2];
-        if (first <= last) {
-            System.arraycopy(data, first, newArray, 0, size());
-        } else {
-            System.arraycopy(data, first, newArray, 0, size() - first);
-            System.arraycopy(data, 0, newArray, size() - first, last + 1);
+        int last = this.last;
+        int i = 0;
+        while (i < count) {
+            if (last + 1 == data.length) {
+                last = 0;
+            } else {
+                last++;
+            }
+            newArray[i++] = data[last];
         }
-        data = newArray;
-        first = 0;
-        last = size() - 1;
+        this.first = i - 1;
+        this.last = newArray.length - 1;
+        this.data = newArray;
     }
 
     /**
