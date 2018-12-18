@@ -17,7 +17,7 @@ import java.util.Objects;
 public class AVLTree<E extends Comparable<E>> implements ISelfBalancingSortedTreeSet<E> {
 
     //todo: update it if required
-    protected static class AVLNode<E> {
+    static class AVLNode<E> {
         E value;
         AVLNode<E> left;
         AVLNode<E> right;
@@ -171,8 +171,8 @@ public class AVLTree<E extends Comparable<E>> implements ISelfBalancingSortedTre
      * The comparator used to maintain order in this tree map.
      */
     protected final Comparator<E> comparator;
-    private AVLNode<E> root;
     protected int size;
+    AVLNode<E> root;
 
     public AVLTree() {
         this(Comparator.naturalOrder());
