@@ -3,6 +3,7 @@ package ru.mail.polis.collections.list.todo;
 import ru.mail.polis.collections.list.IDeque;
 
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 /**
  * Linked list implementation of the {@link IDeque} interface with no capacity restrictions.
@@ -10,6 +11,26 @@ import java.util.Iterator;
  * @param <E> the type of elements held in this deque
  */
 public class LinkedDequeSimple<E> implements IDeque<E> {
+
+    protected class Node {
+        public Node previous;
+        public Node next;
+        public E value;
+
+        public Node(E value) {
+            this.value = value;
+        }
+    }
+
+    protected Node first;
+    protected Node last;
+    protected int length;
+
+    public LinkedDequeSimple() {
+        this.first = null;
+        this.last = null;
+        this.length = 0;
+    }
 
     /**
      * Inserts the specified element at the front of this deque.
@@ -19,62 +40,115 @@ public class LinkedDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public void addFirst(E value) {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (value == null) {
+            throw new NullPointerException();
+        }
+        if (size() == 0) {
+            first = last = new Node(value);
+            length++;
+        } else {
+            first.next = new Node(value);
+            first.next.previous = first;
+            first = first.next;
+            length++;
+        }
     }
 
     /**
      * Retrieves and removes the first element of this queue.
      *
-     * @return the head of this queue
+     * @return the first of this queue
      * @throws java.util.NoSuchElementException if this deque is empty
      */
     @Override
     public E removeFirst() {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (isEmpty()) {
+            throw new NoSuchElementException();
+        }
+        E result = first.value;
+        if (size() == 1) {
+            first = last = null;
+        } else {
+            first = first.previous;
+            first.next.previous = null;
+            first.next = null;
+        }
+        length--;
+        return result;
     }
 
     /**
      * Retrieves, but does not remove, the first element of this queue.
      *
-     * @return the head of this queue
+     * @return the first of this queue
      * @throws java.util.NoSuchElementException if this queue is empty
      */
     @Override
     public E getFirst() {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (isEmpty()) {
+            throw new NoSuchElementException();
+        }
+        return first.value;
     }
 
     /**
-     * Inserts the specified element at the tail of this queue
+     * Inserts the specified element at the last of this queue
      *
      * @param value the element to add
      * @throws NullPointerException if the specified element is null
      */
     @Override
     public void addLast(E value) {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (value == null) {
+            throw new NullPointerException();
+        }
+        if (size() == 0) {
+            first = last = new Node(value);
+            length++;
+        } else {
+            last.previous = new Node(value);
+            last.previous.next = last;
+            last = last.previous;
+            length++;
+        }
     }
 
     /**
      * Retrieves and removes the last element of this deque.
      *
-     * @return the tail of this deque
+     * @return the last of this deque
      * @throws java.util.NoSuchElementException if this deque is empty
      */
     @Override
     public E removeLast() {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (isEmpty()) {
+            throw new NoSuchElementException();
+        }
+        E result = last.value;
+        if (size() == 1) {
+            first = last = null;
+        } else {
+            last = last.next;
+            last.previous.next = null;
+            last.previous = null;
+        }
+
+        length--;
+        return result;
     }
 
     /**
      * Retrieves, but does not remove, the last element of this deque.
      *
-     * @return the tail of this deque
+     * @return the last of this deque
      * @throws java.util.NoSuchElementException if this deque is empty
      */
     @Override
     public E getLast() {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (isEmpty()) {
+            throw new NoSuchElementException();
+        }
+        return last.value;
     }
 
     /**
@@ -87,7 +161,15 @@ public class LinkedDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public boolean contains(E value) {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (value == null) {
+            throw new NullPointerException();
+        }
+        for (E node : this) {
+            if (value.equals(node)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -97,7 +179,7 @@ public class LinkedDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public int size() {
-        throw new UnsupportedOperationException("todo: implement this");
+        return length;
     }
 
     /**
@@ -107,7 +189,7 @@ public class LinkedDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public boolean isEmpty() {
-        throw new UnsupportedOperationException("todo: implement this");
+        return size() == 0;
     }
 
     /**
@@ -116,17 +198,66 @@ public class LinkedDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public void clear() {
-        throw new UnsupportedOperationException("todo: implement this");
+        first = last = null;
+        length = 0;
     }
 
     /**
      * Returns an iterator over the elements in this collection in proper sequence.
-     * The elements will be returned in order from first (head) to last (tail).
+     * The elements will be returned in order from first (first) to last (last).
      *
      * @return an iterator over the elements in this collection in proper sequence
      */
     @Override
     public Iterator<E> iterator() {
-        throw new UnsupportedOperationException("todo: implement this");
+        return new Iterator<>() {
+            Node current = first;
+            boolean remove = false;
+
+            @Override
+            public boolean hasNext() {
+                remove = false;
+                return current != null;
+            }
+
+            @Override
+            public E next() {
+                if (!hasNext()) {
+                    throw new NoSuchElementException();
+                }
+                E result = current.value;
+                current = current.previous;
+                remove = true;
+                return result;
+            }
+
+            @Override
+            public void remove() {
+                if (!remove) {
+                    throw new IllegalStateException();
+                }
+                if (current == null) {
+                    length--;
+                } else {
+                    LinkedDequeSimple.this.remove(current.next);
+                }
+                remove = false;
+
+            }
+
+        };
+    }
+
+    protected void remove(Node currentNode) {
+        if (currentNode.next != null) {
+            currentNode.next.previous = currentNode.previous;
+        }
+        if (currentNode.previous != null) {
+            currentNode.previous.next = currentNode.next;
+        }
+        length--;
+        if (size() == 0) {
+            clear();
+        }
     }
 }
