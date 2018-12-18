@@ -3,7 +3,10 @@ package ru.mail.polis.collections.set.sorted.todo;
 import ru.mail.polis.collections.set.sorted.ISortedSetIterable;
 
 import java.util.Comparator;
+import java.util.ConcurrentModificationException;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
+import java.util.Stack;
 
 /**
  * A AVL tree with iterator based {@link ru.mail.polis.collections.set.sorted.ISelfBalancingSortedTreeSet} implementation.
@@ -33,7 +36,52 @@ public class AVLTreeIterable<E extends Comparable<E>> extends AVLTree<E> impleme
      */
     @Override
     public Iterator<E> iterator() {
-        throw new UnsupportedOperationException("todo: implement this");
+
+        AVLNode<E> nextNode = root;
+        Stack<AVLNode<E>> stack = new Stack<>();
+        int expectedModCount = modCount;
+
+        while (nextNode != null) {
+            stack.push(nextNode);
+            nextNode = nextNode.left;
+        }
+
+        Iterator<E> iterator = new Iterator<E>() {
+
+            @Override
+            public boolean hasNext() {
+                if (expectedModCount != modCount) {
+                    throw new ConcurrentModificationException();
+                }
+                if (stack.empty()) {
+                    return false;
+                } else {
+                    return true;
+                }
+            }
+
+            @Override
+            public E next() {
+                if (expectedModCount != modCount) {
+                    throw new ConcurrentModificationException();
+                }
+                if (!hasNext()) {
+                    throw new NoSuchElementException();
+                }
+                AVLNode<E> tempNode = stack.pop();
+                E tempValue = tempNode.value;
+                if (tempNode.right != null) {
+                    tempNode = tempNode.right;
+                    while (tempNode != null) {
+                        stack.push(tempNode);
+                        tempNode = tempNode.left;
+                    }
+                }
+                return tempValue;
+            }
+        };
+
+        return iterator;
     }
 
     /**
@@ -43,6 +91,50 @@ public class AVLTreeIterable<E extends Comparable<E>> extends AVLTree<E> impleme
      */
     @Override
     public Iterator<E> descendingIterator() {
-        throw new UnsupportedOperationException("todo: implement this");
+        AVLNode<E> nextNode = root;
+        Stack<AVLNode<E>> stack = new Stack<>();
+        int expectedModCount = modCount;
+
+        while (nextNode != null) {
+            stack.push(nextNode);
+            nextNode = nextNode.right;
+        }
+
+        Iterator<E> iterator = new Iterator<E>() {
+
+            @Override
+            public boolean hasNext() {
+                if (expectedModCount != modCount) {
+                    throw new ConcurrentModificationException();
+                }
+                if (stack.empty()) {
+                    return false;
+                } else {
+                    return true;
+                }
+            }
+
+            @Override
+            public E next() {
+                if (expectedModCount != modCount) {
+                    throw new ConcurrentModificationException();
+                }
+                if (!hasNext()) {
+                    throw new NoSuchElementException();
+                }
+                AVLNode<E> tempNode = stack.pop();
+                E tempValue = tempNode.value;
+                if (tempNode.left != null) {
+                    tempNode = tempNode.left;
+                    while (tempNode != null) {
+                        stack.push(tempNode);
+                        tempNode = tempNode.right;
+                    }
+                }
+                return tempValue;
+            }
+        };
+
+        return iterator;
     }
 }
