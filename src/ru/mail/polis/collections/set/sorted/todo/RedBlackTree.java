@@ -12,6 +12,8 @@ import java.util.NoSuchElementException;
  * ! An implementation of red-black trees must be based on the description in
  * Introduction to Algorithms (Cormen, Leiserson, Rivest)
  *
+ * <a href="http://staff.ustc.edu.cn/~csli/graduate/algorithms/book6/chap13.htm">CHAPTER 13: BINARY SEARCH TREES</a>
+ *
  * <a href="http://staff.ustc.edu.cn/~csli/graduate/algorithms/book6/chap14.htm">CHAPTER 14: RED-BLACK TREES</a>
  *
  * @param <E> the type of elements maintained by this set
