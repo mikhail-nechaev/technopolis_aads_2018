@@ -13,6 +13,7 @@ public class Student extends AbstractOpenHashTableEntity {
     private final Gender gender;
     private final LocalDate birthday;
     private final int groupId;
+    private boolean deleted;
 
     public Student(long id, String firstName, String lastName, Gender gender, LocalDate birthday, int groupId) {
         this.id = id;
@@ -21,6 +22,15 @@ public class Student extends AbstractOpenHashTableEntity {
         this.gender = Objects.requireNonNull(gender, "gender");
         this.birthday = Objects.requireNonNull(birthday, "birthday");
         this.groupId = groupId;
+        deleted = false;
+    }
+
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
     }
 
     public long getId() {
@@ -49,32 +59,60 @@ public class Student extends AbstractOpenHashTableEntity {
 
     @Override
     public int hashCode(int tableSize, int probId) throws IllegalArgumentException {
-        //todo: see IOpenHashTableEntity contract
-        //todo: use this in OpenHashTable
-        throw new UnsupportedOperationException("todo: implement this");
+
+        int hashCode = hashCode();
+        int hashVal = -1;
+        if (hashCode < 0) {
+            hashVal = tableSize - Math.abs(hashCode) % tableSize;
+        } else {
+            hashVal = hashCode % tableSize;
+        }
+        int stepSize = hashCode2();
+        return (hashVal + stepSize * probId) % tableSize;
     }
 
     @Override
     public int hashCode() {
-        //todo: don't forget [hashCode - equals] contract
-        throw new UnsupportedOperationException("todo: implement this");
+        final int prime = 31;
+        int result = 1;
+        result = (prime * result + Long.hashCode(id)) % Integer.MAX_VALUE;
+        result = (prime * result + Integer.hashCode(groupId)) % Integer.MAX_VALUE;
+        result = (prime * result + firstName.hashCode()) % Integer.MAX_VALUE;
+        result = (prime * result + lastName.hashCode()) % Integer.MAX_VALUE;
+        result = (prime * result + gender.hashCode()) % Integer.MAX_VALUE;
+        result = (prime * result + birthday.hashCode()) % Integer.MAX_VALUE;
+        return result;
     }
 
     @Override
     protected int hashCode2() {
-        throw new UnsupportedOperationException("todo: implement this");
+        return 5 - hashCode() % 5;
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         Student student = (Student) o;
-        if (id != student.id) return false;
-        if (groupId != student.groupId) return false;
-        if (!firstName.equals(student.firstName)) return false;
-        if (!lastName.equals(student.lastName)) return false;
-        if (gender != student.gender) return false;
+        if (id != student.id) {
+            return false;
+        }
+        if (groupId != student.groupId) {
+            return false;
+        }
+        if (!firstName.equals(student.firstName)) {
+            return false;
+        }
+        if (!lastName.equals(student.lastName)) {
+            return false;
+        }
+        if (gender != student.gender) {
+            return false;
+        }
         return birthday.equals(student.birthday);
     }
 
