@@ -64,10 +64,13 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
         if (collection == null || comparator == null)
             throw new NullPointerException();
         this.comparator = Objects.requireNonNull(comparator, "comparator");
-        this.elements = new Object[11];
+        this.elements = new Object[collection.size() + 11];
         this.size = 0;
-        int s = size();
-        collection.forEach(this::add);
+        for (E value : collection) {
+            elements[size++] = value;
+        }
+        for (int i = (size / 2) - 1; i > -1; i--)
+            siftDown(i);
     }
 
     /**
