@@ -1,17 +1,29 @@
 package ru.mail.polis.collections.set.sorted.todo;
 
-import ru.mail.polis.collections.set.sorted.ISelfBalancingTreeSet;
-import ru.mail.polis.collections.set.sorted.ISortedSet;
+import ru.mail.polis.collections.set.sorted.ISelfBalancingSortedTreeSet;
 import ru.mail.polis.collections.set.sorted.UnbalancedTreeException;
 
 import java.util.Comparator;
+import java.util.NoSuchElementException;
 
-public class RedBlackTree<E extends Comparable<E>> implements ISortedSet<E>, ISelfBalancingTreeSet<E> {
+/**
+ * A Red-Black tree based {@link ISelfBalancingSortedTreeSet} implementation.
+ *
+ * ! An implementation of red-black trees must be based on the description in
+ * Introduction to Algorithms (Cormen, Leiserson, Rivest)
+ *
+ * <a href="http://staff.ustc.edu.cn/~csli/graduate/algorithms/book6/chap14.htm">CHAPTER 14: RED-BLACK TREES</a>
+ *
+ * @param <E> the type of elements maintained by this set
+ */
+public class RedBlackTree<E extends Comparable<E>> implements ISelfBalancingSortedTreeSet<E> {
 
+    //todo: update it if required
     enum RBColor {
         RED, BLACK
     }
 
+    //todo: update it if required
     static final class RBNode<E> {
         E value;
         RBNode<E> left;
@@ -30,6 +42,9 @@ public class RedBlackTree<E extends Comparable<E>> implements ISortedSet<E>, ISe
         }
     }
 
+    /**
+     * The comparator used to maintain order in this tree sett.
+     */
     protected final Comparator<E> comparator;
     protected RBNode root;
 
@@ -37,6 +52,12 @@ public class RedBlackTree<E extends Comparable<E>> implements ISortedSet<E>, ISe
         this(Comparator.naturalOrder());
     }
 
+    /**
+     * Creates a {@code ISelfBalancingSortedTreeSet} that orders its elements according to the specified comparator.
+     *
+     * @param comparator comparator the comparator that will be used to order this priority queue.
+     * @throws NullPointerException if the specified comparator is null
+     */
     public RedBlackTree(Comparator<E> comparator) {
         this.comparator = comparator;
     }
@@ -67,10 +88,23 @@ public class RedBlackTree<E extends Comparable<E>> implements ISortedSet<E>, ISe
     }
 
     /**
+     * Returns {@code true} if this collection contains the specified element.
+     * aka collection contains element el such that {@code Objects.equals(el, value) == true}
+     *
+     * @param value element whose presence in this collection is to be tested
+     * @return {@code true} if this collection contains the specified element
+     * @throws NullPointerException if the specified element is null
+     */
+    @Override
+    public boolean contains(E value) {
+        throw new UnsupportedOperationException("todo: implement this");
+    }
+
+    /**
      * Returns the first (lowest) element currently in this set.
      *
      * @return the first (lowest) element currently in this set
-     * @throws java.util.NoSuchElementException if this set is empty
+     * @throws NoSuchElementException if this set is empty
      */
     @Override
     public E first() {
@@ -81,23 +115,10 @@ public class RedBlackTree<E extends Comparable<E>> implements ISortedSet<E>, ISe
      * Returns the last (highest) element currently in this set.
      *
      * @return the last (highest) element currently in this set
-     * @throws java.util.NoSuchElementException if this set is empty
+     * @throws NoSuchElementException if this set is empty
      */
     @Override
     public E last() {
-        throw new UnsupportedOperationException("todo: implement this");
-    }
-
-    /**
-     * Returns {@code true} if this collection contains the specified element.
-     * aka collection contains element el such that {@code Objects.equals(el, value) == true}
-     *
-     * @param value element whose presence in this collection is to be tested
-     * @return {@code true} if this collection contains the specified element
-     * @throws NullPointerException if the specified element is null
-     */
-    @Override
-    public boolean contains(E value) {
         throw new UnsupportedOperationException("todo: implement this");
     }
 

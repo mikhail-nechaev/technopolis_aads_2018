@@ -1,13 +1,24 @@
 package ru.mail.polis.collections.set.hash.todo;
 
+import ru.mail.polis.collections.set.hash.IOpenHashTable;
+import ru.mail.polis.collections.set.hash.IOpenHashTableEntity;
+
 import java.util.Iterator;
 
-import ru.mail.polis.collections.set.ISetIterable;
-import ru.mail.polis.collections.set.hash.OpenHashTableEntity;
+/**
+ *
+ * Implementation open addressed hash table with double hashing
+ *
+ * <a href="https://en.wikipedia.org/wiki/Double_hashing">Double_hashing</a>
+ *
+ * Use {@link IOpenHashTableEntity#hashCode(int,int)} for hash code calculating
+ *
+ * Use loadFactor = from 0.5f to 0.75f included
+ *
+ * @param <E> the type of elements maintained by this hash table
+ */
+public class OpenHashTable<E extends IOpenHashTableEntity> implements IOpenHashTable<E> {
 
-public class OpenHashTable<E extends OpenHashTableEntity> implements ISetIterable<E> {
-
-    //todo: use OpenHashTableEntity.hashCode for calculate hash code
 
     /**
      * Adds the specified element to this set if it is not already present.
@@ -15,7 +26,9 @@ public class OpenHashTable<E extends OpenHashTableEntity> implements ISetIterabl
      * @param value element to be added to this set
      * @return {@code true} if this set did not already contain the specified
      * element
-     * @throws NullPointerException if the specified element is null
+     * @throws NullPointerException     if the specified element is null
+     * @throws IllegalArgumentException if some property of the element prevents it from being added to this collection
+     *                                  In other words if {@link IOpenHashTableEntity#hashCode(int, int)} specified element is incorrect.
      */
     @Override
     public boolean add(E value) {
@@ -27,7 +40,9 @@ public class OpenHashTable<E extends OpenHashTableEntity> implements ISetIterabl
      *
      * @param value object to be removed from this set, if present
      * @return {@code true} if this set contained the specified element
-     * @throws NullPointerException if the specified element is null
+     * @throws NullPointerException     if the specified element is null
+     * @throws IllegalArgumentException if some property of the element prevents it from being added to this collection
+     *                                  In other words if {@link IOpenHashTableEntity#hashCode(int, int)} specified element is incorrect.
      */
     @Override
     public boolean remove(E value) {
@@ -40,7 +55,9 @@ public class OpenHashTable<E extends OpenHashTableEntity> implements ISetIterabl
      *
      * @param value element whose presence in this collection is to be tested
      * @return {@code true} if this collection contains the specified element
-     * @throws NullPointerException if the specified element is null
+     * @throws NullPointerException     if the specified element is null
+     * @throws IllegalArgumentException if some property of the element prevents it from being added to this collection
+     *                                  In other words if {@link IOpenHashTableEntity#hashCode(int, int)} specified element is incorrect.
      */
     @Override
     public boolean contains(E value) {
@@ -84,5 +101,10 @@ public class OpenHashTable<E extends OpenHashTableEntity> implements ISetIterabl
     @Override
     public Iterator<E> iterator() {
         throw new UnsupportedOperationException("todo: implement this");
+    }
+
+    @Override
+    public int tableSize() {
+        throw new UnsupportedOperationException("todo: return dataArray.length");
     }
 }

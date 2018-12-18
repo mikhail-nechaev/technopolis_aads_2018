@@ -28,6 +28,8 @@ public interface IPriorityQueue<E extends Comparable<E>> extends ICollectionIter
     /**
      * Inserts the specified element into this priority queue.
      *
+     * Complexity = O(log(n))
+     *
      * @param value the element to add
      * @throws NullPointerException if the specified element is null
      */
@@ -36,6 +38,8 @@ public interface IPriorityQueue<E extends Comparable<E>> extends ICollectionIter
     /**
      * Retrieves and removes the head of this queue.
      *
+     * Complexity = O(log(n))
+     *
      * @return the head of this queue
      * @throws java.util.NoSuchElementException if this queue is empty
      */
@@ -43,6 +47,8 @@ public interface IPriorityQueue<E extends Comparable<E>> extends ICollectionIter
 
     /**
      * Retrieves, but does not remove, the head of this queue.
+     *
+     * Complexity = O(1)
      *
      * @return the head of this queue
      * @throws java.util.NoSuchElementException if this queue is empty
