@@ -2,7 +2,7 @@ package ru.mail.polis.collections.list.todo;
 
 import ru.mail.polis.collections.list.IDeque;
 
-import java.util.Iterator;
+import java.util.*;
 
 /**
  * Resizable cyclic array implementation of the {@link IDeque} interface.
@@ -13,6 +13,33 @@ import java.util.Iterator;
  */
 public class ArrayDequeSimple<E> implements IDeque<E> {
 
+    Object[] elements;
+    int start, end;
+    int size;
+    int capasity = INITIAL_CAPASITY;
+
+    final static int INITIAL_CAPASITY = 8;
+
+    public ArrayDequeSimple() {
+        this.elements = new Object[INITIAL_CAPASITY];
+        this.size = 0;
+        this.start = this.end = -1;
+    }
+
+    private void extension() {
+        Object[] newElements = new Object[capasity << 1];
+        if (start <= end) {
+            System.arraycopy(elements, start, newElements, 0, size);
+        } else {
+            System.arraycopy(elements, start, newElements, 0, size - start);
+            System.arraycopy(elements, 0, newElements, size - start, end + 1);
+        }
+        elements = newElements;
+        capasity <<= 1;
+        start = 0;
+        end = size - 1;
+    }
+
     /**
      * Inserts the specified element at the front of this deque.
      *
@@ -21,7 +48,13 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public void addFirst(E value) {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (value == null) throw new NullPointerException();
+        if (size == capasity) extension();
+        if (isEmpty()) {
+            start = end = 0;
+        } else start = (start + capasity - 1) % capasity;
+        elements[start] = value;
+        size++;
     }
 
     /**
@@ -32,7 +65,13 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public E removeFirst() {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (isEmpty()) throw new NoSuchElementException();
+        E first = (E) elements[start];
+        if (start == end) {
+            start = end = -1;
+        } else start = (start + 1) % capasity;
+        size--;
+        return first;
     }
 
     /**
@@ -43,7 +82,8 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public E getFirst() {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (isEmpty()) throw new NoSuchElementException("Deque is empty");
+        return (E) elements[start];
     }
 
     /**
@@ -54,7 +94,13 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public void addLast(E value) {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (value == null) throw new NullPointerException();
+        if (size == capasity) extension();
+        if (isEmpty()) {
+            start = end = 0;
+        } else end = (end + 1) % capasity;
+        elements[end] = value;
+        size++;
     }
 
     /**
@@ -65,7 +111,13 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public E removeLast() {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (isEmpty()) throw new NoSuchElementException();
+        E last = (E) elements[end];
+        if (start == end) {
+            start = end = -1;
+        } else end = (end + capasity - 1) % capasity;
+        size--;
+        return last;
     }
 
     /**
@@ -76,7 +128,8 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public E getLast() {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (isEmpty()) throw new NoSuchElementException();
+        return (E) elements[end];
     }
 
     /**
@@ -89,7 +142,12 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public boolean contains(E value) {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (value == null) throw new NullPointerException();
+        if (this.isEmpty()) return false;
+        for (Object o : elements) {
+            if (Objects.equals(o, value)) return true;
+        }
+        return false;
     }
 
     /**
@@ -99,7 +157,7 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public int size() {
-        throw new UnsupportedOperationException("todo: implement this");
+        return size;
     }
 
     /**
@@ -109,7 +167,7 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public boolean isEmpty() {
-        throw new UnsupportedOperationException("todo: implement this");
+        return size == 0;
     }
 
     /**
@@ -118,7 +176,37 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public void clear() {
-        throw new UnsupportedOperationException("todo: implement this");
+        start = end = -1;
+        size = 0;
+    }
+
+    void removeElement(int index) {
+        if (index == start) {
+            removeFirst();
+            return;
+        }
+        if (index == end) {
+            removeLast();
+            return;
+        }
+        if (start <= end) {
+            if (index < start || index > end) {
+                throw new IllegalArgumentException();
+            }
+            System.arraycopy(elements, index + 1, elements, index, end - index);
+            end--;
+        } else {
+            if (index > start) {
+                System.arraycopy(elements, start, elements, start + 1, index - start);
+                start = (start + 1) % capasity;
+            } else if (index < end) {
+                System.arraycopy(elements, index + 1, elements, index, end - index);
+                end--;
+            } else {
+                throw new NoSuchElementException();
+            }
+        }
+        size--;
     }
 
     /**
@@ -129,6 +217,34 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public Iterator<E> iterator() {
-        throw new UnsupportedOperationException("todo: implement this");
+        return new Iterator<E>() {
+            private int head = ArrayDequeSimple.this.start;
+            private int nextIndex = 0;
+            private int lastNextIndex = -1;
+            private int size = size();
+
+            @Override
+            public boolean hasNext() {
+                return nextIndex < size;
+            }
+
+            @Override
+            public E next() {
+                if (!hasNext()) {
+                    throw new NoSuchElementException();
+                }
+                lastNextIndex = nextIndex++;
+                return (E) elements[(lastNextIndex + head) % capasity];
+            }
+
+            @Override
+            public void remove() {
+                if (lastNextIndex == -1) {
+                    throw new IllegalStateException();
+                }
+                removeElement((lastNextIndex + head) % capasity);
+                lastNextIndex = -1;
+            }
+        };
     }
 }

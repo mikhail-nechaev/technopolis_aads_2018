@@ -5,10 +5,11 @@ import ru.mail.polis.collections.set.sorted.UnbalancedTreeException;
 
 import java.util.Comparator;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 
 /**
  * A Red-Black tree based {@link ISelfBalancingSortedTreeSet} implementation.
- *
+ * <p>
  * ! An implementation of red-black trees must be based on the description in
  * Introduction to Algorithms (Cormen, Leiserson, Rivest)
  *
@@ -20,18 +21,24 @@ import java.util.NoSuchElementException;
  */
 public class RedBlackTree<E extends Comparable<E>> implements ISelfBalancingSortedTreeSet<E> {
 
-    //todo: update it if required
     enum RBColor {
         RED, BLACK
     }
 
-    //todo: update it if required
-    static final class RBNode<E> {
+    final class RBNode<E> {
         E value;
         RBNode<E> left;
         RBNode<E> right;
         RBNode<E> parent;
         RBColor color = RBColor.BLACK;
+
+        public RBNode(E value, RBColor color) {
+            this.value = value;
+            this.color = color;
+        }
+
+        public RBNode() {}
+
 
         @Override
         public String toString() {
@@ -42,6 +49,23 @@ public class RedBlackTree<E extends Comparable<E>> implements ISelfBalancingSort
                     ", color=" + color +
                     '}';
         }
+
+        public RBNode<E> getSuccessor() {
+            RBNode<E> temp;
+            RBNode<E> node = this;
+            if(!(node.right == null || node.right == blankNode)) {
+                temp = node.right;
+                while(!(temp.left == null || temp.left == blankNode))
+                    temp = temp.left;
+                return temp;
+            }
+            temp = node.parent;
+            while(temp != blankNode && node == temp.right) {
+                node = temp;
+                temp = temp.parent;
+            }
+            return temp;
+        }
     }
 
     /**
@@ -49,6 +73,8 @@ public class RedBlackTree<E extends Comparable<E>> implements ISelfBalancingSort
      */
     protected final Comparator<E> comparator;
     protected RBNode root;
+    protected int size = 0;
+    protected RBNode<E> blankNode = new RBNode<>();
 
     public RedBlackTree() {
         this(Comparator.naturalOrder());
@@ -74,7 +100,97 @@ public class RedBlackTree<E extends Comparable<E>> implements ISelfBalancingSort
      */
     @Override
     public boolean add(E value) {
-        throw new UnsupportedOperationException("todo: implement this");
+        Objects.requireNonNull(value);
+        RBNode<E> parent = blankNode;
+        RBNode<E> node = root;
+        while (node != blankNode && node != null) {
+            parent = node;
+            if (compare(value, node.value) < 0) node = node.left;
+            else if (compare(value, node.value) > 0) node = node.right;
+            else return false;
+        }
+        node = new RBNode<>(value, RBColor.RED);
+        node.parent = parent;
+        node.left = node.right = blankNode;
+        if (parent != blankNode) {
+            if (compare(value, parent.value) < 0) parent.left = node;
+            else parent.right = node;
+        } else root = node;
+        balance(node);
+        size++;
+        return true;
+    }
+
+    private int compare(E a, E b) {
+        return comparator == null ? a.compareTo(b) : comparator.compare(a, b);
+    }
+
+    private RBNode<E> leftRotate(RBNode<E> node) {
+        RBNode<E> right = node.right;
+        node.right = right.left;
+        if (right.left != blankNode) right.left.parent = node;
+        if (right != blankNode) right.parent = node.parent;
+        if (node.parent != blankNode) {
+            if (node == node.parent.left) node.parent.left = right;
+            else node.parent.right = right;
+        } else root = right;
+        right.left = node;
+        if (node != blankNode) node.parent = right;
+        return root;
+    }
+
+    private RBNode<E> rightRotate(RBNode<E> node) {
+        RBNode<E> left = node.left;
+        node.left = left.right;
+        if (left.right != blankNode) left.right.parent = node;
+        if (left != blankNode) left.parent = node.parent;
+        if (node.parent != blankNode) {
+            if (node == node.parent.right) node.parent.right = left;
+            else node.parent.left = left;
+        } else  root = left;
+        left.right = node;
+        if (node != blankNode) node.parent = left;
+        return root;
+    }
+
+    private void balance(RBNode<E> node) {
+        RBNode<E> uncle;
+        while (node != root && node.parent.color == RBColor.RED) {
+            if (node.parent == node.parent.parent.left) {
+                uncle = node.parent.parent.right;
+                if (uncle.color == RBColor.RED) {
+                    node.parent.color = RBColor.BLACK;
+                    uncle.color = RBColor.BLACK;
+                    node.parent.parent.color = RBColor.RED;
+                    node = node.parent.parent;
+                } else {
+                    if (node == node.parent.right) {
+                        node = node.parent;
+                        root = leftRotate(node);
+                    }
+                    node.parent.color = RBColor.BLACK;
+                    node.parent.parent.color = RBColor.RED;
+                    root = rightRotate(node.parent.parent);
+                }
+            } else {
+                uncle = node.parent.parent.left;
+                if (uncle.color == RBColor.RED) {
+                    node.parent.color = RBColor.BLACK;
+                    uncle.color = RBColor.BLACK;
+                    node.parent.parent.color = RBColor.RED;
+                    node = node.parent.parent;
+                } else {
+                    if (node == node.parent.left) {
+                        node = node.parent;
+                        root = rightRotate(node);
+                    }
+                    node.parent.color = RBColor.BLACK;
+                    node.parent.parent.color = RBColor.RED;
+                    root = leftRotate(node.parent.parent);
+                }
+            }
+        }
+        root.color = RBColor.BLACK;
     }
 
     /**
@@ -86,8 +202,90 @@ public class RedBlackTree<E extends Comparable<E>> implements ISelfBalancingSort
      */
     @Override
     public boolean remove(E value) {
-        throw new UnsupportedOperationException("todo: implement this");
+
+        RBNode<E> curr = root;
+        while(curr != blankNode && curr != null) {
+            if(compare(value, curr.value) < 0) curr = curr.left;
+            else if(compare(value, curr.value) > 0) curr = curr.right;
+            else if(compare(value, curr.value) == 0) break;
+        }
+        if(curr != blankNode && compare(value, curr.value) == 0) {
+            RBNode<E> temp, successor;
+            if(curr == null || curr == blankNode) return false;
+            if(curr.left == null || curr.left == blankNode || curr.right == null || curr.right == blankNode)
+                successor = curr;
+            else successor = curr.getSuccessor();
+            if(!(successor.left == null || successor.left == blankNode)) temp = successor.left;
+            else temp = successor.right;
+            temp.parent = successor.parent;
+            if(successor.parent == null || successor.parent == blankNode) root = temp;
+            else if(successor == successor.parent.left) successor.parent.left = temp;
+            else successor.parent.right = temp;
+            if(successor != curr) curr.value = successor.value;
+            if(successor.color == RBColor.BLACK) removeFixUp(temp);
+            size--;
+            return true;
+        }
+        return false;
     }
+
+    private void removeFixUp(RBNode<E> node) {
+        RBNode<E> temp;
+        while(node != root && node.color == RBColor.BLACK) {
+            if(node == node.parent.left) {
+                temp = node.parent.right;
+                if(temp.color == RBColor.RED) {
+                    temp.color = RBColor.BLACK;
+                    node.parent.color = RBColor.RED;
+                    leftRotate(node.parent);
+                    temp = node.parent.right;
+                }
+                if(temp.left.color == RBColor.BLACK && temp.right.color == RBColor.BLACK) {
+                    temp.color = RBColor.RED;
+                    node = node.parent;
+                } else {
+                    if(temp.right.color == RBColor.BLACK) {
+                        temp.left.color = RBColor.BLACK;
+                        temp.color = RBColor.RED;
+                        rightRotate(temp);
+                        temp = node.parent.right;
+                    }
+                    temp.color = node.parent.color;
+                    node.parent.color = RBColor.BLACK;
+                    temp.right.color = RBColor.BLACK;
+                    leftRotate(node.parent);
+                    node = root;
+                }
+            } else {
+                temp = node.parent.left;
+                if(temp.color == RBColor.RED) {
+                    temp.color = RBColor.BLACK;
+                    node.parent.color = RBColor.RED;
+                    rightRotate(node.parent);
+                    temp = node.parent.left;
+                }
+                if(temp.left.color == RBColor.BLACK && temp.right.color == RBColor.BLACK) {
+                    temp.color = RBColor.RED;
+                    node = node.parent;
+                } else {
+                    if(temp.left.color == RBColor.BLACK) {
+                        temp.right.color = RBColor.BLACK;
+                        temp.color = RBColor.RED;;
+                        leftRotate(temp);
+                        temp = node.parent.left;
+                    }
+                    temp.color = node.parent.color;
+                    node.parent.color = RBColor.BLACK;
+                    temp.left.color = RBColor.BLACK;
+
+                    rightRotate(node.parent);
+                    node = root;
+                }
+            }
+        }
+        node.color = RBColor.BLACK;
+    }
+
 
     /**
      * Returns {@code true} if this collection contains the specified element.
@@ -99,7 +297,13 @@ public class RedBlackTree<E extends Comparable<E>> implements ISelfBalancingSort
      */
     @Override
     public boolean contains(E value) {
-        throw new UnsupportedOperationException("todo: implement this");
+        Objects.requireNonNull(value);
+        RBNode<E> curr = root;
+        while(curr != blankNode && curr != null) {
+            if (compare(curr.value, value) == 0) return true;
+            curr = (compare(value, curr.value) < 0) ? curr.left : curr.right;
+        }
+        return false;
     }
 
     /**
@@ -110,7 +314,12 @@ public class RedBlackTree<E extends Comparable<E>> implements ISelfBalancingSort
      */
     @Override
     public E first() {
-        throw new UnsupportedOperationException("todo: implement this");
+        if(isEmpty()) throw new NoSuchElementException();
+        RBNode<E> curr = root;
+        while (!(curr.left == null || curr.left == curr)) {
+            curr = curr.left;
+        }
+        return curr.value;
     }
 
     /**
@@ -121,7 +330,12 @@ public class RedBlackTree<E extends Comparable<E>> implements ISelfBalancingSort
      */
     @Override
     public E last() {
-        throw new UnsupportedOperationException("todo: implement this");
+        if(isEmpty()) throw new NoSuchElementException();
+        RBNode<E> curr = root;
+        while (!(curr.right == null || curr.right == blankNode)) {
+            curr = curr.right;
+        }
+        return curr.value;
     }
 
     /**
@@ -131,7 +345,7 @@ public class RedBlackTree<E extends Comparable<E>> implements ISelfBalancingSort
      */
     @Override
     public int size() {
-        throw new UnsupportedOperationException("todo: implement this");
+        return size;
     }
 
     /**
@@ -141,7 +355,7 @@ public class RedBlackTree<E extends Comparable<E>> implements ISelfBalancingSort
      */
     @Override
     public boolean isEmpty() {
-        throw new UnsupportedOperationException("todo: implement this");
+        return root == null;
     }
 
     /**
@@ -150,7 +364,8 @@ public class RedBlackTree<E extends Comparable<E>> implements ISelfBalancingSort
      */
     @Override
     public void clear() {
-        throw new UnsupportedOperationException("todo: implement this");
+        size = 0;
+        root = null;
     }
 
     /**
