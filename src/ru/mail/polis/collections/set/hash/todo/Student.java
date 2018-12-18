@@ -13,6 +13,7 @@ public class Student extends AbstractOpenHashTableEntity {
     private final Gender gender;
     private final LocalDate birthday;
     private final int groupId;
+    private final int PRIME_NUMBER = 7;
 
     public Student(long id, String firstName, String lastName, Gender gender, LocalDate birthday, int groupId) {
         this.id = id;
@@ -49,20 +50,33 @@ public class Student extends AbstractOpenHashTableEntity {
 
     @Override
     public int hashCode(int tableSize, int probId) throws IllegalArgumentException {
-        //todo: see IOpenHashTableEntity contract
-        //todo: use this in OpenHashTable
-        throw new UnsupportedOperationException("todo: implement this");
+        if (probId < 0 || probId >= tableSize) {
+            throw new IllegalArgumentException();
+        }
+        int hash1 = Math.abs(hashCode()) % tableSize;
+        int hash2 = ( Math.abs(hashCode2())) % tableSize;
+        if (hash2 % 2 == 0) {
+            hash2++;
+        }
+        return (hash1 + hash2 * probId) % tableSize;
     }
 
     @Override
     public int hashCode() {
-        //todo: don't forget [hashCode - equals] contract
-        throw new UnsupportedOperationException("todo: implement this");
+        return Objects.hash(id, firstName, lastName, gender, birthday, groupId);
     }
 
     @Override
     protected int hashCode2() {
-        throw new UnsupportedOperationException("todo: implement this");
+        int hashCode = PRIME_NUMBER;
+        hashCode = hashCode * PRIME_NUMBER + (int) id;
+        hashCode = hashCode * PRIME_NUMBER + firstName.hashCode();
+        hashCode = hashCode * PRIME_NUMBER+ lastName.hashCode();
+        hashCode = hashCode * PRIME_NUMBER+ gender.hashCode();
+        hashCode = hashCode * PRIME_NUMBER + birthday.hashCode();
+        hashCode = hashCode * PRIME_NUMBER + groupId;
+        return hashCode;
+
     }
 
     @Override

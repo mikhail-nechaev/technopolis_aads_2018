@@ -5,6 +5,7 @@ import ru.mail.polis.collections.set.sorted.UnbalancedTreeException;
 
 import java.util.Comparator;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 
 /**
  * A Red-Black tree based {@link ISelfBalancingSortedTreeSet} implementation.
@@ -33,6 +34,13 @@ public class RedBlackTree<E extends Comparable<E>> implements ISelfBalancingSort
         RBNode<E> parent;
         RBColor color = RBColor.BLACK;
 
+        public RBNode() {}
+
+        public RBNode(E value, RBColor color) {
+            this.value = value;
+            this.color = color;
+        }
+
         @Override
         public String toString() {
             return "RBNode{" +
@@ -49,6 +57,8 @@ public class RedBlackTree<E extends Comparable<E>> implements ISelfBalancingSort
      */
     protected final Comparator<E> comparator;
     protected RBNode root;
+    protected int size = 0;
+    protected RBNode<E> nillNode = new RBNode<>();
 
     public RedBlackTree() {
         this(Comparator.naturalOrder());
@@ -64,6 +74,92 @@ public class RedBlackTree<E extends Comparable<E>> implements ISelfBalancingSort
         this.comparator = comparator;
     }
 
+    private int compare(E v1, E v2) {
+        return comparator == null ? v1.compareTo(v2) : comparator.compare(v1, v2);
+    }
+
+    private RBNode<E> left_Rotate(RBNode<E> node) {
+        RBNode<E> right = node.right;
+        node.right = right.left;
+        if(right.left != nillNode)
+            right.left.parent = node;
+        if(right != nillNode)
+            right.parent = node.parent;
+        if(node.parent != nillNode) {
+            if(node == node.parent.left)
+                node.parent.left = right;
+            else
+                node.parent.right = right;
+        } else
+            root = right;
+        right.left = node;
+        if(node != nillNode)
+            node.parent = right;
+        return root;
+    }
+
+
+    private RBNode<E> right_Rotate(RBNode<E> node) {
+        RBNode<E> left = node.left;
+        node.left = left.right;
+        if(left.right != nillNode)
+            left.right.parent = node;
+        if(left != nillNode)
+            left.parent = node.parent;
+        if(node.parent != nillNode) {
+            if(node == node.parent.right)
+                node.parent.right = left;
+            else
+                node.parent.left = left;
+
+        } else
+            root = left;
+        left.right = node;
+        if(node != nillNode)
+            node.parent = left;
+        return root;
+    }
+
+    private void RB_InsertFixUp(RBNode<E> node) {
+        RBNode<E> uncle;
+        while(node != root && node.parent.color == RBColor.RED) {
+            if(node.parent == node.parent.parent.left) {
+                uncle = node.parent.parent.right;
+                if(uncle.color == RBColor.RED) {
+                    node.parent.color = RBColor.BLACK;
+                    uncle.color = RBColor.BLACK;
+                    node.parent.parent.color = RBColor.RED;
+                    node = node.parent.parent;
+                } else {
+                    if(node == node.parent.right) {
+                        node = node.parent;
+                        root = left_Rotate(node);
+                    }
+                    node.parent.color = RBColor.BLACK;
+                    node.parent.parent.color = RBColor.RED;
+                    root = right_Rotate(node.parent.parent);
+                }
+            } else {
+                uncle = node.parent.parent.left;
+                if(uncle.color == RBColor.RED) {
+                    node.parent.color = RBColor.BLACK;
+                    uncle.color = RBColor.BLACK;
+                    node.parent.parent.color = RBColor.RED;
+                    node = node.parent.parent;
+                } else {
+                    if (node == node.parent.left) {
+                        node = node.parent;
+                        root = right_Rotate(node);
+                    }
+                    node.parent.color = RBColor.BLACK;
+                    node.parent.parent.color = RBColor.RED;
+                    root = left_Rotate(node.parent.parent);
+                }
+            }
+        }
+        root.color = RBColor.BLACK;
+    }
+
     /**
      * Adds the specified element to this set if it is not already present.
      *
@@ -74,7 +170,32 @@ public class RedBlackTree<E extends Comparable<E>> implements ISelfBalancingSort
      */
     @Override
     public boolean add(E value) {
-        throw new UnsupportedOperationException("todo: implement this");
+        Objects.requireNonNull(value);
+        RBNode<E> parent = nillNode;
+        RBNode<E> node = root;
+        while(node != nillNode && node != null) {
+            parent = node;
+            if(compare(value, node.value) < 0)
+                node = node.left;
+            else if(compare(value, node.value) > 0)
+                node = node.right;
+            else
+                return false;
+        }
+        node = new RBNode<>(value, RBColor.RED);
+        node.parent = parent;
+        node.left = node.right = nillNode;
+        if(parent != nillNode) {
+            if(compare(value, parent.value) < 0)
+                parent.left = node;
+            else
+                parent.right = node;
+        } else {
+            root = node;
+        }
+        RB_InsertFixUp(node);
+        size++;
+        return true;
     }
 
     /**
@@ -86,7 +207,119 @@ public class RedBlackTree<E extends Comparable<E>> implements ISelfBalancingSort
      */
     @Override
     public boolean remove(E value) {
-        throw new UnsupportedOperationException("todo: implement this");
+        Objects.requireNonNull(value);
+        RBNode<E> current = root;
+        while (current!=nillNode&&current!=null){
+            if (comparator.compare(current.value,value)>0){
+                current=current.left;
+            }else if (comparator.compare(current.value,value)<0){
+                current=current.right;
+            }else{
+                RBNode<E> y;
+                RBNode<E> x;
+                if (current.left==nillNode||current.right==nillNode){
+                    y=current;
+                }else{
+                    y= tree_treeSuccessor(current);
+                }
+                if (y.left!=nillNode){
+                    x=y.left;
+                }else{
+                    x=y.right;
+                }
+                x.parent=y.parent;
+                if (y.parent==nillNode){
+                    root=x;
+                }else{
+                    if (y==y.parent.left){
+                        y.parent.left=x;
+                    }else{
+                        y.parent.right=x;
+                    }
+                }
+                if (y!=current){
+                    current.value=y.value;
+                }
+                if (y.color==RBColor.BLACK){
+                    RBDeleteFixUp(x);
+                }
+                size--;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void RBDeleteFixUp(RBNode<E> node) {
+        RBNode<E> uncleNode;
+        while (node!=root&&node.color==RBColor.BLACK){
+            if(node==node.parent.left){
+                uncleNode=node.parent.right;
+                if (uncleNode.color==RBColor.RED){
+                    uncleNode.color=RBColor.BLACK;
+                    node.parent.color=RBColor.RED;
+                    left_Rotate(node.parent);
+                    uncleNode=node.parent.right;
+                }
+                if (uncleNode.left.color==RBColor.BLACK&&uncleNode.right.color==RBColor.BLACK){
+                    uncleNode.color=RBColor.RED;
+                    node=node.parent;
+                }else {
+                    if (uncleNode.right.color==RBColor.BLACK){
+                        uncleNode.left.color=RBColor.BLACK;
+                        uncleNode.color=RBColor.RED;
+                        right_Rotate(uncleNode);
+                        uncleNode=node.parent.right;
+                    }
+                    uncleNode.color=node.parent.color;
+                    node.parent.color=RBColor.BLACK;
+                    uncleNode.right.color=RBColor.BLACK;
+                    left_Rotate(node.parent);
+                    node=root;
+                }
+            }else{
+                uncleNode=node.parent.left;
+                if (uncleNode.color==RBColor.RED){
+                    uncleNode.color=RBColor.BLACK;
+                    node.parent.color=RBColor.RED;
+                    right_Rotate(node.parent);
+                    uncleNode=node.parent.left;
+                }
+                if (uncleNode.right.color==RBColor.BLACK&&uncleNode.left.color==RBColor.BLACK){
+                    uncleNode.color=RBColor.RED;
+                    node=node.parent;
+                }else {
+                    if (uncleNode.left.color==RBColor.BLACK){
+                        uncleNode.right.color=RBColor.BLACK;
+                        uncleNode.color=RBColor.RED;
+                        left_Rotate(uncleNode);
+                        uncleNode=node.parent.left;
+                    }
+                    uncleNode.color=node.parent.color;
+                    node.parent.color=RBColor.BLACK;
+                    uncleNode.left.color=RBColor.BLACK;
+                    right_Rotate(node.parent);
+                    node=root;
+                }
+            }
+        }
+        node.color=RBColor.BLACK;
+    }
+
+    private RBNode<E> tree_treeSuccessor(RBNode<E> node) {
+        if (node.right!=nillNode){
+            RBNode<E> current=node.right;
+            while (current.left!=nillNode){
+                current=current.left;
+            }
+            return current;
+        }
+        RBNode<E> y=node.parent;
+        while (y!=nillNode&&node==y.right){
+            node=y;
+            y=y.parent;
+        }
+        return y;
     }
 
     /**
@@ -99,7 +332,15 @@ public class RedBlackTree<E extends Comparable<E>> implements ISelfBalancingSort
      */
     @Override
     public boolean contains(E value) {
-        throw new UnsupportedOperationException("todo: implement this");
+
+        Objects.requireNonNull(value);
+        RBNode<E> curr = root;
+        while(curr != nillNode && curr != null) {
+            if (compare(curr.value, value) == 0)
+                return true;
+            curr = (compare(value, curr.value) < 0) ? curr.left : curr.right;
+        }
+        return false;
     }
 
     /**
@@ -110,7 +351,14 @@ public class RedBlackTree<E extends Comparable<E>> implements ISelfBalancingSort
      */
     @Override
     public E first() {
-        throw new UnsupportedOperationException("todo: implement this");
+        if(isEmpty()) {
+            throw new NoSuchElementException();
+        }
+        RBNode<E> curr = root;
+        while (!(curr.left == null || curr.left == nillNode)) {
+            curr = curr.left;
+        }
+        return curr.value;
     }
 
     /**
@@ -121,7 +369,14 @@ public class RedBlackTree<E extends Comparable<E>> implements ISelfBalancingSort
      */
     @Override
     public E last() {
-        throw new UnsupportedOperationException("todo: implement this");
+        if(isEmpty()) {
+            throw new NoSuchElementException();
+        }
+        RBNode<E> curr = root;
+        while (!(curr.right == null || curr.right == nillNode)) {
+            curr = curr.right;
+        }
+        return curr.value;
     }
 
     /**
@@ -131,7 +386,7 @@ public class RedBlackTree<E extends Comparable<E>> implements ISelfBalancingSort
      */
     @Override
     public int size() {
-        throw new UnsupportedOperationException("todo: implement this");
+        return size;
     }
 
     /**
@@ -141,7 +396,7 @@ public class RedBlackTree<E extends Comparable<E>> implements ISelfBalancingSort
      */
     @Override
     public boolean isEmpty() {
-        throw new UnsupportedOperationException("todo: implement this");
+        return size == 0 || root == null;
     }
 
     /**
@@ -150,7 +405,8 @@ public class RedBlackTree<E extends Comparable<E>> implements ISelfBalancingSort
      */
     @Override
     public void clear() {
-        throw new UnsupportedOperationException("todo: implement this");
+        size = 0;
+        root = null;
     }
 
     /**
