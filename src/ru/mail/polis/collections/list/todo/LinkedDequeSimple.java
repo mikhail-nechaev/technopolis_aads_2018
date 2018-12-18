@@ -9,7 +9,7 @@ import java.util.ListIterator;
  *
  * @param <E> the type of elements held in this deque
  */
-public abstract class LinkedDequeSimple<E> implements IDeque<E> {
+public class LinkedDequeSimple<E> implements IDeque<E> {
 
     /**
      * Inserts the specified element at the front of this deque.

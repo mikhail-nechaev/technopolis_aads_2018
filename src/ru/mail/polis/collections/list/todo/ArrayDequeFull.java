@@ -5,18 +5,19 @@ import java.util.Deque;
 import java.util.Iterator;
 import java.util.ListIterator;
 import java.util.NoSuchElementException;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ArrayDequeFull<E> extends ArrayDequeSimple<E> implements Deque<E> {
     @Override
     public boolean offerFirst(E e) {
-        if (e == null) return false;
+        if (e == null) throw new NullPointerException();
         this.addFirst(e);
         return true;
     }
 
     @Override
     public boolean offerLast(E e) {
-        if (e == null) return false;
+        if (e == null) throw new NullPointerException();
         this.addLast(e);
         return true;
     }
@@ -43,18 +44,20 @@ public class ArrayDequeFull<E> extends ArrayDequeSimple<E> implements Deque<E> {
 
     @Override
     public boolean removeFirstOccurrence(Object o) {
-            ListIterator iterator = iterator();
-            while (iterator.hasNext()) {
-                if (iterator.next().equals(o)) {
-                    iterator.remove();
-                    return true;
-                }
+        if (o == null) throw new NullPointerException();
+        ListIterator iterator = iterator();
+        while (iterator.hasNext()) {
+            if (iterator.next().equals(o)) {
+                iterator.remove();
+                return true;
             }
-            return false;
+        }
+        return false;
     }
 
     @Override
     public boolean removeLastOccurrence(Object o) {
+        if (o == null) throw new NullPointerException();
         ListIterator iterator = iterator();
         boolean hasElement = false;
         Object lastElem = null;
@@ -122,47 +125,83 @@ public class ArrayDequeFull<E> extends ArrayDequeSimple<E> implements Deque<E> {
 
     @Override
     public boolean removeAll(Collection<?> c) {
-        return false;
+        AtomicBoolean isCollectionChanged = new AtomicBoolean(false);
+        c.forEach(it -> {
+            while (this.contains(it)) {
+                remove(it);
+                isCollectionChanged.set(true);
+            }
+        });
+        return isCollectionChanged.get();
     }
 
     @Override
     public boolean retainAll(Collection<?> c) {
-        return false;
+        AtomicBoolean isCollectionChanged = new AtomicBoolean(false);
+        ListIterator iterator = iterator();
+        while (iterator.hasNext()) {
+            if (!c.contains(iterator.next())) {
+                iterator.remove();
+                isCollectionChanged.set(true);
+            }
+        }
+        return isCollectionChanged.get();
     }
 
     @Override
     public void push(E e) {
-
+        addFirst(e);
     }
 
     @Override
     public E pop() {
-        return null;
+        return removeFirst();
     }
 
     @Override
     public boolean remove(Object o) {
-        return false;
+        return removeFirstOccurrence(o);
     }
 
     @Override
     public boolean containsAll(Collection<?> c) {
-        return false;
+        for (Object elem : c) {
+            if (!contains(elem)) return false;
+        }
+        return true;
     }
 
     @Override
     public boolean contains(Object o) {
+        if (o == null) throw new NullPointerException();
+        for (Object i : this) {
+            if (i.equals(o)) {
+                return true;
+            }
+        }
         return false;
     }
 
     @Override
     public Object[] toArray() {
-        return new Object[0];
+        Object[] result = new Object[size()];
+        int i = 0;
+        for (Object elem : this) {
+            result[i] = elem;
+            i++;
+        }
+        return result;
     }
 
     @Override
     public <T> T[] toArray(T[] a) {
-        return null;
+        T[] result = a.length >= size() ? a : (T[]) new Object[size()];
+        int i = 0;
+        for (Object elem : this) {
+            result[i] = (T) elem;
+            i++;
+        }
+        return result;
     }
 
     @Override

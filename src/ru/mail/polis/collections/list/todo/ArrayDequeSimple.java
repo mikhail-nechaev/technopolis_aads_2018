@@ -242,6 +242,9 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
 
             @Override
             public E next() {
+                if (!hasNext()) {
+                    throw new NoSuchElementException();
+                }
                 E elem = array[nextPointer];
                 if (elem == null) {
                     throw new NoSuchElementException();

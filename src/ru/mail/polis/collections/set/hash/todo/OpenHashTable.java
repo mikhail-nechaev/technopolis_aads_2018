@@ -19,7 +19,9 @@ import java.util.Iterator;
  */
 public class OpenHashTable<E extends IOpenHashTableEntity> implements IOpenHashTable<E> {
 
-
+    public int tableSize(){
+        return 0;
+    }
     /**
      * Adds the specified element to this set if it is not already present.
      *

@@ -3,7 +3,6 @@ package ru.mail.polis.collections;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-
 import ru.mail.polis.collections.list.todo.ArrayDequeSimple;
 
 /*
