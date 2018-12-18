@@ -1,6 +1,11 @@
 package ru.mail.polis.collections.iterator.todo;
 
 import java.util.Iterator;
+import java.util.NoSuchElementException;
+import java.util.PriorityQueue;
+
+import ru.mail.polis.collections.iterator.IPeekingIterator;
+import ru.mail.polis.collections.list.todo.ArrayPriorityQueueSimple;
 
 /**
  * Итератор возвращающий последовательность последовательностей элементов возрастающих итераторов в порядке возрастания
@@ -15,6 +20,7 @@ import java.util.Iterator;
  */
 public class MergingPeekingIncreasingIterator implements Iterator<Integer> {
 
+    PriorityQueue<IPeekingIterator> priorityQueue=new PriorityQueue<>();
     /**
      * Creates a {@code MergingPeekingIncreasingIterator} containing the inside all elements of this specified iterators.
      *
@@ -23,7 +29,10 @@ public class MergingPeekingIncreasingIterator implements Iterator<Integer> {
      * @param iterators the iterators whose are to be placed into this merging peeking increasing iterator
      */
     public MergingPeekingIncreasingIterator(IntegerIncreasingSequencePeekingIterator... iterators) {
-        //todo: do some stuff with iterators
+        priorityQueue = new PriorityQueue<>();
+        for(int i=0;i<iterators.length;i++){
+            priorityQueue.add(iterators[i]);
+        }
     }
 
     /**
@@ -37,7 +46,7 @@ public class MergingPeekingIncreasingIterator implements Iterator<Integer> {
      */
     @Override
     public boolean hasNext() {
-        throw new UnsupportedOperationException("todo: implement this");
+        return priorityQueue.size()>0;
     }
 
     /**
@@ -50,6 +59,14 @@ public class MergingPeekingIncreasingIterator implements Iterator<Integer> {
      */
     @Override
     public Integer next() {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (!hasNext()){
+            throw new NoSuchElementException();
+        }
+        IPeekingIterator<Integer> integerIPeekingIterator=priorityQueue.remove();
+        Integer result=integerIPeekingIterator.next();
+        if (integerIPeekingIterator.hasNext()){
+            priorityQueue.add(integerIPeekingIterator);
+        }
+        return result;
     }
 }

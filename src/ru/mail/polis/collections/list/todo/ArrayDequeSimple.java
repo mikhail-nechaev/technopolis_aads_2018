@@ -2,7 +2,14 @@ package ru.mail.polis.collections.list.todo;
 
 import ru.mail.polis.collections.list.IDeque;
 
+import java.lang.reflect.Array;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
+import java.util.Objects;
+
+import org.junit.Assert;
+
+import static java.lang.Float.max;
 
 /**
  * Resizable cyclic array implementation of the {@link IDeque} interface.
@@ -13,15 +20,47 @@ import java.util.Iterator;
  */
 public class ArrayDequeSimple<E> implements IDeque<E> {
 
+    Object[] deque;
+    int first = 0;
+    int end = 0;
+    int n;
+
+    public ArrayDequeSimple() {
+        n = 10;
+        deque = new Object[n];
+    }
     /**
      * Inserts the specified element at the front of this deque.
      *
      * @param value the element to add
      * @throws NullPointerException if the specified element is null
      */
+
     @Override
     public void addFirst(E value) {
-        throw new UnsupportedOperationException("todo: implement this");
+        Objects.requireNonNull(value);
+        if (isEmpty()) {
+            deque[first] = value;
+            end++;
+        } else {
+            for (int i = end; i > 0; i--) {
+                deque[i] = deque[i-1];
+            }
+            deque[0] = value;
+            end++;
+            if (end == n ) {
+                increaseSize();
+            }
+        }
+    }
+
+    public void increaseSize(){
+        Object[] array = deque.clone();
+        deque = new Object[n * 2];
+        for (int i = 0; i < n; i++) {
+            deque[i] = array[i];
+        }
+        n = n * 2;
     }
 
     /**
@@ -32,7 +71,19 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public E removeFirst() {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (isEmpty()) {
+            throw new NoSuchElementException();
+        }
+        E output = (E) deque[first];
+        if ((end == 1)) {
+            clear();
+        } else {
+            for (int i = 0; i < end - 1; i++) {
+                deque[i] = deque[i + 1];
+            }
+            end--;
+        }
+        return output;
     }
 
     /**
@@ -43,7 +94,10 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public E getFirst() {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (isEmpty()) {
+            throw new NoSuchElementException();
+        }
+        return (E) deque[first];
     }
 
     /**
@@ -54,7 +108,11 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public void addLast(E value) {
-        throw new UnsupportedOperationException("todo: implement this");
+        Objects.requireNonNull(value);
+        if (end == n ) {
+            increaseSize();
+        }
+        deque[end++] = value;
     }
 
     /**
@@ -65,7 +123,10 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public E removeLast() {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (isEmpty()) {
+            throw new NoSuchElementException();
+        }
+        return (E) deque[--end];
     }
 
     /**
@@ -76,7 +137,10 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public E getLast() {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (isEmpty()) {
+            throw new NoSuchElementException();
+        }
+        return (E) deque[end - 1];
     }
 
     /**
@@ -89,7 +153,17 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public boolean contains(E value) {
-        throw new UnsupportedOperationException("todo: implement this");
+        Objects.requireNonNull(value);
+        boolean b = false;
+        if (isEmpty()) {
+            return b;
+        }
+        for (int i = 0; i < end; i++) {
+            if (deque[i] == value) {
+                b = true;
+            }
+        }
+        return b;
     }
 
     /**
@@ -99,7 +173,7 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public int size() {
-        throw new UnsupportedOperationException("todo: implement this");
+        return (end);
     }
 
     /**
@@ -109,7 +183,8 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public boolean isEmpty() {
-        throw new UnsupportedOperationException("todo: implement this");
+        return (end == 0);
+
     }
 
     /**
@@ -118,7 +193,9 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public void clear() {
-        throw new UnsupportedOperationException("todo: implement this");
+        deque = new Object[n];
+        first = 0;
+        end = 0;
     }
 
     /**
@@ -129,6 +206,81 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public Iterator<E> iterator() {
-        throw new UnsupportedOperationException("todo: implement this");
+
+        Iterator<E> iterator=new Iterator<E>() {
+            int size = size();
+            int pointer = 0;
+            boolean state = false;
+
+            /**
+             * Returns {@code true} if the iteration has more elements.
+             * (In other words, returns {@code true} if {@link #next} would
+             * return an element rather than throwing an exception.)
+             *
+             * @return {@code true} if the iteration has more elements
+             */
+            @Override
+            public boolean hasNext() {
+                state = false;
+                return size > 0;
+            }
+
+            /**
+             * Returns the next element in the iteration.
+             *
+             * @return the next element in the iteration
+             * @throws NoSuchElementException if the iteration has no more elements
+             */
+            @Override
+            public E next() {
+                if (hasNext()) {
+                    size--;
+                    state = true;
+                    return (E) deque[pointer++];
+
+                } else {
+                    throw new NoSuchElementException();
+                }
+
+            }
+
+            /**
+             * Removes from the underlying collection the last element returned
+             * by this iterator (optional operation).  This method can be called
+             * only once per call to {@link #next}.
+             * <p>
+             * The behavior of an iterator is unspecified if the underlying collection
+             * is modified while the iteration is in progress in any way other than by
+             * calling this method, unless an overriding class has specified a
+             * concurrent modification policy.
+             * <p>
+             * The behavior of an iterator is unspecified if this method is called
+             * after a call to the {@link #forEachRemaining forEachRemaining} method.
+             *
+             * @throws UnsupportedOperationException if the {@code remove}
+             *                                       operation is not supported by this iterator
+             * @throws IllegalStateException         if the {@code next} method has not
+             *                                       yet been called, or the {@code remove} method has already
+             *                                       been called after the last call to the {@code next}
+             *                                       method
+             * @implSpec The default implementation throws an instance of
+             * {@link UnsupportedOperationException} and performs no other action.
+             */
+            @Override
+            public void remove() {
+                if (!state) throw new IllegalStateException();
+                pointer--;
+                for (int i = pointer; i < end+1 ; i++) {
+                    deque[i] = deque[i + 1];
+                }
+                end--;
+                state=false;
+            }
+        };
+        return iterator;
+    }
+
+    public static void main(String[] args) {
+
     }
 }

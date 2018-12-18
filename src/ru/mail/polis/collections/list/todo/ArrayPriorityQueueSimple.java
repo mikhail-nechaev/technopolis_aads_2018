@@ -3,9 +3,16 @@ package ru.mail.polis.collections.list.todo;
 import ru.mail.polis.collections.list.IPriorityQueue;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
+import org.junit.Assert;
 
 /**
  * Resizable array implementation of the {@link IPriorityQueue} interface based on a priority heap.
@@ -15,6 +22,10 @@ import java.util.Objects;
  * @param <E> the type of elements maintained by this priority queue
  */
 public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPriorityQueue<E> {
+
+    E[] queue;
+    int maxSize = 10;
+    int numberItems = 0;
 
     private final Comparator<E> comparator;
 
@@ -33,6 +44,7 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
      * @throws NullPointerException if the specified collection is null
      */
     public ArrayPriorityQueueSimple(Collection<E> collection) {
+
         this(collection, Comparator.naturalOrder());
     }
 
@@ -43,7 +55,9 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
      * @throws NullPointerException if the specified comparator is null
      */
     public ArrayPriorityQueueSimple(Comparator<E> comparator) {
+
         this.comparator = Objects.requireNonNull(comparator, "comparator");
+        queue = (E[]) new Comparable[maxSize];
     }
 
     /**
@@ -60,7 +74,14 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
      */
     public ArrayPriorityQueueSimple(Collection<E> collection, Comparator<E> comparator) {
         this.comparator = Objects.requireNonNull(comparator, "comparator");
-        //todo: do some stuff with collection
+        if (collection == null || comparator == null) {
+            throw new NullPointerException();
+        }
+        queue = (E[]) new Comparable[maxSize];
+        Iterator<E> iterator=collection.iterator();
+        while(iterator.hasNext()){
+            add(iterator.next());
+        }
     }
 
     /**
@@ -73,7 +94,34 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
      */
     @Override
     public void add(E value) {
-        throw new UnsupportedOperationException("todo: implement this");
+        Objects.requireNonNull(value);
+        int i;
+        if (numberItems == 0) {
+            queue[numberItems++] = value;
+        } else {
+            for (i = numberItems - 1; i >= 0; i--) {
+                if (comparator.compare( value,  queue[i]) > 0) {
+                    queue[i+1] = queue[i];
+                } else {
+                    break;
+                }
+
+            }
+            queue[i+1] = value;
+            numberItems++;
+            if (numberItems == maxSize) {
+                increaseSize();
+            }
+        }
+    }
+
+    public void increaseSize(){
+        E[] array = queue.clone();
+        queue = (E[]) new Comparable[maxSize * 2];
+        for (int i = 0; i < maxSize; i++) {
+            queue[i] = array[i];
+        }
+        maxSize = maxSize * 2;
     }
 
     /**
@@ -86,7 +134,10 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
      */
     @Override
     public E remove() {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (isEmpty()) {
+            throw new NoSuchElementException();
+        }
+        return queue[--numberItems];
     }
 
     /**
@@ -99,7 +150,10 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
      */
     @Override
     public E element() {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (isEmpty()) {
+            throw new NoSuchElementException();
+        }
+        return queue[numberItems - 1];
     }
 
     /**
@@ -114,7 +168,15 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
      */
     @Override
     public boolean contains(E value) {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (value==null){
+            throw new NullPointerException();
+        }
+        for(int i = 0; i < numberItems;i++){
+            if (comparator.compare( value, queue[i]) == 0){
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -124,7 +186,7 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
      */
     @Override
     public int size() {
-        throw new UnsupportedOperationException("todo: implement this");
+        return numberItems;
     }
 
     /**
@@ -134,7 +196,7 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
      */
     @Override
     public boolean isEmpty() {
-        throw new UnsupportedOperationException("todo: implement this");
+        return numberItems == 0;
     }
 
     /**
@@ -143,7 +205,7 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
      */
     @Override
     public void clear() {
-        throw new UnsupportedOperationException("todo: implement this");
+        numberItems = 0;
     }
 
     /**
@@ -154,6 +216,73 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
      */
     @Override
     public Iterator<E> iterator() {
-        throw new UnsupportedOperationException("todo: implement this");
+        Iterator<E> iterator=new Iterator<E>() {
+            int pointer = 0;
+            boolean check=false;
+            /**
+             * Returns {@code true} if the iteration has more elements.
+             * (In other words, returns {@code true} if {@link #next} would
+             * return an element rather than throwing an exception.)
+             *
+             * @return {@code true} if the iteration has more elements
+             */
+            @Override
+            public boolean hasNext() {
+                check = false;
+                return pointer < size();
+            }
+
+            /**
+             * Returns the next element in the iteration.
+             *
+             * @return the next element in the iteration
+             * @throws NoSuchElementException if the iteration has no more elements
+             */
+            @Override
+            public E next() {
+                if (!hasNext()) {
+                    throw new NoSuchElementException();
+                }
+                check = true;
+                return queue[pointer++];
+            }
+
+            /**
+             * Removes from the underlying collection the last element returned
+             * by this iterator (optional operation).  This method can be called
+             * only once per call to {@link #next}.
+             * <p>
+             * The behavior of an iterator is unspecified if the underlying collection
+             * is modified while the iteration is in progress in any way other than by
+             * calling this method, unless an overriding class has specified a
+             * concurrent modification policy.
+             * <p>
+             * The behavior of an iterator is unspecified if this method is called
+             * after a call to the {@link #forEachRemaining forEachRemaining} method.
+             *
+             * @throws UnsupportedOperationException if the {@code remove}
+             *                                       operation is not supported by this iterator
+             * @throws IllegalStateException         if the {@code next} method has not
+             *                                       yet been called, or the {@code remove} method has already
+             *                                       been called after the last call to the {@code next}
+             *                                       method
+             * @implSpec The default implementation throws an instance of
+             * {@link UnsupportedOperationException} and performs no other action.
+             */
+            @Override
+            public void remove() {
+                if (!check) throw new IllegalStateException();
+                pointer--;
+                for (int i = pointer; i < numberItems+1 ; i++) {
+                    queue[i] = queue[i + 1];
+                }
+                numberItems--;
+                check=false;
+
+            }
+        };
+        return iterator;
     }
+
+
 }
