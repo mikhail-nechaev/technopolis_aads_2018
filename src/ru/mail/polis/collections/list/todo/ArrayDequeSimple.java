@@ -3,6 +3,7 @@ package ru.mail.polis.collections.list.todo;
 import ru.mail.polis.collections.list.IDeque;
 
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 /**
  * Resizable cyclic array implementation of the {@link IDeque} interface.
@@ -12,6 +13,30 @@ import java.util.Iterator;
  * @param <E> the type of elements held in this deque
  */
 public class ArrayDequeSimple<E> implements IDeque<E> {
+    protected Object[] array;
+    protected int size;
+    protected int capacity = 8;
+    protected int head, tail;//голова, хвост
+
+    public ArrayDequeSimple() {
+        this.array = new Object[capacity];
+        this.size = 0;
+        this.head = this.tail = -1;
+    }
+
+    private void resize() {
+        Object[] newArray = new Object[capacity << 1];
+        if (head <= tail) {
+            System.arraycopy(array, head, newArray, 0, size);
+        } else {
+            System.arraycopy(array, head, newArray, 0, size - head);
+            System.arraycopy(array, 0, newArray, size - head, tail + 1);
+        }
+        array = newArray;
+        capacity <<= 1;
+        head = 0;
+        tail = size - 1;
+    }
 
     /**
      * Inserts the specified element at the front of this deque.
@@ -21,7 +46,19 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public void addFirst(E value) {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (value == null)
+            throw new NullPointerException();
+
+        if (size == capacity)
+            resize();
+
+        if (isEmpty())
+            head = tail = 0;
+        else
+            head = (head + capacity - 1) % capacity;
+
+        array[head] = value;
+        size++;
     }
 
     /**
@@ -32,7 +69,17 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public E removeFirst() {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (isEmpty())
+            throw new NoSuchElementException();
+        Object value = array[head];
+
+        if (head == tail)
+            head = tail = -1;
+        else
+            head = (head + 1) % capacity;
+
+        size--;
+        return (E) value;
     }
 
     /**
@@ -43,7 +90,9 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public E getFirst() {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (isEmpty())
+            throw new NoSuchElementException();
+        return (E) array[head];
     }
 
     /**
@@ -54,7 +103,19 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public void addLast(E value) {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (value == null)
+            throw new NullPointerException();
+
+        if (capacity == size)
+            resize();
+
+        if (isEmpty())
+            head = tail = 0;
+        else
+            tail = (tail + 1) % capacity;
+
+        array[tail] = value;
+        size++;
     }
 
     /**
@@ -65,7 +126,17 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public E removeLast() {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (isEmpty())
+            throw new NoSuchElementException();
+
+        Object value = array[tail];
+        if (head == tail)
+            head = tail = -1;
+        else
+            tail = (tail + capacity - 1) % capacity;
+
+        size--;
+        return (E) value;
     }
 
     /**
@@ -76,7 +147,10 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public E getLast() {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (isEmpty())
+            throw new NoSuchElementException();
+
+        return (E) array[tail];
     }
 
     /**
@@ -89,7 +163,15 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public boolean contains(E value) {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (value == null)
+            throw new NullPointerException();
+
+        Iterator<E> iter = iterator();
+        while (iter.hasNext())
+            if (value.equals(iter.next()))
+                return true;
+
+        return false;
     }
 
     /**
@@ -99,7 +181,7 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public int size() {
-        throw new UnsupportedOperationException("todo: implement this");
+        return size;
     }
 
     /**
@@ -109,7 +191,7 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public boolean isEmpty() {
-        throw new UnsupportedOperationException("todo: implement this");
+        return size == 0;
     }
 
     /**
@@ -118,7 +200,8 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public void clear() {
-        throw new UnsupportedOperationException("todo: implement this");
+        size = 0;
+        head = tail = -1;
     }
 
     /**
@@ -129,6 +212,56 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public Iterator<E> iterator() {
-        throw new UnsupportedOperationException("todo: implement this");
+        return new Iterator<E>() {
+            private int size = size();
+            private int nextIndex = 0;
+            private int lastNextIndex = -1;
+            private int head = ArrayDequeSimple.this.head;
+
+            @Override
+            public boolean hasNext() {
+                return nextIndex < size;
+            }
+
+            @Override
+            public E next() {
+                if (!hasNext()) throw new NoSuchElementException();
+
+                lastNextIndex = nextIndex++;
+                return (E) array[(lastNextIndex + head) % capacity];
+            }
+
+            @Override
+            public void remove() {
+                if (lastNextIndex == -1) throw new IllegalStateException();
+
+                removeElement((lastNextIndex + head) % capacity);
+                lastNextIndex = -1;
+            }
+        };
+    }
+
+    protected void removeElement(int index) {
+        if (index == head) {
+            removeFirst();
+            return;
+        }
+        if (index == tail) {
+            removeLast();
+            return;
+        }
+        if (head <= tail) {
+            System.arraycopy(array, index + 1, array, index, tail - index);
+            tail--;
+        } else {
+            if (index > head) {
+                System.arraycopy(array, head, array, head + 1, index - head);
+                head = (head + 1) % capacity;
+            } else if (index < tail) {
+                System.arraycopy(array, index + 1, array, index, tail - index);
+                tail--;
+            }
+        }
+        size--;
     }
 }
