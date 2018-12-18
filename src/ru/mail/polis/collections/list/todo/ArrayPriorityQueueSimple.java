@@ -5,6 +5,7 @@ import ru.mail.polis.collections.list.IPriorityQueue;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 
 /**
@@ -14,9 +15,19 @@ import java.util.Objects;
  *
  * @param <E> the type of elements maintained by this priority queue
  */
+@SuppressWarnings("unchecked")
 public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPriorityQueue<E> {
+    private Comparator<E> comparator;
+    private int size = 0;
+    private static final int DEFAULT_CAPACITY = 50;
+    /**
+     * Isn`t fixed, expandable with resize method
+     */
+    private Comparable<E>[] heap;
 
-    private final Comparator<E> comparator;
+    /**
+     * Array for the heap
+     */
 
     public ArrayPriorityQueueSimple() {
         this(Comparator.naturalOrder());
@@ -24,16 +35,21 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
 
     /**
      * Creates a {@code IPriorityQueue} containing the elements in the specified collection.
-     *
+     * <p>
      * You may consider that all elements in collection is not a null.
-     *
+     * <p>
      * Complexity = O(n)
      *
      * @param collection the collection whose elements are to be placed into this priority queue
      * @throws NullPointerException if the specified collection is null
      */
     public ArrayPriorityQueueSimple(Collection<E> collection) {
-        this(collection, Comparator.naturalOrder());
+        this(Comparator.naturalOrder());
+        this.size = collection.size();
+        //Sift-up to minimize
+        for (E item : collection) {
+            add(item);
+        }
     }
 
     /**
@@ -43,15 +59,20 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
      * @throws NullPointerException if the specified comparator is null
      */
     public ArrayPriorityQueueSimple(Comparator<E> comparator) {
+        if (comparator == null) {
+            throw new NullPointerException();
+        }
         this.comparator = Objects.requireNonNull(comparator, "comparator");
+        size = 0;
+        heap = new Comparable[DEFAULT_CAPACITY + 1];
     }
 
     /**
      * Creates a {@code IPriorityQueue} containing the elements in the specified collection
-     *  that orders its elements according to the specified comparator.
-     *
+     * that orders its elements according to the specified comparator.
+     * <p>
      * You may consider that all elements in collection is not a null.
-     *
+     * <p>
      * Complexity = O(n)
      *
      * @param collection the collection whose elements are to be placed into this priority queue
@@ -59,13 +80,26 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
      * @throws NullPointerException if the specified collection or comparator is null
      */
     public ArrayPriorityQueueSimple(Collection<E> collection, Comparator<E> comparator) {
-        this.comparator = Objects.requireNonNull(comparator, "comparator");
-        //todo: do some stuff with collection
+        this(comparator);
+        if (collection == null) throw new NullPointerException();
+        this.size = collection.size();
+        for (E item : collection) {
+            add(item);
+        }
+    }
+
+    /**
+     * Compares left and right nodes during heap-walking
+     */
+    private int compare(Comparable<E> left, Comparable<E> right) {
+
+        return comparator.compare((E) left, (E) right);
+
     }
 
     /**
      * Inserts the specified element into this priority queue.
-     *
+     * <p>
      * Complexity = O(log(n))
      *
      * @param value the element to add
@@ -73,12 +107,44 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
      */
     @Override
     public void add(E value) {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (value == null) {
+            throw new NullPointerException();
+        }
+        if (this.size >= heap.length) {
+            this.resize();
+        }
+        heap[this.size] = value;
+        sink(size);
+        size++;
     }
+
+    private void sink(int index) {
+        if (index <= 0) {
+            return;
+        }
+        //int parrentIndex = (index - 1) / 2;
+        int parentIndex = index % 2 == 0 ? (index - 2) / 2 : (index - 1) / 2;
+        if (compare(heap[index], heap[parentIndex]) < 0) {
+            E changed = (E) heap[parentIndex];
+            heap[parentIndex] = heap[index];
+            heap[index] = changed;
+            sink(parentIndex);
+        }
+    }
+
+    private void resize() {
+        E[] newHeap;
+        newHeap = (E[]) new Object[heap.length * 2];
+        for (int i = 0; i < heap.length; i++) {
+            newHeap[i] = (E) heap[i];
+        }
+        heap = newHeap;
+    }
+
 
     /**
      * Retrieves and removes the head of this queue.
-     *
+     * <p>
      * Complexity = O(log(n))
      *
      * @return the head of this queue
@@ -86,26 +152,73 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
      */
     @Override
     public E remove() {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (this.size == 0) {
+            throw new NoSuchElementException();
+        }
+        E removed = (E) heap[0];
+        heap[0] = heap[size - 1];
+        swim(0);
+        size--;
+        return removed;
+    }
+
+    private int childrens(int index) {
+        if ((index * 2 + 1) >= size) {
+            return 0;
+        }
+
+        if ((index * 2 + 1) == (size - 1)) {
+            return 1;
+        }
+
+        return 2;
+    }
+
+    private void swim(int sinkerIndex) {
+        int childIndex = sinkerIndex * 2 + 1;
+
+        switch (childrens(sinkerIndex)) {
+        case 2:
+            if (compare(heap[childIndex], heap[sinkerIndex * 2 + 2]) > 0) {
+                childIndex = (sinkerIndex * 2 + 2);
+            }
+            break;
+        case 0:
+            return;
+        }
+
+
+        if (compare(heap[sinkerIndex], heap[childIndex]) > 0) {
+            E changed;
+            changed = (E) heap[childIndex];
+            heap[childIndex] = heap[sinkerIndex];
+            heap[sinkerIndex] = changed;
+            swim(childIndex);
+        }
     }
 
     /**
      * Retrieves, but does not remove, the head of this queue.
-     *
+     * <p>
      * Complexity = O(1)
      *
      * @return the head of this queue
      * @throws java.util.NoSuchElementException if this queue is empty
      */
+    @SuppressWarnings("unchecked")
     @Override
     public E element() {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (isEmpty()) {
+            throw new NoSuchElementException();
+        }
+        E head = (E) heap[0];
+        return head;
     }
 
     /**
      * Returns {@code true} if this collection contains the specified element.
      * aka collection contains element el such that {@code Objects.equals(el, value) == true}
-     *
+     * <p>
      * Complexity = O(n)
      *
      * @param value element whose presence in this collection is to be tested
@@ -114,7 +227,16 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
      */
     @Override
     public boolean contains(E value) {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (value == null) {
+            throw new NullPointerException();
+        }
+        boolean flag = false;
+        for (int i = 0; i < this.size; i++) {
+            if (this.heap[i] == value) {
+                flag = true;
+            }
+        }
+        return flag;
     }
 
     /**
@@ -124,7 +246,10 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
      */
     @Override
     public int size() {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (this.heap == null) {
+            throw new NullPointerException();
+        }
+        return this.size;
     }
 
     /**
@@ -134,7 +259,7 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
      */
     @Override
     public boolean isEmpty() {
-        throw new UnsupportedOperationException("todo: implement this");
+        return (this.size() == 0);
     }
 
     /**
@@ -143,7 +268,7 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
      */
     @Override
     public void clear() {
-        throw new UnsupportedOperationException("todo: implement this");
+        this.size = 0;
     }
 
     /**
@@ -154,6 +279,31 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
      */
     @Override
     public Iterator<E> iterator() {
-        throw new UnsupportedOperationException("todo: implement this");
+        return new PriorityQueueIterator();
+    }
+
+    private class PriorityQueueIterator implements Iterator<E> {
+        private int index = 0;
+
+        @Override
+        public boolean hasNext() {
+            return index < size();
+        }
+
+        @Override
+        public E next() {
+            if (hasNext()) {
+                E result = (E) heap[index];
+                index++;
+                return result;
+            } else {
+                throw new NoSuchElementException();
+            }
+        }
+
+        @Override
+        public void remove() {
+
+        }
     }
 }
