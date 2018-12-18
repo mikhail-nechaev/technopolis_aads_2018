@@ -14,24 +14,20 @@ import java.util.NoSuchElementException;
  * @param <E> the type of elements maintained by this set
  */
 public class AVLTree<E extends Comparable<E>> implements ISelfBalancingSortedTreeSet<E> {
-
     //todo: update it if required
     protected static class AVLNode<E> {
         E value;
         AVLNode<E> left;
         AVLNode<E> right;
     }
-
     /**
      * The comparator used to maintain order in this tree map.
      */
     protected final Comparator<E> comparator;
     protected AVLNode<E> root;
-
     public AVLTree() {
         this(Comparator.naturalOrder());
     }
-
     /**
      * Creates a {@code ISelfBalancingSortedTreeSet} that orders its elements according to the specified comparator.
      *
@@ -41,7 +37,6 @@ public class AVLTree<E extends Comparable<E>> implements ISelfBalancingSortedTre
     public AVLTree(Comparator<E> comparator) {
         this.comparator = comparator;
     }
-
     /**
      * Adds the specified element to this set if it is not already present.
      * <p>
@@ -56,7 +51,6 @@ public class AVLTree<E extends Comparable<E>> implements ISelfBalancingSortedTre
     public boolean add(E value) {
         throw new UnsupportedOperationException("todo: implement this");
     }
-
     /**
      * Removes the specified element from this set if it is present.
      * <p>
@@ -70,7 +64,6 @@ public class AVLTree<E extends Comparable<E>> implements ISelfBalancingSortedTre
     public boolean remove(E value) {
         throw new UnsupportedOperationException("todo: implement this");
     }
-
     /**
      * Returns {@code true} if this collection contains the specified element.
      * aka collection contains element el such that {@code Objects.equals(el, value) == true}
@@ -85,7 +78,6 @@ public class AVLTree<E extends Comparable<E>> implements ISelfBalancingSortedTre
     public boolean contains(E value) {
         throw new UnsupportedOperationException("todo: implement this");
     }
-
     /**
      * Returns the first (lowest) element currently in this set.
      * <p>
@@ -98,7 +90,6 @@ public class AVLTree<E extends Comparable<E>> implements ISelfBalancingSortedTre
     public E first() {
         throw new UnsupportedOperationException("todo: implement this");
     }
-
     /**
      * Returns the last (highest) element currently in this set.
      * <p>
@@ -111,7 +102,6 @@ public class AVLTree<E extends Comparable<E>> implements ISelfBalancingSortedTre
     public E last() {
         throw new UnsupportedOperationException("todo: implement this");
     }
-
     /**
      * Returns the number of elements in this collection.
      *
@@ -121,7 +111,6 @@ public class AVLTree<E extends Comparable<E>> implements ISelfBalancingSortedTre
     public int size() {
         throw new UnsupportedOperationException("todo: implement this");
     }
-
     /**
      * Returns {@code true} if this collection contains no elements.
      *
@@ -131,7 +120,6 @@ public class AVLTree<E extends Comparable<E>> implements ISelfBalancingSortedTre
     public boolean isEmpty() {
         throw new UnsupportedOperationException("todo: implement this");
     }
-
     /**
      * Removes all of the elements from this collection.
      * The collection will be empty after this method returns.
@@ -140,7 +128,6 @@ public class AVLTree<E extends Comparable<E>> implements ISelfBalancingSortedTre
     public void clear() {
         throw new UnsupportedOperationException("todo: implement this");
     }
-
     /**
      * Обходит дерево и проверяет что высоты двух поддеревьев
      * различны по высоте не более чем на 1
@@ -151,7 +138,6 @@ public class AVLTree<E extends Comparable<E>> implements ISelfBalancingSortedTre
     public void checkBalance() throws UnbalancedTreeException {
         traverseTreeAndCheckBalanced(root);
     }
-
     private int traverseTreeAndCheckBalanced(AVLNode<E> curr) throws UnbalancedTreeException {
         if (curr == null) {
             return 0;

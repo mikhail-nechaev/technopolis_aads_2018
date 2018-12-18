@@ -29,7 +29,7 @@ Before pull request make sure than relevant tests is passed.
 | 5.0    | T15_OHT   | 15 OpenHashTable + Student | 
 | 1.0    | T16_OHTIR | 16 OpenHashTable + Student + Iterator Remove |
 
-**Max points == 55*
+**Max points == 55* 
 
 Run `TestAllTask` for check all task.
  
