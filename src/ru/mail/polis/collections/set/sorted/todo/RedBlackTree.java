@@ -6,24 +6,14 @@ import ru.mail.polis.collections.set.sorted.UnbalancedTreeException;
 import java.util.Comparator;
 import java.util.NoSuchElementException;
 
-/**
- * A Red-Black tree based {@link ISelfBalancingSortedTreeSet} implementation.
- *
- * ! An implementation of red-black trees must be based on the description in
- * Introduction to Algorithms (Cormen, Leiserson, Rivest)
- *
- * <a href="http://staff.ustc.edu.cn/~csli/graduate/algorithms/book6/chap14.htm">CHAPTER 14: RED-BLACK TREES</a>
- *
- * @param <E> the type of elements maintained by this set
- */
+
+@SuppressWarnings("unchecked")
 public class RedBlackTree<E extends Comparable<E>> implements ISelfBalancingSortedTreeSet<E> {
 
-    //todo: update it if required
-    enum RBColor {
+    private enum RBColor {
         RED, BLACK
     }
 
-    //todo: update it if required
     static final class RBNode<E> {
         E value;
         RBNode<E> left;
@@ -42,124 +32,312 @@ public class RedBlackTree<E extends Comparable<E>> implements ISelfBalancingSort
         }
     }
 
-    /**
-     * The comparator used to maintain order in this tree sett.
-     */
+
     protected final Comparator<E> comparator;
-    protected RBNode root;
+    protected RBNode nil = new RBNode(), root = nil;
+    int size = 0;
+
 
     public RedBlackTree() {
         this(Comparator.naturalOrder());
     }
 
-    /**
-     * Creates a {@code ISelfBalancingSortedTreeSet} that orders its elements according to the specified comparator.
-     *
-     * @param comparator comparator the comparator that will be used to order this priority queue.
-     * @throws NullPointerException if the specified comparator is null
-     */
-    public RedBlackTree(Comparator<E> comparator) {
+    public RedBlackTree(Comparator comparator) {
+        if (comparator == null)
+            throw new NullPointerException();
         this.comparator = comparator;
     }
 
-    /**
-     * Adds the specified element to this set if it is not already present.
-     *
-     * @param value element to be added to this set
-     * @return {@code true} if this set did not already contain the specified
-     * element
-     * @throws NullPointerException if the specified element is null
-     */
-    @Override
-    public boolean add(E value) {
-        throw new UnsupportedOperationException("todo: implement this");
+
+    private void rotateLeft(RBNode x) {
+        RBNode y = x.right;
+        x.right = y.left;
+
+        if (y.left != nil)
+            y.left.parent = x;
+        y.parent = x.parent;
+        if (x.parent == nil)
+            root = y;
+        else if (x == x.parent.left)
+            x.parent.left = y;
+        else
+            x.parent.right = y;
+        y.left = x;
+        x.parent = y;
     }
 
-    /**
-     * Removes the specified element from this set if it is present.
-     *
-     * @param value object to be removed from this set, if present
-     * @return {@code true} if this set contained the specified element
-     * @throws NullPointerException if the specified element is null
-     */
-    @Override
-    public boolean remove(E value) {
-        throw new UnsupportedOperationException("todo: implement this");
+    private void rotateRight(RBNode x) {
+        RBNode y = x.left;
+        x.left = y.right;
+
+        if (y.right != nil)
+            y.right.parent = x;
+        y.parent = x.parent;
+        if (x.parent == nil)
+            root = y;
+        else if (x == x.parent.right)
+            x.parent.right = y;
+        else
+            x.parent.left = y;
+        y.right = x;
+        x.parent = y;
     }
 
-    /**
-     * Returns {@code true} if this collection contains the specified element.
-     * aka collection contains element el such that {@code Objects.equals(el, value) == true}
-     *
-     * @param value element whose presence in this collection is to be tested
-     * @return {@code true} if this collection contains the specified element
-     * @throws NullPointerException if the specified element is null
-     */
-    @Override
-    public boolean contains(E value) {
-        throw new UnsupportedOperationException("todo: implement this");
+    private void insert(RBNode z) {
+        RBNode y = nil;
+        RBNode x = root;
+        while (x != nil) {
+            y = x;
+            if (comparator.compare((E) z.value, (E) x.value) < 0)
+                x = x.left;
+            else
+                x = x.right;
+        }
+        z.parent = y;
+        if (y == nil)
+            root = z;
+        else if (comparator.compare((E) z.value, (E) y.value) < 0)
+            y.left = z;
+        else
+            y.right = z;
+        z.left = nil;
+        z.right = nil;
+        z.color = RBColor.RED;
+        insertFixUp(z);
     }
 
-    /**
-     * Returns the first (lowest) element currently in this set.
-     *
-     * @return the first (lowest) element currently in this set
-     * @throws NoSuchElementException if this set is empty
-     */
-    @Override
-    public E first() {
-        throw new UnsupportedOperationException("todo: implement this");
+    private void insertFixUp(RBNode z) {
+        RBNode y;
+        while (z.parent.color == RBColor.RED) {
+            if (z.parent == z.parent.parent.left) {
+                y = z.parent.parent.right;
+                if (y.color == RBColor.RED) {
+                    z.parent.color = RBColor.BLACK;
+                    y.color = RBColor.BLACK;
+                    z.parent.parent.color = RBColor.RED;
+                    z = z.parent.parent;
+                } else if (z == z.parent.right) {
+                    z = z.parent;
+                    rotateLeft(z);
+                } else {
+                    z.parent.color = RBColor.BLACK;
+                    z.parent.parent.color = RBColor.RED;
+                    rotateRight(z.parent.parent);
+                }
+            } else {
+                y = z.parent.parent.left;
+                if (y.color == RBColor.RED) {
+                    z.parent.color = RBColor.BLACK;
+                    y.color = RBColor.BLACK;
+                    z.parent.parent.color = RBColor.RED;
+                    z = z.parent.parent;
+                } else if (z == z.parent.left) {
+                    z = z.parent;
+                    rotateRight(z);
+                } else {
+                    z.parent.color = RBColor.BLACK;
+                    z.parent.parent.color = RBColor.RED;
+                    rotateLeft(z.parent.parent);
+                }
+            }
+        }
+        root.color = RBColor.BLACK;
     }
 
-    /**
-     * Returns the last (highest) element currently in this set.
-     *
-     * @return the last (highest) element currently in this set
-     * @throws NoSuchElementException if this set is empty
-     */
-    @Override
-    public E last() {
-        throw new UnsupportedOperationException("todo: implement this");
+    public RBNode contains(RBNode node, E value) {
+        if (node == nil)
+            return null;
+
+        if (comparator.compare((E) node.value, value) == 0)
+            return node;
+
+        if (comparator.compare((E) node.value, value) < 0)
+            return contains(node.right, value);
+        else
+            return contains(node.left, value);
+
     }
 
-    /**
-     * Returns the number of elements in this collection.
-     *
-     * @return the number of elements in this collection
-     */
+
+    @Override
+    public boolean add(E value) throws NullPointerException {
+        if (value == null)
+            throw new NullPointerException();
+        if (contains(root, value) == null) {
+            RBNode<E> newNode = new RBNode<>();
+            newNode.value = value;
+            insert(newNode);
+            size++;
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean remove(E value) throws NullPointerException {
+        if (value == null)
+            throw new NullPointerException();
+        RBNode<E> node = contains(root, value);
+        if (!contains(value))
+            return false;
+        remove(node);
+        size--;
+        return true;
+    }
+
+    private RBNode<E> remove(RBNode<E> z) {
+        RBNode<E> y, x;
+        if (z.left == nil || z.right == nil)
+            y = z;
+        else
+            y = treeSuccessor(z);
+        if (y.left != nil)
+            x = y.left;
+        else
+            x = y.right;
+        x.parent = y.parent;
+        if (y.parent == nil)
+            root = x;
+        else if (y == y.parent.left)
+            y.parent.left = x;
+        else
+            y.parent.right = x;
+        if (y != z)
+            z.value = y.value;
+        if (y.color == RBColor.BLACK)
+            deleteFixUp(x);
+        return y;
+    }
+
+    private RBNode<E> treeSuccessor(RBNode<E> x) {
+        if (x.left != null)
+            return getMin(x.right);
+        RBNode y = x.parent;
+        while (y != null && x == y.right) {
+            x = y;
+            y = y.parent;
+        }
+        return y;
+    }
+
+    private void deleteFixUp(RBNode x) {
+
+        RBNode w;
+        while (x != root && x.color == RBColor.BLACK) {
+            if (x == x.parent.left) {
+                w = x.parent.right;
+                if (w.color == RBColor.RED) {
+                    w.color = RBColor.BLACK;
+                    x.parent.color = RBColor.RED;
+                    rotateLeft(x.parent);
+                    w = x.parent.right;
+                }
+
+                if (w.left.color == RBColor.BLACK &&
+                        w.right.color == RBColor.BLACK) {
+                    w.color = RBColor.RED;
+                    x = x.parent;
+                } else {
+                    if (w.right.color == RBColor.BLACK) {
+                        w.left.color = RBColor.BLACK;
+                        w.color = RBColor.RED;
+                        rotateRight(w);
+                        w = x.parent.right;
+                    }
+                    w.color = x.parent.color;
+                    x.parent.color = RBColor.BLACK;
+                    w.right.color = RBColor.BLACK;
+                    rotateLeft(x.parent);
+                    x = root;
+                }
+            } else {
+                w = x.parent.left;
+                if (w.color == RBColor.RED) {
+                    w.color = RBColor.BLACK;
+                    x.parent.color = RBColor.RED;
+                    rotateRight(x.parent);
+                    w = x.parent.left;
+                }
+
+                if (w.right.color == RBColor.BLACK &&
+                        w.left.color == RBColor.BLACK) {
+                    w.color = RBColor.RED;
+                    x = x.parent;
+                } else {
+                    if (w.left.color == RBColor.BLACK) {
+                        w.right.color = RBColor.BLACK;
+                        w.color = RBColor.RED;
+                        rotateLeft(w);
+                        w = x.parent.left;
+                    }
+                    w.color = x.parent.color;
+                    x.parent.color = RBColor.BLACK;
+                    w.left.color = RBColor.BLACK;
+                    rotateRight(x.parent);
+                    x = root;
+                }
+            }
+        }
+        x.color = RBColor.BLACK;
+    }
+
+    @Override
+    public boolean contains(E value) throws NullPointerException {
+        if (value == null)
+            throw new NullPointerException();
+        if (contains(root, value) == null)
+            return false;
+        return true;
+    }
+
+
+    @Override
+    public E first() throws NoSuchElementException {
+        if (isEmpty())
+            throw new NoSuchElementException();
+
+        return getMin(root).value;
+    }
+
+    RBNode<E> getMin(RBNode node) {
+        while (node.left != nil)
+            node = node.left;
+
+        return node;
+    }
+
+    @Override
+    public E last() throws NoSuchElementException {
+        if (isEmpty())
+            throw new NoSuchElementException();
+
+        return getMax(root).value;
+    }
+
+
+    RBNode<E> getMax(RBNode node) {
+        while (node.right != nil)
+            node = node.right;
+
+        return node;
+    }
+
     @Override
     public int size() {
-        throw new UnsupportedOperationException("todo: implement this");
+        return size;
     }
 
-    /**
-     * Returns {@code true} if this collection contains no elements.
-     *
-     * @return {@code true} if this collection contains no elements
-     */
     @Override
     public boolean isEmpty() {
-        throw new UnsupportedOperationException("todo: implement this");
+        return root == nil;
     }
 
-    /**
-     * Removes all of the elements from this collection.
-     * The collection will be empty after this method returns.
-     */
     @Override
     public void clear() {
-        throw new UnsupportedOperationException("todo: implement this");
+        root = nil;
+        size = 0;
     }
 
-    /**
-     * Обходит дерево и проверяет выполнение свойств сбалансированного красно-чёрного дерева
-     * <p>
-     * 1) Корень всегда чёрный.
-     * 2) Если узел красный, то его потомки должны быть чёрными (обратное не всегда верно)
-     * 3) Все пути от узла до листьев содержат одинаковое количество чёрных узлов (чёрная высота)
-     *
-     * @throws UnbalancedTreeException если какое-либо свойство невыполнено
-     */
     @Override
     public void checkBalance() throws UnbalancedTreeException {
         if (root != null) {
@@ -196,3 +374,4 @@ public class RedBlackTree<E extends Comparable<E>> implements ISelfBalancingSort
     }
 
 }
+
