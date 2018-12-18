@@ -70,10 +70,10 @@ public class OpenHashTable<E extends IOpenHashTableEntity> implements IOpenHashT
                 return true;
             }
             if (value.equals(table[hash])) {
-                break;
+                return false;
             }
         }
-        return false;
+        throw new IllegalArgumentException();
     }
 
     /**
@@ -94,7 +94,7 @@ public class OpenHashTable<E extends IOpenHashTableEntity> implements IOpenHashT
         for (int probeId = 0; probeId < tableSize(); probeId++) {
             int hash = value.hashCode(tableSize(), probeId);
             if (table[hash] == null) {
-                break;
+                return false;
             }
             if (value.equals(table[hash]) && !deleted[hash]) {
                 size--;
@@ -102,7 +102,7 @@ public class OpenHashTable<E extends IOpenHashTableEntity> implements IOpenHashT
                 return true;
             }
         }
-        return false;
+        throw new IllegalArgumentException();
     }
 
     /**
@@ -123,13 +123,13 @@ public class OpenHashTable<E extends IOpenHashTableEntity> implements IOpenHashT
         for (int probeId = 0; probeId < tableSize(); probeId++) {
             int hash = value.hashCode(tableSize(), probeId);
             if (table[hash] == null) {
-                break;
+                return false;
             }
             if (value.equals(table[hash]) && !deleted[hash]) {
                 return true;
             }
         }
-        return false;
+        throw new IllegalArgumentException();
     }
 
     /**
@@ -171,25 +171,26 @@ public class OpenHashTable<E extends IOpenHashTableEntity> implements IOpenHashT
     @Override
     public Iterator<E> iterator() {
         return new Iterator<E>() {
-            private int nextIndex=0;
+            private int nextIndex = 0;
             private int lastNextIndex = -1;
-            private int size = size();
+            private int rest = size();
 
             @Override
             public boolean hasNext() {
-                return nextIndex<size;
+                return rest > 0;
             }
 
             @Override
             public E next() {
-                if(!hasNext()){
+                if (!hasNext()) {
                     throw new NoSuchElementException();
                 }
-                while(table[nextIndex] == null || deleted[nextIndex]){
+                while (table[nextIndex] == null || deleted[nextIndex]) {
                     nextIndex++;
                 }
-                lastNextIndex = nextIndex;
-                return (E)table[lastNextIndex];
+                rest--;
+                lastNextIndex = nextIndex++;
+                return (E) table[lastNextIndex];
             }
 
             @Override

@@ -56,11 +56,30 @@ public class AVLTreeIterable<E extends Comparable<E>> extends AVLTree<E> impleme
     public Iterator<E> iterator() {
         return new Iterator<E>() {
             private AVLNode<E> lastNextNode = null;
-            private Stack<AVLNode<E>> stack = makeAscStack(root, new Stack<>());
+            private AVLNode<E> nextNode;
+            private int rest = size();
+
+            private AVLNode<E> getNextNode(AVLNode<E> cur, AVLNode<E> parent) {
+                while (cur != null) {
+                    int cmp = comparator.compare(lastNextNode.value, cur.value);
+                    if (cmp < 0) {
+                        parent = cur;
+                        cur = cur.left;
+                    } else if (cmp > 0) {
+                        cur = cur.right;
+                    } else {
+                        if(cur.right == null){
+                            return parent;
+                        }
+                        cur = cur.right;
+                    }
+                }
+                return parent;
+            }
 
             @Override
             public boolean hasNext() {
-                return stack.size() > 0;
+                return rest > 0;
             }
 
             @Override
@@ -68,8 +87,13 @@ public class AVLTreeIterable<E extends Comparable<E>> extends AVLTree<E> impleme
                 if (!hasNext()) {
                     throw new NoSuchElementException();
                 }
-                lastNextNode = stack.peek();
-                return stack.pop().value;
+                rest--;
+                if(nextNode == null){
+                    nextNode=findMin(root);
+                }
+                lastNextNode = nextNode;
+                nextNode = getNextNode(root, null);
+                return lastNextNode.value;
             }
 
             @Override
@@ -92,11 +116,31 @@ public class AVLTreeIterable<E extends Comparable<E>> extends AVLTree<E> impleme
     public Iterator<E> descendingIterator() {
         return new Iterator<E>() {
             private AVLNode<E> lastNextNode = null;
-            private Stack<AVLNode<E>> stack = makeDescStack(root, new Stack<>());
+            private AVLNode<E> nextNode;
+            private int rest = size();
+
+
+            private AVLNode<E> getNextNode(AVLNode<E> cur, AVLNode<E> parent) {
+                while (cur != null) {
+                    int cmp = comparator.compare(lastNextNode.value, cur.value);
+                    if (cmp < 0) {
+                        cur = cur.left;
+                    } else if (cmp > 0) {
+                        parent = cur;
+                        cur = cur.right;
+                    } else {
+                        if(cur.left == null){
+                            return parent;
+                        }
+                        cur = cur.left;
+                    }
+                }
+                return parent;
+            }
 
             @Override
             public boolean hasNext() {
-                return stack.size() > 0;
+                return rest > 0;
             }
 
             @Override
@@ -104,8 +148,13 @@ public class AVLTreeIterable<E extends Comparable<E>> extends AVLTree<E> impleme
                 if (!hasNext()) {
                     throw new NoSuchElementException();
                 }
-                lastNextNode = stack.peek();
-                return stack.pop().value;
+                rest--;
+                if(nextNode==null){
+                    nextNode=findMax(root);
+                }
+                lastNextNode = nextNode;
+                nextNode = getNextNode(root,null);
+                return lastNextNode.value;
             }
 
             @Override
