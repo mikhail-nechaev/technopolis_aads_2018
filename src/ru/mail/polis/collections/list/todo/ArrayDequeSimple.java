@@ -349,6 +349,7 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
             }
             E res = (E) dequeue[current];
             current = ++current % dequeue.length;
+            next++;
             return res;
         }
 
