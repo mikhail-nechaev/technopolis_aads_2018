@@ -2,7 +2,8 @@ package ru.mail.polis.collections.list.todo;
 
 import ru.mail.polis.collections.list.IDeque;
 
-import java.util.Iterator;
+import java.util.ListIterator;
+import java.util.NoSuchElementException;
 
 /**
  * Resizable cyclic array implementation of the {@link IDeque} interface.
@@ -13,6 +14,18 @@ import java.util.Iterator;
  */
 public class ArrayDequeSimple<E> implements IDeque<E> {
 
+    Object[] data;
+    int head = 0;
+    int tail = 0;
+
+    public ArrayDequeSimple() {
+        data = new Object[16];
+    }
+
+    public ArrayDequeSimple(int size) {
+        data = new Object[size];
+    }
+
     /**
      * Inserts the specified element at the front of this deque.
      *
@@ -21,7 +34,13 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public void addFirst(E value) {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (value == null) throw new NullPointerException("Element can't be null.");
+
+        if (--head < 0) {
+            head = data.length - 1;
+        }
+        data[head] = value;
+        if (head == tail) doubleSize();
     }
 
     /**
@@ -32,7 +51,14 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public E removeFirst() {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (isEmpty()) throw new NoSuchElementException("Deque is empty.");
+
+        E result = getFirst();
+        data[head++] = null;
+        if (head >= data.length) {
+            head = 0;
+        }
+        return result;
     }
 
     /**
@@ -43,7 +69,9 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public E getFirst() {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (isEmpty()) throw new NoSuchElementException("Deque is empty.");
+        //noinspection unchecked
+        return (E) data[head];
     }
 
     /**
@@ -54,7 +82,11 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public void addLast(E value) {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (value == null) throw new NullPointerException("Element can't be null.");
+
+        data[tail++] = value;
+        if (tail == data.length) tail = 0;
+        if (head == tail) doubleSize();
     }
 
     /**
@@ -65,7 +97,15 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public E removeLast() {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (isEmpty()) throw new NoSuchElementException("Deque is empty.");
+
+        int t = tail - 1;
+        if (t == -1) t = data.length - 1;
+        //noinspection unchecked
+        E result = (E) data[t];
+        data[t] = null;
+        tail = t;
+        return result;
     }
 
     /**
@@ -76,7 +116,11 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public E getLast() {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (isEmpty()) throw new NoSuchElementException("Deque is empty.");
+        int t = tail - 1;
+        if (t == -1) t = data.length - 1;
+        //noinspection unchecked
+        return (E) data[t];
     }
 
     /**
@@ -89,7 +133,15 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public boolean contains(E value) {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (value == null) throw new NullPointerException();
+
+        int i = head;
+        Object element;
+        while ((element = data[i]) != null) {
+            if (value.equals(element)) return true;
+            if (++i == data.length) i = 0;
+        }
+        return false;
     }
 
     /**
@@ -99,7 +151,11 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public int size() {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (tail >= head) {
+            return tail - head;
+        } else {
+            return data.length - head + tail;
+        }
     }
 
     /**
@@ -109,7 +165,7 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public boolean isEmpty() {
-        throw new UnsupportedOperationException("todo: implement this");
+        return head == tail;
     }
 
     /**
@@ -118,7 +174,12 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public void clear() {
-        throw new UnsupportedOperationException("todo: implement this");
+        int i = head;
+        while (data[i] != null) {
+            data[i] = null;
+            if (++i == data.length) i = 0;
+        }
+        head = tail = 0;
     }
 
     /**
@@ -128,7 +189,147 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      * @return an iterator over the elements in this collection in proper sequence
      */
     @Override
-    public Iterator<E> iterator() {
-        throw new UnsupportedOperationException("todo: implement this");
+    public ListIterator<E> iterator() {
+        return new ArrayDequeIterator();
+    }
+
+    private class ArrayDequeIterator implements ListIterator<E> {
+
+        private int returnedPointer = -1;
+        private boolean deleted = false;
+
+        @Override
+        public boolean hasNext() {
+            int currentPointer = returnedPointer < 0 ? head - 1 : returnedPointer;
+            return currentPointer + 1 < data.length ? data[currentPointer + 1] != null : data[0] != null;
+        }
+
+        @Override
+        public E next() {
+            if (!hasNext()) throw new NoSuchElementException();
+
+            int currentPointer = returnedPointer < 0 ? head - 1 : returnedPointer;
+            returnedPointer = currentPointer + 1 < data.length ? currentPointer + 1 : 0;
+            @SuppressWarnings("unchecked")
+            E next = (E) data[returnedPointer];
+            deleted = false;
+            return next;
+        }
+
+        @Override
+        public boolean hasPrevious() {
+            if (returnedPointer < 0) return false;
+            if (deleted) return data[returnedPointer] != null;
+            return returnedPointer > 0 ? data[returnedPointer - 1] != null : data[data.length - 1] != null;
+        }
+
+        @Override
+        public E previous() {
+            if (!hasPrevious()) throw new NoSuchElementException();
+
+            if (!deleted) {
+                returnedPointer = returnedPointer > 0 ? returnedPointer - 1 : data.length - 1;
+            }
+
+            @SuppressWarnings("unchecked")
+            E prev = (E) data[returnedPointer];
+            return prev;
+        }
+
+        @Override
+        public int nextIndex() {
+            return returnedPointer + 1 < data.length ? returnedPointer + 1 : 0;
+        }
+
+        @Override
+        public int previousIndex() {
+            if (deleted) return returnedPointer;
+            return returnedPointer > 0 ? returnedPointer - 1 : data.length - 1;
+        }
+
+        @Override
+        public void remove() {
+            if (returnedPointer < 0 || deleted) throw new IllegalStateException();
+
+            boolean shifted = delete(returnedPointer);
+            if (shifted) {
+                returnedPointer = returnedPointer > 0 ? returnedPointer - 1 : data.length - 1;
+            }
+            deleted = true;
+        }
+
+        @Override
+        public void set(E e) {
+            data[returnedPointer] = e;
+        }
+
+        @Override
+        public void add(E e) {
+            throw new UnsupportedOperationException();
+        }
+    }
+
+    private void doubleSize() {
+        int currentSize = data.length;
+        int newSize = currentSize << 1;
+        if (newSize < 0) throw new IllegalStateException("Max deque size is reached.");
+
+        Object[] newData = new Object[newSize];
+
+        int i = head;
+        int j = 0;
+        while (i != tail) {
+            newData[j++] = data[i];
+            if (++i == currentSize) {
+                i = 0;
+            }
+        }
+
+        data = newData;
+        head = 0;
+        tail = currentSize;
+    }
+
+    /**
+     * Removes the element at the specified position in the elements array,
+     * adjusting head and tail as necessary.  This can result in motion of
+     * elements backwards or forwards in the array.
+     *
+     * @return true if elements moved backwards
+     */
+    boolean delete(int i) {
+        int h = head;
+        int t = tail;
+        int elementsBefore = i - h >= 0 ? i - h : data.length - i + h;
+        int elementsAfter = t - i > 0 ? t - i - 1 : data.length - t + i;
+        if (i == t) {
+            elementsAfter = 0;
+        }
+
+        if (elementsBefore < elementsAfter) {
+            if (h <= i) {
+                System.arraycopy(data, h, data, h + 1, elementsBefore);
+                data[h] = null;
+                head = h + 1 == data.length ? 0 : h + 1;
+                return false;
+            } else {
+                System.arraycopy(data, i, data, i + 1, elementsAfter);
+                data[i] = null;
+                tail = t == 0 ? data.length - 1 : t - 1;
+                return true;
+            }
+        } else {
+            if (i < t) {
+                System.arraycopy(data, i, data, i + 1, elementsAfter);
+                data[i] = null;
+                tail = t - 1;
+                return true;
+            } else {
+                System.arraycopy(data, h, data, h + 1, elementsBefore);
+                data[h] = null;
+                head = h + 1 == data.length ? 0 : h + 1;
+                return false;
+            }
+        }
     }
 }
