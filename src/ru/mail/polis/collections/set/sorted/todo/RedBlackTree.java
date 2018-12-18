@@ -66,7 +66,7 @@ public class RedBlackTree<E extends Comparable<E>> implements ISelfBalancingSort
 
     public RedBlackTree() {
         this(Comparator.naturalOrder());
-        root = null;
+        root = nil;
     }
 
     /**
@@ -80,7 +80,7 @@ public class RedBlackTree<E extends Comparable<E>> implements ISelfBalancingSort
             throw new NullPointerException();
         }
         this.comparator = comparator;
-        nil = new RBNode<>(null);
+        nil = new RBNode<>();
         root = nil;
         root.left = nil;
         root.right = nil;
@@ -235,7 +235,8 @@ public class RedBlackTree<E extends Comparable<E>> implements ISelfBalancingSort
         while ((x != root) && (x.color == BLACK)) {
             if (x == x.parent.left) {
                 node = x.parent.right;
-                if (node.color == BLACK) {
+                if (node.color == RED) {
+                    node.color = BLACK;
                     x.parent.color = RED;
                     leftRotate(x.parent);
                     node = x.parent.right;
@@ -249,16 +250,19 @@ public class RedBlackTree<E extends Comparable<E>> implements ISelfBalancingSort
                     rightRotate(node);
                     node = x.parent.right;
                 }
-                node.color = x.parent.color;
-                x.parent.color = BLACK;
-                node.right.color = BLACK;
-                leftRotate(x.parent);
-                x = root;
+                else {
+                    node.color = x.parent.color;
+                    x.parent.color = BLACK;
+                    node.right.color = BLACK;
+                    leftRotate(x.parent);
+                    x = root;
+                }
             } else {
                 node = x.parent.left;
-                if (node.color == BLACK) {
+                if (node.color == RED) {
+                    node.color = BLACK;
                     x.parent.color = RED;
-                    leftRotate(x.parent);
+                    rightRotate(x.parent);
                     node = x.parent.left;
                 }
                 if ((node.right.color == BLACK) && (node.left.color == BLACK)) {
@@ -267,17 +271,19 @@ public class RedBlackTree<E extends Comparable<E>> implements ISelfBalancingSort
                 } else if (node.left.color == BLACK) {
                     node.right.color = BLACK;
                     node.color = RED;
-                    rightRotate(node);
+                    leftRotate(node);
                     node = x.parent.left;
                 }
-                node.color = x.parent.color;
-                x.parent.color = BLACK;
-                node.left.color = BLACK;
-                leftRotate(x.parent);
-                x = root;
+                else {
+                    node.color = x.parent.color;
+                    x.parent.color = BLACK;
+                    node.left.color = BLACK;
+                    rightRotate(x.parent);
+                    x = root;
+                }
             }
         }
-        size--;
+        x.color = BLACK;
     }
 
     /**
@@ -292,38 +298,50 @@ public class RedBlackTree<E extends Comparable<E>> implements ISelfBalancingSort
         if (value == null) {
             throw new NullPointerException();
         }
-        RBNode z = new RBNode();
-        RBNode y;
-        RBNode x;
-        z.value = value;
-        if ((z.left == nil) || (z.right == nil)) {
-            y = z;
-        } else {
-            y = successor(z);
+        RBNode<E> z = root;
+        RBNode<E> y;
+        RBNode<E> x;
+        while(z != nil && z != null) {
+            if(comparator.compare(value, z.value) < 0)
+                z = z.left;
+            else if(comparator.compare(value, z.value) > 0)
+                z = z.right;
+            else if(comparator.compare(value, z.value) == 0)
+                break;
         }
-        if (y.left != nil) {
-            x = y.left;
-        } else {
-            x = y.right;
-        }
-        x.parent = y.parent;
-        if (y.parent == nil) {
-            root = x;
-        } else {
-            if (y == y.parent.left) {
-                y.parent.left = x;
+        if(z != nil && comparator.compare(value, z.value) == 0) {
+            if ((z.left == nil) || (z.right == nil)) {
+                y = z;
             } else {
-                y.parent.right = x;
+                y = successor(z);
             }
+            if (y.left != nil) {
+                x = y.left;
+            } else {
+                x = y.right;
+            }
+            x.parent = y.parent;
+            if (y.parent == nil) {
+                root = x;
+            } else {
+                if (y == y.parent.left) {
+                    y.parent.left = x;
+                } else {
+                    y.parent.right = x;
+                }
+            }
+            if (y != z) {
+                z.value = y.value;
+            }
+            if (y.color == BLACK) {
+                deleteFixUp(x);
+            }
+            size--;
+            return true;
         }
-        if (y != z) {
-            z.value = y.value;
-        }
-        if (y.color == BLACK) {
-            deleteFixUp(x);
-        }
-        return true;
+        return false;
     }
+
 
     /**
      * Returns {@code true} if this collection contains the specified element.

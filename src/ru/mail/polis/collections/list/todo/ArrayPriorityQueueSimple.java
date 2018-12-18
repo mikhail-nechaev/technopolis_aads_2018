@@ -45,9 +45,6 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
      */
     public ArrayPriorityQueueSimple(Collection<E> collection) {
         this(Comparator.naturalOrder());
-        if (collection == null) {
-            throw new NullPointerException();
-        }
         this.size = collection.size();
         //Sift-up to minimize
         for (E item : collection) {
@@ -84,6 +81,7 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
      */
     public ArrayPriorityQueueSimple(Collection<E> collection, Comparator<E> comparator) {
         this(comparator);
+        if (collection == null) throw new NullPointerException();
         this.size = collection.size();
         for (E item : collection) {
             add(item);
@@ -126,7 +124,7 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
         }
         //int parrentIndex = (index - 1) / 2;
         int parentIndex = index % 2 == 0 ? (index - 2) / 2 : (index - 1) / 2;
-        if (compare(heap[index], heap[parentIndex])< 0) {
+        if (compare(heap[index], heap[parentIndex]) < 0) {
             E changed = (E) heap[parentIndex];
             heap[parentIndex] = heap[index];
             heap[index] = changed;
@@ -196,9 +194,7 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
             heap[childIndex] = heap[sinkerIndex];
             heap[sinkerIndex] = changed;
             swim(childIndex);
-
         }
-
     }
 
     /**

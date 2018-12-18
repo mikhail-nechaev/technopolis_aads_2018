@@ -13,27 +13,35 @@ public class LinkedDequeFull<E> extends LinkedDequeSimple<E> implements Deque<E>
 
     @Override
     public boolean offerFirst(E e) {
-        if (e == null) throw new NullPointerException();
+        if (e == null) {
+            throw new NullPointerException();
+        }
         addFirst(e);
         return true;
     }
 
     @Override
     public boolean offerLast(E e) {
-        if (e == null) throw new NullPointerException();
+        if (e == null) {
+            throw new NullPointerException();
+        }
         addLast(e);
         return true;
     }
 
     @Override
     public E pollFirst() {
-        if (isEmpty()) return null;
+        if (isEmpty()) {
+            return null;
+        }
         return removeFirst();
     }
 
     @Override
     public E pollLast() {
-        if (isEmpty()) return null;
+        if (isEmpty()) {
+            return null;
+        }
         return removeFirst();
     }
 
@@ -53,44 +61,67 @@ public class LinkedDequeFull<E> extends LinkedDequeSimple<E> implements Deque<E>
         return getLast();
     }
 
+    private void doRemove(Node<E> item) {
+        Node<E> prev = item.prev;
+        Node<E> next = item.next;
+        if (prev != null) {
+            prev.next = next;
+        }
+        if (next != null) {
+            next.prev = prev;
+        }
+    }
+
     @Override
     public boolean removeFirstOccurrence(Object o) {
-        if (o == null) throw new NullPointerException();
-        Node item = first;
+        if (o == null) {
+            throw new NullPointerException();
+        }
+        Node<E> item = first;
         while (item != null) {
-            if (item.current.equals(o)) {
-                remove(item);
+            if (item.value.equals(o)) {
+                doRemove(item);
+                size--;
                 return true;
+            } else {
+                item = item.next;
             }
-            else item = item.next;
         }
         return false;
     }
 
     @Override
     public boolean removeLastOccurrence(Object o) {
-        if (o == null) throw new NullPointerException();
-        Node item = last;
+        if (o == null) {
+            throw new NullPointerException();
+        }
+        Node<E> item = last;
         while (item != null) {
-            if (item.current.equals(o)) {
-                remove(item);
+            if (item.value.equals(o)) {
+                doRemove(item);
+                size--;
                 return true;
+            } else {
+                item = item.prev;
             }
-            else item = item.prev;
         }
         return false;
     }
 
     @Override
     public boolean add(E e) {
-        if (e == null) throw new NullPointerException();
+        if (e == null) {
+            throw new NullPointerException();
+        }
         addLast(e);
         return true;
     }
 
     @Override
     public boolean offer(E e) {
-        if (e == null) throw new NullPointerException();
+        if (e == null) {
+            throw new NullPointerException();
+        }
         return offerLast(e);
     }
 
@@ -111,13 +142,15 @@ public class LinkedDequeFull<E> extends LinkedDequeSimple<E> implements Deque<E>
 
     @Override
     public E peek() {
-        if (isEmpty()) return null;
+        if (isEmpty()) {
+            return null;
+        }
         return getFirst();
     }
 
     @Override
     public boolean addAll(Collection<? extends E> c) {
-        for (Object item: c) {
+        for (Object item : c) {
             this.add((E) item);
         }
         return true;
@@ -176,14 +209,8 @@ public class LinkedDequeFull<E> extends LinkedDequeSimple<E> implements Deque<E>
 
     @Override
     public boolean contains(Object o) {
-        Node item = first;
-        while (item != null) {
-            if (item.current.equals(o)) {
-                return true;
-            }
-            item = item.next;
-        }
-        return false;
+        if (o == null) throw new NullPointerException();
+        return containsInner(o);
     }
 
 
@@ -207,20 +234,19 @@ public class LinkedDequeFull<E> extends LinkedDequeSimple<E> implements Deque<E>
     public Iterator<E> descendingIterator() {
         return new Iterator<E>() {
 
-            private Node future, current = last;
+            private Node<E> current = last;
 
             @Override
             public boolean hasNext() {
-                return current.prev != null;
+                return current != null;
             }
 
             @Override
             public E next() {
-                if (hasNext() == false) throw new NoSuchElementException();
-                current = future;
-                future = current.prev;
-                return (E) current.current;
+                E result = current.value;
+                current = current.prev;
+                return result;
             }
         };
     }
-    }
+}

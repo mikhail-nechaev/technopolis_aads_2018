@@ -12,11 +12,11 @@ import java.util.NoSuchElementException;
  */
 public class LinkedDequeSimple<E> implements IDeque<E> {
     protected class Node<E> {
-        protected E current;
+        protected E value;
         protected Node<E> next, prev;
 
-        Node(E current) {
-            this.current = current;
+        Node(E value) {
+            this.value = value;
         }
     }
 
@@ -68,7 +68,7 @@ public class LinkedDequeSimple<E> implements IDeque<E> {
         if (isEmpty()) {
             throw new NoSuchElementException();
         }
-        E res = (E) first.current;
+        E res = first.value;
         first = first.next;
         if (first != null) {
             first.prev = null;
@@ -92,7 +92,7 @@ public class LinkedDequeSimple<E> implements IDeque<E> {
         if (isEmpty()) {
             throw new NoSuchElementException();
         }
-        return (E) first.current;
+        return first.value;
     }
 
     /**
@@ -132,7 +132,7 @@ public class LinkedDequeSimple<E> implements IDeque<E> {
         if (isEmpty()) {
             throw new NoSuchElementException();
         }
-        E res = (E) last.current;
+        E res = last.value;
         last = last.prev;
         if (last != null) {
             last.next = null;
@@ -156,7 +156,7 @@ public class LinkedDequeSimple<E> implements IDeque<E> {
         if (isEmpty()) {
             throw new NoSuchElementException();
         }
-        return (E) last.current;
+        return last.value;
     }
 
     /**
@@ -172,9 +172,13 @@ public class LinkedDequeSimple<E> implements IDeque<E> {
         if (value == null) {
             throw new NullPointerException();
         }
+        return containsInner(value);
+    }
+
+    boolean containsInner(Object value) {
         Node<E> checked = first;
         while (checked != null) {
-            if (checked.current.equals(value)) {
+            if (checked.value.equals(value)) {
                 return true;
             }
             checked = checked.next;
@@ -240,7 +244,7 @@ public class LinkedDequeSimple<E> implements IDeque<E> {
             if (!hasNext()) {
                 throw new NoSuchElementException();
             }
-            E newCur = cur.current;
+            E newCur = cur.value;
             cur = cur.next;
             return newCur;
         }
