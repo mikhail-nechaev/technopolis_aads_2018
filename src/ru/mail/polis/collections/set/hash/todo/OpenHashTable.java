@@ -4,21 +4,33 @@ import ru.mail.polis.collections.set.hash.IOpenHashTable;
 import ru.mail.polis.collections.set.hash.IOpenHashTableEntity;
 
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 /**
- *
  * Implementation open addressed hash table with double hashing
  *
  * <a href="https://en.wikipedia.org/wiki/Double_hashing">Double_hashing</a>
- *
- * Use {@link IOpenHashTableEntity#hashCode(int,int)} for hash code calculating
- *
- * Use loadFactor = from 0.5f to 0.75f included
+ * <p>
+ * Use {@link IOpenHashTableEntity#hashCode(int, int)} for hash code calculating
+ * <p>
+ * Use load = from 0.5f to 0.75f included
  *
  * @param <E> the type of elements maintained by this hash table
  */
+@SuppressWarnings("ALL")
 public class OpenHashTable<E extends IOpenHashTableEntity> implements IOpenHashTable<E> {
 
+    private Object[] data;
+    private boolean[] deleted;
+    private final float load = 0.5f;
+    private int length = 0;
+
+    private final int DEFAULT = 16;
+
+    public OpenHashTable() {
+        this.data = new Object[DEFAULT];
+        this.deleted = new boolean[DEFAULT];
+    }
 
     /**
      * Adds the specified element to this set if it is not already present.
@@ -32,7 +44,37 @@ public class OpenHashTable<E extends IOpenHashTableEntity> implements IOpenHashT
      */
     @Override
     public boolean add(E value) {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (value == null) {
+            throw new NullPointerException();
+        }
+        if (length >= load * tableSize()) {
+            resize();
+        }
+        for (int i = 0; i < tableSize(); i++) {
+            int hash = value.hashCode(tableSize(), i);
+            if (data[hash] == null || deleted[hash]) {
+                length++;
+                data[hash] = value;
+                return true;
+            }
+            if (value.equals(data[hash])) {
+                return false;
+            }
+        }
+        throw new IllegalArgumentException();
+    }
+
+    private void resize() {
+        Object[] oldTable = data;
+        data = new Object[tableSize() * 2];
+        deleted = new boolean[tableSize() * 2];
+        int oldSize = length;
+        for (int i = 0; i < oldTable.length; i++) {
+            if (oldTable[i] != null && !deleted[i]) {
+                add((E) oldTable[i]);
+            }
+        }
+        length = oldSize;
     }
 
     /**
@@ -46,7 +88,21 @@ public class OpenHashTable<E extends IOpenHashTableEntity> implements IOpenHashT
      */
     @Override
     public boolean remove(E value) {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (value == null) {
+            throw new NullPointerException();
+        }
+        for (int i = 0; i < tableSize(); i++) {
+            int hash = value.hashCode(tableSize(), i);
+            if (data[hash] == null) {
+                return false;
+            }
+            if (value.equals(data[hash]) && !deleted[hash]) {
+                length--;
+                deleted[hash] = true;
+                return true;
+            }
+        }
+        throw new IllegalArgumentException();
     }
 
     /**
@@ -61,7 +117,19 @@ public class OpenHashTable<E extends IOpenHashTableEntity> implements IOpenHashT
      */
     @Override
     public boolean contains(E value) {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (value == null) {
+            throw new NullPointerException();
+        }
+        for (int i = 0; i < tableSize(); i++) {
+            int hash = value.hashCode(tableSize(), i);
+            if (data[hash] == null) {
+                return false;
+            }
+            if (value.equals(data[hash]) && !deleted[hash]) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -71,7 +139,7 @@ public class OpenHashTable<E extends IOpenHashTableEntity> implements IOpenHashT
      */
     @Override
     public int size() {
-        throw new UnsupportedOperationException("todo: implement this");
+        return length;
     }
 
     /**
@@ -81,7 +149,7 @@ public class OpenHashTable<E extends IOpenHashTableEntity> implements IOpenHashT
      */
     @Override
     public boolean isEmpty() {
-        throw new UnsupportedOperationException("todo: implement this");
+        return size() == 0;
     }
 
     /**
@@ -90,7 +158,9 @@ public class OpenHashTable<E extends IOpenHashTableEntity> implements IOpenHashT
      */
     @Override
     public void clear() {
-        throw new UnsupportedOperationException("todo: implement this");
+        this.length = 0;
+        this.data = new Object[DEFAULT];
+        this.deleted = new boolean[DEFAULT];
     }
 
     /**
@@ -100,11 +170,43 @@ public class OpenHashTable<E extends IOpenHashTableEntity> implements IOpenHashT
      */
     @Override
     public Iterator<E> iterator() {
-        throw new UnsupportedOperationException("todo: implement this");
+        return new Iterator<>() {
+            private int next = 0;
+            private int lastNext = -1;
+            private int p = size();
+
+            @Override
+            public boolean hasNext() {
+                return p > 0;
+            }
+
+            @Override
+            public E next() {
+                if (!hasNext()) {
+                    throw new NoSuchElementException();
+                }
+                while (data[next] == null || deleted[next]) {
+                    next++;
+                }
+                p--;
+                lastNext = next++;
+                return (E) data[lastNext];
+            }
+
+            @Override
+            public void remove() {
+                if (lastNext < 0) {
+                    throw new IllegalStateException();
+                }
+                length--;
+                deleted[lastNext] = true;
+                lastNext = -1;
+            }
+        };
     }
 
     @Override
     public int tableSize() {
-        throw new UnsupportedOperationException("todo: return dataArray.length");
+        return data.length;
     }
 }
