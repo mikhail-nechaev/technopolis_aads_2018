@@ -2,9 +2,11 @@ package ru.mail.polis.collections.list.todo;
 
 import ru.mail.polis.collections.list.IPriorityQueue;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 
 /**
@@ -17,6 +19,11 @@ import java.util.Objects;
 public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPriorityQueue<E> {
 
     private final Comparator<E> comparator;
+
+    private final static int INITIAL_CAPACITY = 8;
+
+    private Object[] array;
+    private int size;
 
     public ArrayPriorityQueueSimple() {
         this(Comparator.naturalOrder());
@@ -44,6 +51,12 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
      */
     public ArrayPriorityQueueSimple(Comparator<E> comparator) {
         this.comparator = Objects.requireNonNull(comparator, "comparator");
+        init();
+    }
+
+    private void init() {
+        array = new Object[INITIAL_CAPACITY];
+        size = 0;
     }
 
     /**
@@ -60,7 +73,40 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
      */
     public ArrayPriorityQueueSimple(Collection<E> collection, Comparator<E> comparator) {
         this.comparator = Objects.requireNonNull(comparator, "comparator");
-        //todo: do some stuff with collection
+        size = collection.size();
+        array = Arrays.copyOf(collection.toArray(), collection.size()); // не степень двойки
+        for (int i = array.length / 2; i > -1 ; i--) {
+            siftDown(i);
+        }
+
+    }
+
+    private void siftDown(int i) {
+        while (2 * i + 1 < size) {
+            int left = 2* i + 1;
+            int right = 2* i + 2;
+            int j = left;
+            if (right < size && comparator.compare((E)array[right], (E)array[left]) < 0) {
+                j = right;
+            }
+            if (comparator.compare((E) array[i], (E) array[j]) <= 0) {
+                break;
+            }
+            Object tmp = array[i];
+            array[i] = array[j];
+            array[j] = (E) tmp;
+            i = j;
+        }
+    }
+
+    //??? условие при выходе в корень
+    private void siftUp(int i) {
+        while ((comparator.compare((E) array[i], (E) array[(i - 1) / 2]) < 0) && (i > 0)) {
+            Object tmp = array[i];
+            array[i] = array[(i - 1) / 2];
+            array[(i - 1) / 2] = (E) tmp;
+            i = (i - 1) / 2;
+        }
     }
 
     /**
@@ -73,7 +119,20 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
      */
     @Override
     public void add(E value) {
-        throw new UnsupportedOperationException("todo: implement this");
+        throwExceptionIfArgumentIsNull(value);
+        if (size == array.length) {
+            grow();
+        }
+        array[size] = value;
+        siftUp(size);
+        size++;
+    }
+
+    private void grow() {
+        if (array.length * 2 < 0) {
+            throw new IllegalStateException();
+        }
+        array = Arrays.copyOf(array, array.length * 2);
     }
 
     /**
@@ -86,7 +145,12 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
      */
     @Override
     public E remove() {
-        throw new UnsupportedOperationException("todo: implement this");
+        E tmp = element();
+        array[0] = array[size - 1];
+        array[size - 1] = null;
+        size--;
+        siftDown(0);
+        return tmp;
     }
 
     /**
@@ -99,7 +163,10 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
      */
     @Override
     public E element() {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (isEmpty()) {
+            throw new NoSuchElementException("Heap is empty");
+        }
+        return (E) array[0];
     }
 
     /**
@@ -114,7 +181,19 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
      */
     @Override
     public boolean contains(E value) {
-        throw new UnsupportedOperationException("todo: implement this");
+        throwExceptionIfArgumentIsNull(value);
+        for (Object o: array) {
+            if (Objects.equals(o, value)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void throwExceptionIfArgumentIsNull(Object value) {
+        if (value == null) {
+            throw new NullPointerException();
+        }
     }
 
     /**
@@ -124,7 +203,7 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
      */
     @Override
     public int size() {
-        throw new UnsupportedOperationException("todo: implement this");
+        return size;
     }
 
     /**
@@ -134,7 +213,7 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
      */
     @Override
     public boolean isEmpty() {
-        throw new UnsupportedOperationException("todo: implement this");
+        return size == 0;
     }
 
     /**
@@ -143,7 +222,7 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
      */
     @Override
     public void clear() {
-        throw new UnsupportedOperationException("todo: implement this");
+        init();
     }
 
     /**
@@ -154,6 +233,45 @@ public class ArrayPriorityQueueSimple<E extends Comparable<E>> implements IPrior
      */
     @Override
     public Iterator<E> iterator() {
-        throw new UnsupportedOperationException("todo: implement this");
+        return new HeapIterator();
+    }
+
+    private class HeapIterator implements Iterator<E> {
+
+        private int pointer;
+        private boolean methodNextWasCalled;
+
+        public HeapIterator() {
+            methodNextWasCalled = false;
+            pointer = -1;
+        }
+
+        @Override
+        public boolean hasNext() {
+            return pointer < size - 1;
+        }
+
+        @Override
+        public E next() {
+            if (!hasNext()) {
+                throw new NoSuchElementException();
+            }
+            pointer++;
+            methodNextWasCalled = true;
+            return (E) array[pointer];
+        }
+
+        @Override
+        public void remove() {
+            if (!methodNextWasCalled) {
+                throw new IllegalStateException();
+            }
+            methodNextWasCalled = false;
+            array[pointer] = array[size - 1];
+            array[size - 1] = null;
+            size--;
+            siftDown(pointer);
+            pointer--;
+        }
     }
 }

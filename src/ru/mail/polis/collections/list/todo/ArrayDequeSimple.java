@@ -3,6 +3,8 @@ package ru.mail.polis.collections.list.todo;
 import ru.mail.polis.collections.list.IDeque;
 
 import java.util.Iterator;
+import java.util.NoSuchElementException;
+import java.util.Objects;
 
 /**
  * Resizable cyclic array implementation of the {@link IDeque} interface.
@@ -13,6 +15,58 @@ import java.util.Iterator;
  */
 public class ArrayDequeSimple<E> implements IDeque<E> {
 
+    private static final int INITIAL_CAPACITY = 8;
+
+    Object[] array;
+
+    int head;
+    int tail;
+
+    int size;
+
+    public ArrayDequeSimple() {
+        init();
+    }
+
+    private void init() {
+        this.array = new Object[INITIAL_CAPACITY];
+        head = 0;
+        tail = 0;
+        size = 0;
+    }
+
+    private void grow() {
+        if (array.length == Integer.MAX_VALUE) {
+            throw new IllegalStateException("Deque is too big");
+        }
+        Object[] newArray = new Object[array.length * 2];
+        for (int i = 0; i < array.length-1; i++) {
+            newArray[i] = array[head];
+            head = (head + 1) % array.length;
+        }
+        head = 0;
+        tail = array.length;
+        array = newArray;
+    }
+
+    private void throwExceptionIfEmpty() {
+        if (this.isEmpty()) {
+            throw new NoSuchElementException("ArrayDeque is empty");
+        }
+    }
+
+    private void growIfNecessary() {
+        if (size == array.length) {
+            grow();
+        }
+    }
+
+    protected void throwExceptionIfArgumentIsNull(Object value) {
+        if (value == null) {
+            throw new NullPointerException("Can't store null in ArrayDeque");
+        }
+    }
+
     /**
      * Inserts the specified element at the front of this deque.
      *
@@ -21,7 +75,11 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public void addFirst(E value) {
-        throw new UnsupportedOperationException("todo: implement this");
+        throwExceptionIfArgumentIsNull(value);
+        growIfNecessary();
+        head = (head - 1 + array.length) % array.length;
+        array[head] = value;
+        size++;
     }
 
     /**
@@ -32,7 +90,12 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public E removeFirst() {
-        throw new UnsupportedOperationException("todo: implement this");
+        throwExceptionIfEmpty();
+        Object tmp = array[head];
+        array[head] = null;
+        head = (head + 1) % array.length;
+        size--;
+        return (E) tmp;
     }
 
     /**
@@ -43,7 +106,8 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public E getFirst() {
-        throw new UnsupportedOperationException("todo: implement this");
+        throwExceptionIfEmpty();
+        return (E) array[head];
     }
 
     /**
@@ -54,7 +118,11 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public void addLast(E value) {
-        throw new UnsupportedOperationException("todo: implement this");
+        throwExceptionIfArgumentIsNull(value);
+        growIfNecessary();
+        array[tail] = value;
+        tail = (tail + 1) % array.length;
+        size++;
     }
 
     /**
@@ -65,7 +133,12 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public E removeLast() {
-        throw new UnsupportedOperationException("todo: implement this");
+        throwExceptionIfEmpty();
+        Object tmp = array[(tail - 1 + array.length) % array.length];
+        array[(tail - 1 + array.length) % array.length] = null;
+        tail = (tail - 1 + array.length) % array.length;
+        size--;
+        return (E) tmp;
     }
 
     /**
@@ -76,7 +149,8 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public E getLast() {
-        throw new UnsupportedOperationException("todo: implement this");
+        throwExceptionIfEmpty();
+        return (E) array[(tail - 1 + array.length) % array.length];
     }
 
     /**
@@ -89,7 +163,13 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public boolean contains(E value) {
-        throw new UnsupportedOperationException("todo: implement this");
+        throwExceptionIfArgumentIsNull(value);
+        for (Object o: array) {
+            if (Objects.equals(o, value)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -99,7 +179,7 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public int size() {
-        throw new UnsupportedOperationException("todo: implement this");
+        return size;
     }
 
     /**
@@ -109,7 +189,7 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public boolean isEmpty() {
-        throw new UnsupportedOperationException("todo: implement this");
+        return size == 0;
     }
 
     /**
@@ -118,7 +198,7 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public void clear() {
-        throw new UnsupportedOperationException("todo: implement this");
+        init();
     }
 
     /**
@@ -129,6 +209,60 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public Iterator<E> iterator() {
-        throw new UnsupportedOperationException("todo: implement this");
+        return new ArrayDequeIterator();
+    }
+
+    private class ArrayDequeIterator implements Iterator<E> {
+
+        private int ptr;
+        private boolean methodNextWasCalled;
+        private int stepsMade;
+
+        ArrayDequeIterator() {
+            ptr = (head - 1 + array.length) % array.length;
+            stepsMade = 0;
+            methodNextWasCalled = false;
+        }
+
+        @Override
+        public boolean hasNext() {
+            return stepsMade < size;
+        }
+
+        @Override
+        public E next() {
+            if (!hasNext()) {
+                throw new NoSuchElementException();
+            }
+            ptr = (ptr + 1) % array.length;
+            stepsMade++;
+            methodNextWasCalled = true;
+            return (E) array[ptr];
+        }
+
+
+        @Override
+        public void remove() {
+            if (!methodNextWasCalled) {
+                throw new IllegalStateException();
+            }
+            methodNextWasCalled = false;
+            Object[] newArray = new Object[array.length];
+            int newPtrPosition = 0;
+            for (int i = 0; i < array.length-2; i++) {
+                if (head == ptr) {
+                    head = (head + 1) % array.length;
+                    newPtrPosition = i - 1;
+                }
+                newArray[i] = array[head];
+                head = (head + 1) % array.length;
+            }
+            ptr = newPtrPosition;
+            head = 0;
+            size--;
+            tail = size;
+            array = newArray;
+            stepsMade--;
+        }
     }
 }
