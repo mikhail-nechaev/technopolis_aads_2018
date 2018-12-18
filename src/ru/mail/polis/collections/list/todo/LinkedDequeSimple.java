@@ -279,7 +279,7 @@ public class LinkedDequeSimple<E> implements IDeque<E>
 
             @Override
             public void remove() {
-                if (prev == null)
+                if (prev == null || (head == tail && head == null))
                 {
                     throw new IllegalStateException();
                 }
