@@ -23,7 +23,7 @@ import java.util.PriorityQueue;
  * Класс тестирующий интерфейс {@link IPriorityQueue<Integer>} на основе {@link ArrayPriorityQueueSimple<>}
  */
 @RunWith(value = Parameterized.class)
-public class TestIPriorityQueue {
+public class TestIPriorityQueueComp {
 
     @Parameterized.Parameter(0)
     public Comparator<Integer> comparator;
