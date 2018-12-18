@@ -18,7 +18,7 @@ import java.util.PriorityQueue;
  */
 public class MergingPeekingIncreasingIterator implements Iterator<Integer> {
 
-    private final PriorityQueue<IntegerIncreasingSequencePeekingIterator> iterators;
+    private IntegerIncreasingSequencePeekingIterator[] iterators;
 
     /**
      * Creates a {@code MergingPeekingIncreasingIterator} containing the inside all elements of this specified iterators.
@@ -28,8 +28,7 @@ public class MergingPeekingIncreasingIterator implements Iterator<Integer> {
      * @param iterators the iterators whose are to be placed into this merging peeking increasing iterator
      */
     public MergingPeekingIncreasingIterator(IntegerIncreasingSequencePeekingIterator... iterators) {
-        this.iterators = new PriorityQueue<>();
-        this.iterators.addAll(Arrays.asList(iterators));
+        this.iterators = iterators;
     }
 
     /**
@@ -43,7 +42,11 @@ public class MergingPeekingIncreasingIterator implements Iterator<Integer> {
      */
     @Override
     public boolean hasNext() {
-        return iterators.size() > 0;
+        for (IntegerIncreasingSequencePeekingIterator iterator : iterators) {
+            if (iterator.hasNext())
+                return true;
+        }
+        return false;
     }
 
     /**
@@ -56,12 +59,20 @@ public class MergingPeekingIncreasingIterator implements Iterator<Integer> {
      */
     @Override
     public Integer next() {
-        if (!hasNext())
+        if (!hasNext()) {
             throw new NoSuchElementException();
-        IntegerIncreasingSequencePeekingIterator tmp = iterators.remove();
-        int next = tmp.next();
-        if (tmp.hasNext())
-            iterators.add(tmp);
-        return next;
+        }
+        Integer min = Integer.MAX_VALUE;
+        int index = 0;
+        for (int i = 0; i < iterators.length; i++) {
+            if (iterators[i].hasNext()) {
+                if (iterators[i].peek() <= min) {
+                    min = iterators[i].peek();
+                    index = i;
+                }
+            }
+        }
+        min = iterators[index].next();
+        return min;
     }
 }

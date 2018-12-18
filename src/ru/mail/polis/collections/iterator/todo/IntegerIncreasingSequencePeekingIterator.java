@@ -11,9 +11,12 @@ import java.util.Random;
  */
 public class IntegerIncreasingSequencePeekingIterator implements IIncreasingSequenceIterator<Integer> {
 
-    private final int last, minStep = 1;
-    private int maxStep, nextElement;
-    private long lastNextElement;
+    private int nextElement;
+    private int prevNextElement;
+    private final int minStep = 1;
+    private final int maxStep;
+    private final int last;
+    private Random random;
 
     /**
      * minStep = 1
@@ -28,12 +31,14 @@ public class IntegerIncreasingSequencePeekingIterator implements IIncreasingSequ
      * @throws IllegalArgumentException if arguments is invalid
      */
     public IntegerIncreasingSequencePeekingIterator(int first, int last, int maxStep) {
-        if (first > last || maxStep <= 0)
+        if (first > last || maxStep <= 0) {
             throw new IllegalArgumentException();
+        }
+        this.prevNextElement = (first == Integer.MIN_VALUE) ? first : first - 1;
         this.nextElement = first;
         this.last = last;
-        this.lastNextElement = (long) first - 1;
         this.maxStep = maxStep;
+        this.random = new Random();
     }
 
 
@@ -46,7 +51,7 @@ public class IntegerIncreasingSequencePeekingIterator implements IIncreasingSequ
      */
     @Override
     public boolean hasNext() {
-        return lastNextElement + minStep <= last;
+        return prevNextElement + minStep <= last && prevNextElement != Integer.MAX_VALUE;
     }
 
     /**
@@ -57,13 +62,18 @@ public class IntegerIncreasingSequencePeekingIterator implements IIncreasingSequ
      */
     @Override
     public Integer next() {
-        if (!hasNext())
+        if (!hasNext()) {
             throw new NoSuchElementException();
-
-        lastNextElement = nextElement;
-        int next = new Random().nextInt(maxStep) + minStep;
-        nextElement = lastNextElement + next >= last ? last : (int) (lastNextElement + next);
-        return (int) lastNextElement;
+        }
+        prevNextElement = nextElement;
+        long diff = random.nextInt(maxStep) + minStep;
+        long nextLong = nextElement + diff;
+        if (nextLong > last) {
+            nextElement = last;
+        } else {
+            nextElement = (int) nextLong;
+        }
+        return prevNextElement;
     }
 
     /**
@@ -74,9 +84,9 @@ public class IntegerIncreasingSequencePeekingIterator implements IIncreasingSequ
      */
     @Override
     public Integer peek() {
-        if (!hasNext())
+        if (!hasNext()) {
             throw new NoSuchElementException();
-
+        }
         return nextElement;
     }
 
@@ -93,12 +103,11 @@ public class IntegerIncreasingSequencePeekingIterator implements IIncreasingSequ
      */
     @Override
     public int compareTo(IPeekingIterator<Integer> other) {
-        if (!other.hasNext())
-            return 1;
-
-        if (!hasNext())
+        if (!hasNext()) {
             return -1;
-
-        return peek() - other.peek();
+        } else if (!other.hasNext()) {
+            return 1;
+        }
+        return this.peek() < other.peek() ? -1 : this.peek() > other.peek() ? 1 : 0;
     }
 }
