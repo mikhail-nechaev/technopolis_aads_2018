@@ -36,8 +36,6 @@ public class RedBlackTree<E extends Comparable<E>> implements ISelfBalancingSort
         RBNode<E> left;
         RBNode<E> right;
         RBNode<E> parent;
-        int numRight;
-        int numLeft;
         RBColor color = RBColor.BLACK;
 
         @Override
@@ -236,7 +234,6 @@ public class RedBlackTree<E extends Comparable<E>> implements ISelfBalancingSort
             else
                 current = current.left;
         }
-
         return null;
     }
 
@@ -264,42 +261,10 @@ public class RedBlackTree<E extends Comparable<E>> implements ISelfBalancingSort
         if (y != z) {
             z.value = y.value;
         }
-        fixNodeData(x,y);
         if (y.color == RBColor.BLACK) {
             deleteFixup(x);
         }
         return y;
-    }
-
-    private void fixNodeData(RBNode<E> x, RBNode<E> y) {
-        RBNode<E> current = x == nil ? y.parent : x.parent;
-        RBNode<E> track = x == nil ? y : x;
-
-        while (current != nil) {
-            if (comparator.compare(y.value, current.value) != 0) {
-
-                if (comparator.compare(y.value, current.value) > 0)
-                    current.numRight--;
-
-                if (comparator.compare(y.value, current.value) < 0)
-                    current.numLeft--;
-            } else {
-
-                if (current.left == nil)
-                    current.numLeft--;
-                else if (current.right == nil)
-                    current.numRight--;
-
-                else if (track == current.right)
-                    current.numRight--;
-                else if (track == current.left)
-                    current.numLeft--;
-            }
-
-            track = current;
-            current = current.parent;
-
-        }
     }
 
     private void deleteFixup(RBNode<E> x) {
