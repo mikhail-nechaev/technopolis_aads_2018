@@ -90,7 +90,8 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
                 l = dequeue.length - head;
                 r = dequeue.length - tail;
             }
-
+            System.arraycopy(dequeue, l, newDequeue, 0, head);
+            System.arraycopy(dequeue, r, newDequeue, head + 1, r - 1);
             head = 0;
             tail = size - 1;
         }
@@ -122,7 +123,7 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
         size++;
 
         if (size == dequeue.length) {
-//            widen();
+            widen();
         }
 
     }
@@ -143,7 +144,7 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
         head = ++head % dequeue.length;
         size--;
         if (size < dequeue.length / 2) {
-//            reduce();
+            reduce();
         }
         return value;
     }
@@ -184,7 +185,7 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
         dequeue[tail] = value;
         size++;
         if (size == dequeue.length) {
-//            widen();
+            widen();
         }
     }
 
@@ -206,9 +207,9 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
             tail = dequeue.length - 1;
         }
         size--;
-//        if (size < dequeue.length / 2) {
-//            reduce();
-//        }
+        if (size < dequeue.length / 2) {
+            reduce();
+        }
         return value;
     }
 
@@ -224,6 +225,43 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
             throw new NoSuchElementException("No elements in dequeue");
         }
         return dequeue[tail];
+    }
+
+    //Removes elem specified by index and connects splitted parts of dequeue in one
+    protected boolean removeByIndex(int index) {
+        E[] dequeue = this.dequeue;
+        int h = head;
+        int t = tail;
+        int present = dequeue.length - 1;
+        int offset = (index - h) & present;
+        int finish = (tail - index) & present;
+
+        if (offset < finish) {
+            if (h <= index) {
+                System.arraycopy(dequeue, h, dequeue, h + 1, offset);
+            }
+            else {
+                System.arraycopy(dequeue, 0, dequeue, 1, index);
+                dequeue[0] = dequeue[present];
+                System.arraycopy(dequeue, h, dequeue, h + 1, present - h);
+            }
+            dequeue[h] = null;
+            head = (h + 1) & present;
+            return false;
+        }
+        else {
+            if (index < t) {
+                System.arraycopy(dequeue, index + 1, dequeue, index, finish);
+                tail = t - 1;
+            }
+            else {
+                System.arraycopy(dequeue, index + 1, dequeue, index, present - index);
+                dequeue[present] = dequeue[0];
+                System.arraycopy(dequeue, 1, dequeue, 0, t);
+                tail = (t - 1) & present;
+            }
+            return true;
+        }
     }
 
     /**
@@ -288,16 +326,20 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
     }
 
     private class DequeueIterator implements ListIterator<E> {
-        private int pos, size;
+        //iterator is located between current and future and points on current in the moment which is located behind iterator
+        int current, future, size;
+
+        private int next = 0;
 
         public DequeueIterator() {
-            pos = head;
+            current = head;
+            future = head + 1;
             size = size();
         }
 
         @Override
         public boolean hasNext() {
-            return (pos < size);
+            return (next < size);
         }
 
         @Override
@@ -305,21 +347,21 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
             if (!hasNext()) {
                 throw new NoSuchElementException();
             }
-            E res = (E) dequeue[pos];
-            pos = ++pos % dequeue.length;
+            E res = (E) dequeue[current];
+            current = ++current % dequeue.length;
             return res;
         }
 
         @Override
         public boolean hasPrevious() {
-            return (pos > head);
+            return (current > head);
         }
 
         @Override
         public E previous() {
             if (hasPrevious()) {
-                E res = (E) dequeue[pos];
-                pos++;
+                E res = (E) dequeue[current];
+                current++;
                 return res;
             } else {
                 throw new UnsupportedOperationException("No element");
@@ -329,8 +371,8 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
         @Override
         public int nextIndex() {
             if (hasNext()) {
-                pos++;
-                return pos;
+                current++;
+                return current;
             } else {
                 throw new UnsupportedOperationException("No element");
             }
@@ -339,8 +381,8 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
         @Override
         public int previousIndex() {
             if (hasPrevious()) {
-                pos--;
-                return pos;
+                current--;
+                return current;
             } else {
                 throw new UnsupportedOperationException("No element");
             }
@@ -348,18 +390,9 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
 
         @Override
         public void remove() {
-            if (!hasNext()) {
-                throw new UnsupportedOperationException("No elements in dequeue");
-            }
-            E value;
-
-            value = this.next();
-            for (int i = 1; i <= this.size; i++) {
-                if (dequeue[i] == value) {
-                    dequeue[i] = null;
-                }
-            }
-            //TODO
+            if (!hasNext()) throw new IllegalStateException("No elements in dequeue");
+            if (isEmpty()) throw new NoSuchElementException();
+            removeByIndex(current);
         }
 
         @Override

@@ -108,43 +108,6 @@ public class ArrayDequeFull<E> extends ArrayDequeSimple<E> implements Deque<E> {
         return false;
     }
 
-    //Removes elem specified by index and connects splitted parts of dequeue in one
-    private boolean removeByIndex(int index) {
-        E[] dequeue = this.dequeue;
-        int h = head;
-        int t = tail;
-        int present = dequeue.length - 1;
-        int offset = (index - h) & present;
-        int finish = (tail - index) & present;
-
-        if (offset < finish) {
-            if (h <= index) {
-                System.arraycopy(dequeue, h, dequeue, h + 1, offset);
-            }
-            else {
-                System.arraycopy(dequeue, 0, dequeue, 1, index);
-                dequeue[0] = dequeue[present];
-                System.arraycopy(dequeue, h, dequeue, h + 1, present - h);
-            }
-            dequeue[h] = null;
-            head = (h + 1) & present;
-            return false;
-        }
-        else {
-            if (index < t) {
-                System.arraycopy(dequeue, index + 1, dequeue, index, finish);
-                tail = t - 1;
-            }
-            else {
-                System.arraycopy(dequeue, index + 1, dequeue, index, present - index);
-                dequeue[present] = dequeue[0];
-                System.arraycopy(dequeue, 1, dequeue, 0, t);
-                tail = (t - 1) & present;
-            }
-            return true;
-        }
-    }
-
     @Override
     public boolean remove(Object o) {
         if (o == null) throw new NullPointerException();
@@ -184,17 +147,36 @@ public class ArrayDequeFull<E> extends ArrayDequeSimple<E> implements Deque<E> {
 
     @Override
     public boolean addAll(Collection<? extends E> c) {
-        return false;
+        for (Object item : c) {
+            this.add((E) item);
+        }
+        return true;
     }
 
     @Override
     public boolean removeAll(Collection<?> c) {
-        return false;
+        Iterator<E> it = iterator();
+        int deleted = 0;
+        for (E item = it.next(); it.hasNext(); item = it.next()) {
+            if (c.contains(item)) {
+                it.remove();
+                deleted++;
+            }
+        }
+        return (deleted != 0);
     }
 
     @Override
     public boolean retainAll(Collection<?> c) {
-        return false;
+        Iterator<E> it = iterator();
+        int deleted = 0;
+        for (E item = it.next(); it.hasNext(); item = it.next()) {
+            if (c.contains(item) == false) {
+                it.remove();
+                deleted++;
+            }
+        }
+        return (deleted != 0);
     }
 
     @Override
@@ -211,7 +193,12 @@ public class ArrayDequeFull<E> extends ArrayDequeSimple<E> implements Deque<E> {
 
     @Override
     public boolean containsAll(Collection<?> c) {
-        return false;
+        for (Object item : c) {
+            if (!contains(item)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     @Override
@@ -232,23 +219,27 @@ public class ArrayDequeFull<E> extends ArrayDequeSimple<E> implements Deque<E> {
         return false;
     }
 
-    public E getByIndex(int index) {
-        if (isEmpty()) throw new UnsupportedOperationException("No elements in dequeue");
-
-            for (int i=head; i < (dequeue.length - 1) % DEFAULT_CAPACITY; i++) {
-
-
-        }
-    }
-
     @Override
     public Object[] toArray() {
-        return new Object[0];
+        Object[] res = new Object[size];
+        return toArray(res);
+
     }
 
     @Override
     public <T> T[] toArray(T[] a) {
-        return null;
+        int l,r; //pointers on left and right parts of newDequeue in oldDequeue
+        if (head < tail) {
+            r = dequeue.length - head;
+            l = head;
+        }
+        else {
+            l = dequeue.length - head;
+            r = dequeue.length - tail;
+        }
+        System.arraycopy(dequeue, l, a, 0, head);
+        System.arraycopy(dequeue, r, a, head + 1, r - 1);
+        return a;
     }
 
     @Override
@@ -260,8 +251,8 @@ public class ArrayDequeFull<E> extends ArrayDequeSimple<E> implements Deque<E> {
     private class DequeueFullIterator implements Iterator<E> {
         private int next = 0;
         private int prev = -1;
-        private int current = head - 1;
-        private int future = head;
+        private int future = head - 1;
+        private int current = head;
         int size = size();
 
         @Override
@@ -274,15 +265,9 @@ public class ArrayDequeFull<E> extends ArrayDequeSimple<E> implements Deque<E> {
             prev = next;
             next++;
             current = future;
-            future = (future + 1) % DEFAULT_CAPACITY;
-            return getByIndex(current);
-        }
-
-        @Override
-        public void remove() {
-            if (!hasNext()) throw new IllegalStateException();
-            if (isEmpty()) throw new NoSuchElementException();
-            removeByIndex(current);
+            future = (future - 1) % dequeue.length;
+            E res = dequeue[(head + current) % dequeue.length];
+            return res;
         }
     }
 }

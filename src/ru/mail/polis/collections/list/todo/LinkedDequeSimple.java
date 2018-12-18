@@ -11,17 +11,17 @@ import java.util.NoSuchElementException;
  * @param <E> the type of elements held in this deque
  */
 public class LinkedDequeSimple<E> implements IDeque<E> {
-    private class Node<E> {
-        private E current;
-        private Node<E> next, prev;
+    protected class Node<E> {
+        protected E current;
+        protected Node<E> next, prev;
 
         Node(E current) {
             this.current = current;
         }
     }
 
-    private int size;
-    private Node<E> first, last;
+    protected int size;
+    protected Node<E> first, last;
 
     public LinkedDequeSimple() {
         first = null;
