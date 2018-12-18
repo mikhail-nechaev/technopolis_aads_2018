@@ -46,7 +46,7 @@ public class AVLTreeIterable<E extends Comparable<E>> extends AVLTree<E> impleme
 
 
         AVLTreeIterator(){
-            Nodes =(E[]) new Comparable[size()];
+            Nodes =(E[]) new Comparable[sizeIterable];
             inorderTraverse((AVLNode<E>) root);
         }
 
@@ -95,7 +95,7 @@ public class AVLTreeIterable<E extends Comparable<E>> extends AVLTree<E> impleme
 
 
         AVLTreeDescendingIterator(){
-            Nodes =(E[]) new Comparable[size()];
+            Nodes =(E[]) new Comparable[sizeIterable];
             reverseInorderTraverse((AVLNode<E>) root);
         }
 
@@ -115,7 +115,7 @@ public class AVLTreeIterable<E extends Comparable<E>> extends AVLTree<E> impleme
             return  current;
         }
 
-        //remove on index
+        //remove at index
         @Override
         public void remove() {
             if(cursor == 0){
