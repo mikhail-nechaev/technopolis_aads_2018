@@ -15,10 +15,13 @@ import java.util.NoSuchElementException;
  */
 public class ArrayDequeSimple<E> implements IDeque<E> {
     Object[] elements;
-    int head;
-    int tail;
+    int head = 0;
+    int tail = 0;
     private static final int MIN_INITIAL_CAPACITY = 8;
 
+    public ArrayDequeSimple() {
+        elements = new Object[16];
+    }
 
     private void doubleCapacity() {
         assert head == tail;
@@ -151,7 +154,17 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public boolean contains(E value) {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (value == null)
+            return false;
+        int mask = elements.length - 1;
+        int i = head;
+        Object x;
+        while ( (x = elements[i]) != null) {
+            if (value.equals(x))
+                return true;
+            i = (i + 1) & mask;
+        }
+        return false;
     }
 
     /**
@@ -180,7 +193,17 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      */
     @Override
     public void clear() {
-        throw new UnsupportedOperationException("todo: implement this");
+        int h = head;
+        int t = tail;
+        if (h != t) {
+            head = tail = 0;
+            int i = h;
+            int mask = elements.length - 1;
+            do {
+                elements[i] = null;
+                i = (i + 1) & mask;
+            } while (i != t);
+        }
     }
 
     /**
@@ -190,7 +213,156 @@ public class ArrayDequeSimple<E> implements IDeque<E> {
      * @return an iterator over the elements in this collection in proper sequence
      */
     @Override
-    public Iterator<E> iterator() {
-        throw new UnsupportedOperationException("todo: implement this");
+    public ListIterator<E> iterator() {
+        return new DeqListIterator();
+    }
+
+    public class DeqListIterator implements ListIterator {
+
+        int index = -1;
+
+        int cursor;
+
+        int remaining = size();
+
+        int done = 0;
+
+        public DeqListIterator() {
+            cursor = head - 1;
+        }
+
+        @Override
+        public boolean hasNext() {
+            return remaining > 0;
+        }
+
+        @Override
+        public E next() {
+            E element;
+            if (remaining <= 0) {
+                throw new NoSuchElementException();
+            }
+            if (cursor + 1 == elements.length) {
+                cursor = -1;
+            }
+
+            element = (E) elements[++cursor];
+            index++;
+            remaining--;
+            done++;
+            return element;
+
+        }
+
+        @Override
+        public boolean hasPrevious() {
+            return done > 0;
+        }
+
+        @Override
+        public Object previous() {
+            E element;
+            if (done <= 0) {
+                throw new NoSuchElementException();
+            }
+            if (cursor - 1 == -1) {
+                cursor = elements.length - 1;
+            }
+            element = (E) elements[cursor--];
+            index--;
+            remaining++;
+            done--;
+            return element;
+        }
+
+        @Override
+        public int nextIndex() {
+            return index + 1;
+        }
+
+        @Override
+        public int previousIndex() {
+            return index == -1 ? -1 : (index - 1);
+        }
+
+        @Override
+        public void remove() {
+            if (index == -1) {
+                throw new IllegalStateException();
+            }
+            int tmpCur = cursor - 1;
+            if (head > tail) {
+                if (cursor > head)
+                    tmpCur = cursor - head - 1;
+                else
+                    tmpCur += elements.length - head;
+            }
+            delete(cursor);
+            cursor = tmpCur;
+            done--;
+            if (index == 0)
+                index = -1;
+        }
+
+        @Override
+        public void set(Object o) {
+            if (index == -1) {
+                throw new IllegalStateException();
+            }
+            elements[cursor] = o;
+        }
+
+        @Override
+        public void add(Object o) {
+            if (index == -1) {
+                addFirst((E) o);
+                cursor--;
+            } else {
+                insert(cursor, o);
+            }
+            remaining++;
+        }
+    }
+
+    private void insert(int i, Object o) {
+        Object[] tmp = new Object[elements.length];
+        System.arraycopy(elements, 0, tmp, 0, i);
+        System.arraycopy(elements, i + 1, tmp, i + 2, elements.length - 1 - i);
+        tail++;
+        if (tail == elements.length) {
+            tail = 0;
+        }
+        elements[i + 1] = o;
+        elements = tmp;
+    }
+
+    public void delete(int i) {
+        Object[] tmp = new Object[elements.length];
+        if (head > tail) {
+            int s = size();
+            if (i < head) {
+                System.arraycopy(elements, head, tmp, 0, elements.length - head);
+                System.arraycopy(elements, 0, tmp, elements.length - head, i);
+                System.arraycopy(elements, i + 1, tmp, elements.length - head + i, s - (elements.length - head) - i - 1);
+                tail = s - 2;
+            } else {
+                System.arraycopy(elements, head, tmp, 0, i - head);
+                System.arraycopy(elements, i + 1, tmp, i - head, elements.length - i - 1);
+                System.arraycopy(elements, 0, tmp, elements.length - head - 1, tail + 1);
+                tail = s - 2;
+            }
+            head = 0;
+
+        } else {
+            System.arraycopy(elements, head, tmp, 0, i - head);
+            System.arraycopy(elements, i + 1, tmp, i - head, elements.length - 1 - i - head);
+
+            if (tail != 0) {
+                tail--;
+            }
+            tail -= head;
+            head = 0;
+        }
+        elements = tmp;
     }
 }

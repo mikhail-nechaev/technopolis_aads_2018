@@ -13,7 +13,7 @@ package ru.mail.polis.collections.set.sorted;
 public interface ISelfBalancingSortedTreeSet<E> extends ISortedSet<E> {
 
     /**
-     * Adds the specified element to this set if it is not already present.
+     * Adds the specified element to this set if it is nt already present.
      *
      * Complexity = O(log(n))
      *

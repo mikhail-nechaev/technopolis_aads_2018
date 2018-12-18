@@ -25,32 +25,33 @@ import java.util.stream.IntStream;
  */
 public class TestHashTable extends AbstractSetTest {
 
-    private final List<IOpenHashTableEntity> entities = List.of(
-            //uniq
-            new Student(0, "A", "CDCD", Student.Gender.MALE, LocalDate.of(1990, 1, 1), 1000),
-            new Student(0, "AA", "CCDD", Student.Gender.FEMALE, LocalDate.of(1993, 2, 2), 1001),
-            new Student(0, "AAA", "CD", Student.Gender.FEMALE, LocalDate.of(1997, 3, 1), 1002),
-            new Student(0, "AAAA", "C", Student.Gender.FEMALE, LocalDate.of(1990, 4, 7), 1003),
-            //double
-            new Student(0, "AAA", "CD", Student.Gender.FEMALE, LocalDate.of(1997, 3, 1), 1002),
-            //uniq
-            new Student(0, "B", "CCC", Student.Gender.MALE, LocalDate.of(1999, 4, 5), 1000),
-            new Student(0, "BB", "DC", Student.Gender.MALE, LocalDate.of(1999, 5, 1), 1001),
-            new Student(0, "BBB", "DD", Student.Gender.MALE, LocalDate.of(1990, 6, 20), 1002),
-            //double
-            new Student(0, "BB", "DC", Student.Gender.MALE, LocalDate.of(1999, 5, 1), 1001),
-            new Student(0, "BBB", "DD", Student.Gender.MALE, LocalDate.of(1990, 6, 20), 1002),
-            new Student(0, "A", "CDCD", Student.Gender.MALE, LocalDate.of(1990, 1, 1), 1000),
-            //uniq
-            new Student(0, "BBBB", "DDD", Student.Gender.FEMALE, LocalDate.of(1997, 1, 4), 1003),
-            new Student(0, "AB", "D", Student.Gender.MALE, LocalDate.of(1993, 1, 1), 1004),
-            new Student(0, "AABB", "DDC", Student.Gender.MALE, LocalDate.of(1999, 8, 1), 1005),
-            new Student(0, "ABAB", "CDD", Student.Gender.MALE, LocalDate.of(1990, 1, 3), 1006),
-            //double
-            new Student(0, "AB", "D", Student.Gender.MALE, LocalDate.of(1993, 1, 1), 1004),
-            new Student(0, "BBBB", "DDD", Student.Gender.FEMALE, LocalDate.of(1997, 1, 4), 1003),
-            new Student(0, "AAA", "CD", Student.Gender.FEMALE, LocalDate.of(1997, 3, 1), 1002)
-    );
+    private final List<IOpenHashTableEntity> entities = null;
+//            = List.of(
+//            //uniq
+//            new Student(0, "A", "CDCD", Student.Gender.MALE, LocalDate.of(1990, 1, 1), 1000),
+//            new Student(0, "AA", "CCDD", Student.Gender.FEMALE, LocalDate.of(1993, 2, 2), 1001),
+//            new Student(0, "AAA", "CD", Student.Gender.FEMALE, LocalDate.of(1997, 3, 1), 1002),
+//            new Student(0, "AAAA", "C", Student.Gender.FEMALE, LocalDate.of(1990, 4, 7), 1003),
+//            //double
+//            new Student(0, "AAA", "CD", Student.Gender.FEMALE, LocalDate.of(1997, 3, 1), 1002),
+//            //uniq
+//            new Student(0, "B", "CCC", Student.Gender.MALE, LocalDate.of(1999, 4, 5), 1000),
+//            new Student(0, "BB", "DC", Student.Gender.MALE, LocalDate.of(1999, 5, 1), 1001),
+//            new Student(0, "BBB", "DD", Student.Gender.MALE, LocalDate.of(1990, 6, 20), 1002),
+//            //double
+//            new Student(0, "BB", "DC", Student.Gender.MALE, LocalDate.of(1999, 5, 1), 1001),
+//            new Student(0, "BBB", "DD", Student.Gender.MALE, LocalDate.of(1990, 6, 20), 1002),
+//            new Student(0, "A", "CDCD", Student.Gender.MALE, LocalDate.of(1990, 1, 1), 1000),
+//            //uniq
+//            new Student(0, "BBBB", "DDD", Student.Gender.FEMALE, LocalDate.of(1997, 1, 4), 1003),
+//            new Student(0, "AB", "D", Student.Gender.MALE, LocalDate.of(1993, 1, 1), 1004),
+//            new Student(0, "AABB", "DDC", Student.Gender.MALE, LocalDate.of(1999, 8, 1), 1005),
+//            new Student(0, "ABAB", "CDD", Student.Gender.MALE, LocalDate.of(1990, 1, 3), 1006),
+//            //double
+//            new Student(0, "AB", "D", Student.Gender.MALE, LocalDate.of(1993, 1, 1), 1004),
+//            new Student(0, "BBBB", "DDD", Student.Gender.FEMALE, LocalDate.of(1997, 1, 4), 1003),
+//            new Student(0, "AAA", "CD", Student.Gender.FEMALE, LocalDate.of(1997, 3, 1), 1002)
+//    );
 
     private Set<IOpenHashTableEntity> validSet;
     private IOpenHashTable<IOpenHashTableEntity> testSet;
