@@ -2,133 +2,263 @@ package ru.mail.polis.collections.list.todo;
 
 import ru.mail.polis.collections.list.IDeque;
 
-import java.util.ListIterator;
+import java.util.ConcurrentModificationException;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 
-/**
- * Resizable cyclic array implementation of the {@link IDeque} interface.
- * - no capacity restrictions
- * - grow as necessary to support
- *
- * @param <E> the type of elements held in this deque
- */
+
+@SuppressWarnings("unchecked")
 public class ArrayDequeSimple<E> implements IDeque<E> {
 
-    /**
-     * Inserts the specified element at the front of this deque.
-     *
-     * @param value the element to add
-     * @throws NullPointerException if the specified element is null
-     */
-    @Override
-    public void addFirst(E value) {
-        throw new UnsupportedOperationException("todo: implement this");
+
+    protected E[] deque;
+    int head;
+    int tail;
+    private int size;
+
+   
+
+    public ArrayDequeSimple() {
+        deque = (E[]) new Object[8];
     }
 
-    /**
-     * Retrieves and removes the first element of this queue.
-     *
-     * @return the head of this queue
-     * @throws java.util.NoSuchElementException if this deque is empty
-     */
-    @Override
-    public E removeFirst() {
-        throw new UnsupportedOperationException("todo: implement this");
+    public ArrayDequeSimple(int numElements) {
+        deque = (E []) new Object[numElements];
     }
 
-    /**
-     * Retrieves, but does not remove, the first element of this queue.
-     *
-     * @return the head of this queue
-     * @throws java.util.NoSuchElementException if this queue is empty
-     */
-    @Override
-    public E getFirst() {
-        throw new UnsupportedOperationException("todo: implement this");
+
+
+
+    protected boolean delete(int i) {
+        Object[] copyDeque = deque;
+        int lastIndex = copyDeque.length - 1;
+        int head1 = head;
+        int tail1 = tail;
+        int front = (i - head1) & lastIndex;
+        int back = (tail1 - i) & lastIndex;
+
+        if (front >= ((tail1 - head1) & lastIndex))
+            throw new ConcurrentModificationException();
+        if (front < back) {
+            if (head1 <= i) {
+                System.arraycopy(copyDeque, head1, copyDeque, head1 + 1, front);
+            } else {
+                System.arraycopy(copyDeque, 0, copyDeque, 1, i);
+                copyDeque[0] = copyDeque[lastIndex];
+                System.arraycopy(copyDeque, head1, copyDeque, head1 + 1, lastIndex - head1);
+            }
+            copyDeque[head1] = null;
+            head = (head1 + 1) & lastIndex;
+            return false;
+        } else {
+            if (i < tail1) {
+                System.arraycopy(copyDeque, i + 1, copyDeque, i, back);
+                tail = tail1 - 1;
+            } else {
+                System.arraycopy(copyDeque, i + 1, copyDeque, i, lastIndex - i);
+                copyDeque[lastIndex] = copyDeque[0];
+                System.arraycopy(copyDeque, 1, copyDeque, 0, tail1);
+                tail = (tail1 - 1) & lastIndex;
+            }
+            size--;
+            return true;
+        }
     }
 
-    /**
-     * Inserts the specified element at the tail of this queue
-     *
-     * @param value the element to add
-     * @throws NullPointerException if the specified element is null
-     */
-    @Override
-    public void addLast(E value) {
-        throw new UnsupportedOperationException("todo: implement this");
+    private void exp() {
+        int firstIndex = head;
+        int fullLength = deque.length;
+        int r = fullLength - firstIndex;
+        int newCapacity = fullLength << 1;
+        if (newCapacity < 0) {
+            throw new IllegalStateException();
+        }
+        E[] copyArray = (E[]) new Object[newCapacity];
+        System.arraycopy(deque, firstIndex, copyArray, 0, r);
+        System.arraycopy(deque, 0, copyArray, r, firstIndex);
+        deque = copyArray;
+        head = 0;
+        tail = fullLength;
+    }
+    
+    private void press() {
+        int firstIndex = head;
+        int fullLength = deque.length;
+        int r = fullLength - firstIndex;
+        int newLength = fullLength >> 1;
+        if(newLength < 16){
+            return;
+        }
+        E[] copyArray = (E[]) new Object[newLength];
+        System.arraycopy(deque, firstIndex, copyArray, 0, r);
+        System.arraycopy(deque, 0, copyArray, r, firstIndex);
+        deque = copyArray;
+        head = 0;
+        tail = fullLength;
     }
 
-    /**
-     * Retrieves and removes the last element of this deque.
-     *
-     * @return the tail of this deque
-     * @throws java.util.NoSuchElementException if this deque is empty
-     */
     @Override
-    public E removeLast() {
-        throw new UnsupportedOperationException("todo: implement this");
+    public void addFirst(E value) throws NullPointerException {
+        if (value == null) {
+            throw new NullPointerException();
+        }
+        deque[head = (head - 1) & (deque.length - 1)] = value;
+        if (head == tail) {
+            exp();
+        }
+        size ++;
     }
 
-    /**
-     * Retrieves, but does not remove, the last element of this deque.
-     *
-     * @return the tail of this deque
-     * @throws java.util.NoSuchElementException if this deque is empty
-     */
     @Override
-    public E getLast() {
-        throw new UnsupportedOperationException("todo: implement this");
+    public E removeFirst() throws NoSuchElementException {
+        int h = head;
+        E res = deque[h];
+        if (res == null) {
+            throw new NoSuchElementException();
+        }
+        deque[h] = null;
+        head = (h + 1) & (deque.length - 1);
+        size--;
+        if (size << 4 == deque.length) {
+            // press();
+        }
+        return res;
     }
 
-    /**
-     * Returns {@code true} if this collection contains the specified element.
-     * aka collection contains element el such that {@code Objects.equals(el, value) == true}
-     *
-     * @param value element whose presence in this collection is to be tested
-     * @return {@code true} if this collection contains the specified element
-     * @throws NullPointerException if the specified element is null
-     */
+
     @Override
-    public boolean contains(E value) {
-        throw new UnsupportedOperationException("todo: implement this");
+    public E getFirst() throws NoSuchElementException {
+        if (deque[head] == null) {
+            throw new NoSuchElementException();
+        }
+        return deque[head];
     }
 
-    /**
-     * Returns the number of elements in this collection.
-     *
-     * @return the number of elements in this collection
-     */
+
+    @Override
+    public void addLast(E value) throws NullPointerException {
+        if (value == null) {
+            throw new NullPointerException();
+        }
+        deque[tail] = value;
+        if ((tail = (tail + 1) & (deque.length - 1)) == head)
+            exp();
+        size++;
+    }
+
+
+    @Override
+    public E removeLast() throws NoSuchElementException {
+        if (isEmpty()) {
+            throw new NoSuchElementException();
+        }
+        int t = (tail - 1) & (deque.length - 1);
+        E result = deque[t];
+        if (result == null)
+            return null;
+        deque[t] = null;
+        tail = t;
+        size--;
+        if(size << 4 ==deque.length) {
+            //press();
+        }
+        return result;
+    }
+
+
+    @Override
+    public E getLast() throws NoSuchElementException {
+        E result = deque[(tail - 1) & (deque.length - 1)];
+        if (result == null)
+            throw new NoSuchElementException();
+        return result;
+    }
+
+
+    @Override
+    public boolean contains(E value) throws NullPointerException {
+        if (value == null) {
+            throw new NullPointerException();
+        }
+        int mask = deque.length - 1;
+        int i = head;
+        Object tmp;
+        while ((tmp = deque[i]) != null) {
+            if (value.equals(tmp))
+                return true;
+            i = (i + 1) & mask;
+        }
+        return false;
+    }
+
+
     @Override
     public int size() {
-        throw new UnsupportedOperationException("todo: implement this");
+        return size;
     }
 
-    /**
-     * Returns {@code true} if this collection contains no elements.
-     *
-     * @return {@code true} if this collection contains no elements
-     */
     @Override
     public boolean isEmpty() {
-        throw new UnsupportedOperationException("todo: implement this");
+        return size == 0;
     }
 
-    /**
-     * Removes all of the elements from this collection.
-     * The collection will be empty after this method returns.
-     */
+
     @Override
     public void clear() {
-        throw new UnsupportedOperationException("todo: implement this");
+        int h = head;
+        int t = tail;
+        if (h != t) {
+            head = tail = 0;
+            int i = h;
+            int mask = deque.length - 1;
+            do {
+                deque[i] = null;
+                i = (i + 1) & mask;
+            } while (i != t);
+        }
+        size=0;
+        //press();
     }
 
-    /**
-     * Returns an iterator over the elements in this collection in proper sequence.
-     * The elements will be returned in order from first (head) to last (tail).
-     *
-     * @return an iterator over the elements in this collection in proper sequence
-     */
+
     @Override
-    public ListIterator<E> iterator() {
-        throw new UnsupportedOperationException("todo: implement this");
+    public Iterator<E> iterator() {
+        return new Iterator<>() {
+            private int index = head;
+            private int cursor = -1;
+            private int tail1 = tail;
+
+            @Override
+            public boolean hasNext() {
+                return index != tail1;
+            }
+
+            @Override
+            public E next() throws ConcurrentModificationException, NoSuchElementException {
+                if (index == tail1) {
+                    throw new NoSuchElementException();
+                }
+                E result = deque[index];
+                if (tail1 != tail || result == null) {
+                    throw new ConcurrentModificationException();
+                }
+                cursor = index;
+                index = (index + 1) & (deque.length - 1);
+                return result;
+            }
+
+            @Override
+            public void remove() {
+                if (cursor < 0)
+                    throw new IllegalStateException();
+                if (delete(cursor)) {
+                    cursor = (cursor - 1) & (deque.length - 1);
+                    tail1 = tail;
+                }
+                size--;
+                cursor = -1;
+            }
+        };
     }
+
 }

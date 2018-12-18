@@ -2,131 +2,209 @@ package ru.mail.polis.collections.list.todo;
 
 import ru.mail.polis.collections.list.IDeque;
 
-import java.util.ListIterator;
 
-/**
- * Linked list implementation of the {@link IDeque} interface with no capacity restrictions.
- *
- * @param <E> the type of elements held in this deque
- */
+import java.util.NoSuchElementException;
+import java.util.Iterator;
+
+
+
+@SuppressWarnings("unchecked")
 public class LinkedDequeSimple<E> implements IDeque<E> {
 
-    /**
-     * Inserts the specified element at the front of this deque.
-     *
-     * @param value the element to add
-     * @throws NullPointerException if the specified element is null
-     */
-    @Override
-    public void addFirst(E value) {
-        throw new UnsupportedOperationException("todo: implement this");
+    Node head;
+    Node tail;
+    int length;
+
+    public LinkedDequeSimple() {
+        tail = null;
+        head = null;
+        length = 0;
     }
 
-    /**
-     * Retrieves and removes the first element of this queue.
-     *
-     * @return the head of this queue
-     * @throws java.util.NoSuchElementException if this deque is empty
-     */
-    @Override
-    public E removeFirst() {
-        throw new UnsupportedOperationException("todo: implement this");
+    class Node {
+        E value;
+        Node previous;
+        Node next;
+
+        Node(E value) {
+            this.value = value;
+        }
     }
 
-    /**
-     * Retrieves, but does not remove, the first element of this queue.
-     *
-     * @return the head of this queue
-     * @throws java.util.NoSuchElementException if this queue is empty
-     */
-    @Override
-    public E getFirst() {
-        throw new UnsupportedOperationException("todo: implement this");
+    protected void removeNode(Node current) throws IllegalStateException {
+        if(current == head){
+            removeFirst();
+            return;
+        }
+        if(current == tail){
+            removeLast();
+            return;
+        }
+        if (current.previous == null || current.next == null){
+            throw new IllegalStateException();
+        }
+        current.previous.next = current.next;
+        current.next.previous = current.previous;
+        length --;
     }
 
-    /**
-     * Inserts the specified element at the tail of this queue
-     *
-     * @param value the element to add
-     * @throws NullPointerException if the specified element is null
-     */
+
+
     @Override
-    public void addLast(E value) {
-        throw new UnsupportedOperationException("todo: implement this");
+    public void addFirst(E value) throws NullPointerException {
+        if (value == null) {
+            throw new NullPointerException();
+        }
+        Node newFirst = new Node(value);
+
+        if (head != null) {
+            newFirst.next = head;
+            head.previous = newFirst;
+        }
+        head = newFirst;
+        if (tail == null) tail = head;
+        length++;
     }
 
-    /**
-     * Retrieves and removes the last element of this deque.
-     *
-     * @return the tail of this deque
-     * @throws java.util.NoSuchElementException if this deque is empty
-     */
+
     @Override
-    public E removeLast() {
-        throw new UnsupportedOperationException("todo: implement this");
+    public E removeFirst() throws NoSuchElementException {
+        if (length == 0) {
+            throw new NoSuchElementException();
+        }
+        E value = head.value;
+        head = head.next;
+        if (length == 1) {
+            head = tail = null;
+        }
+        if (head == null)
+            tail = null;
+
+        else
+            head.previous = null;
+        length--;
+        return value;
     }
 
-    /**
-     * Retrieves, but does not remove, the last element of this deque.
-     *
-     * @return the tail of this deque
-     * @throws java.util.NoSuchElementException if this deque is empty
-     */
+
     @Override
-    public E getLast() {
-        throw new UnsupportedOperationException("todo: implement this");
+    public E getFirst() throws NoSuchElementException {
+        if (length == 0) {
+            throw new NoSuchElementException();
+        }
+        return head.value;
     }
 
-    /**
-     * Returns {@code true} if this collection contains the specified element.
-     * aka collection contains element el such that {@code Objects.equals(el, value) == true}
-     *
-     * @param value element whose presence in this collection is to be tested
-     * @return {@code true} if this collection contains the specified element
-     * @throws NullPointerException if the specified element is null
-     */
     @Override
-    public boolean contains(E value) {
-        throw new UnsupportedOperationException("todo: implement this");
+    public void addLast(E value) throws NullPointerException {
+        if (value == null) {
+            throw new NullPointerException();
+        }
+        Node newLast = new Node(value);
+
+        if (tail != null) {
+            newLast.previous = tail;
+            tail.next = newLast;
+        }
+        tail = newLast;
+        if (head == null) head = tail;
+        length++;
     }
 
-    /**
-     * Returns the number of elements in this collection.
-     *
-     * @return the number of elements in this collection
-     */
+
+    @Override
+    public E removeLast() throws NoSuchElementException {
+        if (length == 0) {
+            throw new NoSuchElementException();
+        }
+        E value = tail.value;
+        tail = tail.previous;
+        if (tail == null)
+            head = null;
+        else
+            tail.next = null;
+        length--;
+        return value;
+    }
+
+
+    @Override
+    public E getLast() throws NoSuchElementException {
+        if (length == 0) {
+            throw new NoSuchElementException();
+        }
+        return tail.value;
+    }
+
+
+    @Override
+    public boolean contains(E value) throws NullPointerException {
+        if (value == null) {
+            throw new NullPointerException();
+        }
+        Node current = head;
+        while (current != null) {
+            if (current.value == value) {
+                return true;
+            }
+            current = current.next;
+        }
+        return false;
+    }
+
     @Override
     public int size() {
-        throw new UnsupportedOperationException("todo: implement this");
+        return length;
     }
 
-    /**
-     * Returns {@code true} if this collection contains no elements.
-     *
-     * @return {@code true} if this collection contains no elements
-     */
+
     @Override
     public boolean isEmpty() {
-        throw new UnsupportedOperationException("todo: implement this");
+        return tail == null && head == null;
     }
 
-    /**
-     * Removes all of the elements from this collection.
-     * The collection will be empty after this method returns.
-     */
+
     @Override
     public void clear() {
-        throw new UnsupportedOperationException("todo: implement this");
+        head = null;
+        tail = null;
+        length = 0;
     }
 
-    /**
-     * Returns an iterator over the elements in this collection in proper sequence.
-     * The elements will be returned in order from first (head) to last (tail).
-     *
-     * @return an iterator over the elements in this collection in proper sequence
-     */
     @Override
-    public ListIterator<E> iterator() {
-        throw new UnsupportedOperationException("todo: implement this");
+    public Iterator<E> iterator() {
+
+        return new Iterator<>() {
+            private Node index = head;
+            private Node cursor = null;
+
+
+
+            @Override
+            public E next() throws NoSuchElementException {
+                if(!hasNext()){
+                    throw new NoSuchElementException();
+                }
+                cursor = index;
+                index = index.next;
+                return cursor.value;
+            }
+
+
+            @Override
+            public void remove() throws IllegalStateException {
+
+                if(cursor == null){
+                    throw new IllegalStateException();
+                }
+                LinkedDequeSimple.this.removeNode(cursor);
+            }
+
+
+            @Override
+            public boolean hasNext() {
+                return index != null;
+            }
+        };
     }
 }
