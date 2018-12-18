@@ -5,6 +5,7 @@ import ru.mail.polis.collections.set.sorted.UnbalancedTreeException;
 
 import java.util.Comparator;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 
 /**
  * A AVL tree based {@link ISelfBalancingSortedTreeSet} implementation.
@@ -13,145 +14,242 @@ import java.util.NoSuchElementException;
  *
  * @param <E> the type of elements maintained by this set
  */
-public class AVLTree<E extends Comparable<E>> implements ISelfBalancingSortedTreeSet<E> {
-
-    //todo: update it if required
-    protected static class AVLNode<E> {
+@SuppressWarnings("unchecked")
+public class AVLTree<E extends Comparable<E>> implements ISelfBalancingSortedTreeSet<E>  {
+    protected static class AVLNode<E extends  Comparable<E>>  {
         E value;
         AVLNode<E> left;
         AVLNode<E> right;
+        int height = 1;
+        AVLNode(E value){
+            this.value = value;
+        }
     }
-
-    /**
-     * The comparator used to maintain order in this tree map.
-     */
-    protected final Comparator<E> comparator;
-    protected AVLNode<E> root;
-
     public AVLTree() {
         this(Comparator.naturalOrder());
     }
-
-    /**
-     * Creates a {@code ISelfBalancingSortedTreeSet} that orders its elements according to the specified comparator.
-     *
-     * @param comparator comparator the comparator that will be used to order this priority queue.
-     * @throws NullPointerException if the specified comparator is null
-     */
     public AVLTree(Comparator<E> comparator) {
-        this.comparator = comparator;
+        if (comparator == null) {
+            throw new NullPointerException();
+        }
+        this.comparator = Objects.requireNonNull(comparator, "comparator");
+        length = 0;
+    }
+    protected final Comparator<E> comparator;
+    protected AVLNode<E> root;
+    protected int length;
+    protected int getHeight(AVLNode current){
+        if(current == null){
+            return 0;
+        }
+        return current.height;
+    }
+    protected   AVLNode rightRotate(AVLNode current){
+        AVLNode b = current.left;
+        current.left = b.right;
+        //rotate
+        b.right = current;
+        //upd
+        current.height = Math.max(getHeight(current.left), getHeight(current.right)) + 1;
+        b.height = Math.max(getHeight(b.left), getHeight(b.right)) + 1;
+        return b;
+    }
+    protected AVLNode leftRotate(AVLNode current){
+        AVLNode b = current.right;
+        current.right = b.left;
+        //rotate
+        b.left = current;
+        //upd
+        current.height = Math.max(getHeight(current.left), getHeight(current.right)) + 1;
+        b.height = Math.max(getHeight(b.left), getHeight(b.right)) + 1;
+        return b;
+    }
+    protected void insert(E value){
+        this.root = insert(this.root, value);
+    }
+    protected AVLNode insert(AVLNode current, E value){
+        if(current == null){
+            return new AVLNode(value);
+        }
+        if(comparator.compare((E) current.value, value) > 0){
+            current.left = insert(current.left,value);
+        }
+        else if(comparator.compare((E) current.value, value) < 0){
+            current.right = insert(current.right, value);
+        }
+        current.height = Math.max(getHeight(current.left), getHeight(current.right)) + 1;
+        int getBalance = getBalance(current);
+        /*if balanceFactor not 0 or 1, we have to do balance our Tree*/
+        //LL Case
+        if(getBalance > 1 && comparator.compare(value, (E) current.left.value) < 0){
+            return rightRotate(current);
+        }
+        //RR Case
+        if(getBalance < -1 && comparator.compare(value, (E) current.right.value) > 0){
+            return leftRotate(current);
+        }
+        // LR Case
+        if (getBalance > 1 && comparator.compare(value, (E) current.left.value) > 0) {
+            current.left = leftRotate(current.left);
+            return rightRotate(current);
+        }
+        // RL Case
+        if (getBalance < -1 && comparator.compare(value, (E) current.right.value) < 0) {
+            current.right = rightRotate(current.right);
+            return leftRotate(current);
+        }
+        return current;
+    }
+    /*This is a different between left height and right height of AVL Node */
+    protected int getBalance(AVLNode current){ // aka balanceFactor
+        if(current == null){
+            return  0;
+        }
+        return getHeight(current.left) - getHeight(current.right);
+    }
+    protected AVLNode find(AVLNode current, E value){
+        if(current == null || current.value == null || comparator.compare((E) current.value,value) == 0) {
+            return current;
+        }
+        if(comparator.compare((E) current.value, value) > 0){
+            return find(current.left, value);
+        }
+        else{
+            return find(current.right,value);
+        }
+    }
+    protected AVLNode treeMin(AVLNode current){
+        while(current.left != null){
+            current = current.left;
+        }
+        return current;
+    }
+    protected AVLNode treeMax(AVLNode current){
+        while(current.right != null){
+            current = current.right;
+        }
+        return current;
+    }
+    protected void delete(E value){
+        this.root = delete(root, value);
+    }
+    protected AVLNode delete(AVLNode current, E value) throws NoSuchElementException{
+        if(current == null){
+            throw new NoSuchElementException();
+        }
+        if(comparator.compare(value, (E) current.value) < 0){
+            current.left = delete(current.left, value);
+        }
+        else if(comparator.compare(value, (E) current.value) > 0){
+            current.right = delete(current.right, value);
+        }
+        else
+        {
+            AVLNode<E> currentLeft = current.left;
+            AVLNode<E> currentRight = current.right;
+            if (currentRight == null) return currentLeft;
+            AVLNode<E> min = treeMin(currentRight);
+            min.right = removeMin(currentRight);
+            min.left = currentLeft;
+            return fixRemoveBalance(min);
+        }
+        return fixRemoveBalance(current);
+    }
+    protected AVLNode<E> removeMin(AVLNode<E>  current) {
+        if(current.left == null){
+            return current.right;
+        }
+        current.left = removeMin(current.left);
+        return fixRemoveBalance(current);
     }
 
-    /**
-     * Adds the specified element to this set if it is not already present.
-     * <p>
-     * Complexity = O(log(n))
-     *
-     * @param value element to be added to this set
-     * @return {@code true} if this set did not already contain the specified
-     * element
-     * @throws NullPointerException if the specified element is null
-     */
+    protected AVLNode<E> fixRemoveBalance(AVLNode<E> current){
+        current.height = Math.max(getHeight(current.left), getHeight(current.right)) + 1;
+        if(getHeight(current.right) - getHeight(current.left) == 2){
+            if(getHeight(current.right.left) > getHeight(current.right.right)){
+                current.right = rightRotate(current.right);
+            }
+            return leftRotate(current);
+        }
+        if(getHeight(current.left) - getHeight(current.right) == 2){
+            if(getHeight(current.left.right) > getHeight(current.left.left)){
+                current.left = leftRotate(current.left);
+            }
+            return rightRotate(current);
+        }
+        return current;
+    }
     @Override
-    public boolean add(E value) {
-        throw new UnsupportedOperationException("todo: implement this");
+    public boolean add(E value) throws NullPointerException {
+        if(value == null){
+            throw  new NullPointerException();
+        }
+        AVLNode current = find(root, value);
+        if(current == null){
+            insert(value);
+            length ++;
+            return true;
+        }
+        return false;
     }
-
-    /**
-     * Removes the specified element from this set if it is present.
-     * <p>
-     * Complexity = O(log(n))
-     *
-     * @param value object to be removed from this set, if present
-     * @return {@code true} if this set contained the specified element
-     * @throws NullPointerException if the specified element is null
-     */
     @Override
-    public boolean remove(E value) {
-        throw new UnsupportedOperationException("todo: implement this");
+    public boolean remove(E value) throws NullPointerException {
+        if(value == null ){
+            throw new NullPointerException();
+        }
+        AVLNode current = find(root, value);
+        if(current == null || current.value == null){
+            return false;
+        }
+        delete(value);
+        length --;
+        return true;
     }
-
-    /**
-     * Returns {@code true} if this collection contains the specified element.
-     * aka collection contains element el such that {@code Objects.equals(el, value) == true}
-     * <p>
-     * Complexity = O(log(n))
-     *
-     * @param value element whose presence in this collection is to be tested
-     * @return {@code true} if this collection contains the specified element
-     * @throws NullPointerException if the specified element is null
-     */
+    @SuppressWarnings("RedundantIfStatement")
     @Override
-    public boolean contains(E value) {
-        throw new UnsupportedOperationException("todo: implement this");
+    public boolean contains(E value) throws NullPointerException {
+        if(value == null){
+            throw new NullPointerException();
+        }
+        AVLNode current = find(root,(E) value);
+        if(current == null || current.value == null) {
+            return false;
+        }
+        return true;
     }
-
-    /**
-     * Returns the first (lowest) element currently in this set.
-     * <p>
-     * Complexity = O(log(n))
-     *
-     * @return the first (lowest) element currently in this set
-     * @throws NoSuchElementException if this set is empty
-     */
     @Override
-    public E first() {
-        throw new UnsupportedOperationException("todo: implement this");
+    public E first() throws  NoSuchElementException{
+        if(root == null) {
+            throw new NoSuchElementException();
+        }
+        AVLNode current = root;
+        return (E) treeMin(current).value;
     }
-
-    /**
-     * Returns the last (highest) element currently in this set.
-     * <p>
-     * Complexity = O(log(n))
-     *
-     * @return the last (highest) element currently in this set
-     * @throws NoSuchElementException if this set is empty
-     */
     @Override
-    public E last() {
-        throw new UnsupportedOperationException("todo: implement this");
+    public E last() throws  NoSuchElementException{
+        if(root == null){
+            throw new NoSuchElementException();
+        }
+        AVLNode current = root;
+        return (E) treeMax(current).value;
     }
-
-    /**
-     * Returns the number of elements in this collection.
-     *
-     * @return the number of elements in this collection
-     */
     @Override
     public int size() {
-        throw new UnsupportedOperationException("todo: implement this");
+        return length;
     }
-
-    /**
-     * Returns {@code true} if this collection contains no elements.
-     *
-     * @return {@code true} if this collection contains no elements
-     */
     @Override
     public boolean isEmpty() {
-        throw new UnsupportedOperationException("todo: implement this");
+        return  length == 0;
     }
-
-    /**
-     * Removes all of the elements from this collection.
-     * The collection will be empty after this method returns.
-     */
     @Override
     public void clear() {
-        throw new UnsupportedOperationException("todo: implement this");
+        root = null;
+        length = 0;
     }
-
-    /**
-     * Обходит дерево и проверяет что высоты двух поддеревьев
-     * различны по высоте не более чем на 1
-     *
-     * @throws UnbalancedTreeException если высоты отличаются более чем на один
-     */
     @Override
     public void checkBalance() throws UnbalancedTreeException {
         traverseTreeAndCheckBalanced(root);
     }
-
     private int traverseTreeAndCheckBalanced(AVLNode<E> curr) throws UnbalancedTreeException {
         if (curr == null) {
             return 0;
