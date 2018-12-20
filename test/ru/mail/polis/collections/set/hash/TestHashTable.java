@@ -19,15 +19,13 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.stream.IntStream;
 
-import static com.sun.tools.javac.util.List.of;
-
 /**
  * Created by Nechaev Mikhail
  * Since 07/12/2018.
  */
 public class TestHashTable extends AbstractSetTest {
 
-    private final List<IOpenHashTableEntity> entities = of(
+    private final List<IOpenHashTableEntity> entities = List.of(
             //uniq
             new Student(0, "A", "CDCD", Student.Gender.MALE, LocalDate.of(1990, 1, 1), 1000),
             new Student(0, "AA", "CCDD", Student.Gender.FEMALE, LocalDate.of(1993, 2, 2), 1001),

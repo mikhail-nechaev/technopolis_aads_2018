@@ -5,8 +5,7 @@ import ru.mail.polis.collections.list.IDeque;
 import java.util.ArrayDeque;
 import java.util.Collection;
 import java.util.Comparator;
-
-import static com.sun.tools.javac.util.List.of;
+import java.util.Set;
 
 /*
  * Created by Nechaev Mikhail
@@ -14,7 +13,7 @@ import static com.sun.tools.javac.util.List.of;
  */
 public class TestHelper {
 
-    public static final Collection<Object[]> COMPARATORS = of(new Object[][]{
+    public static final Collection<Object[]> COMPARATORS = Set.of(new Object[][]{
             {Comparator.naturalOrder(), "NATURAL"},
             {Comparator.reverseOrder(), "REVERSE"},
             {Comparator.comparingInt((Integer v) -> v % 2).thenComparingInt(v -> v), "EVEN_FIRST"},
