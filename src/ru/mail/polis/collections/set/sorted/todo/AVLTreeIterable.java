@@ -4,45 +4,142 @@ import ru.mail.polis.collections.set.sorted.ISortedSetIterable;
 
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
-/**
- * A AVL tree with iterator based {@link ru.mail.polis.collections.set.sorted.ISelfBalancingSortedTreeSet} implementation.
- *
- * @param <E> the type of elements maintained by this set
- */
 public class AVLTreeIterable<E extends Comparable<E>> extends AVLTree<E> implements ISortedSetIterable<E> {
 
     public AVLTreeIterable() {
         super();
     }
 
-    /**
-     * Creates a {@code ISelfBalancingSortedTreeSet} that orders its elements according to the specified comparator.
-     *
-     * @param comparator comparator the comparator that will be used to order this priority queue.
-     * @throws NullPointerException if the specified comparator is null
-     */
     public AVLTreeIterable(Comparator<E> comparator) {
         super(comparator);
     }
 
-    /**
-     * Returns an iterator over the elements in this set in ascending order.
-     *
-     * @return an iterator over the elements in this set in ascending order
-     */
-    @Override
-    public Iterator<E> iterator() {
-        throw new UnsupportedOperationException("todo: implement this");
+    protected void delete(E value) {
+        remove(value);
     }
 
-    /**
-     * Returns an iterator over the elements in this set in descending order.
-     *
-     * @return an iterator over the elements in this set in descending order
-     */
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public Iterator<E> iterator() {
+        return new Iterator<>() {
+            AVLNode<E> next = getMin(root);
+            AVLNode<E> last;
+            int index = 0;
+            int count = length;
+            boolean toRight = false;
+            boolean removeCheck = false;
+
+            @Override
+            public boolean hasNext() {
+                return index < count;
+            }
+
+            @Override
+            public E next() {
+                if (!hasNext()) {
+                    throw new NoSuchElementException();
+                }
+                last = next;
+                index++;
+                removeCheck = true;
+                if (toRight || next.parent == null) {
+                    next = getMin(next.right);
+                    toRight = false;
+                    return last.value;
+                }
+
+                if (isLeftSon(next)) {
+                    next = next.parent;
+                    toRight = next.right != null;
+                } else {
+                    while (next.parent != null && !isLeftSon(next)) {
+                        next = next.parent;
+                    }
+                    if (next.parent == null) {
+                        next = getMin(next.right);
+                        toRight = false;
+                    } else {
+                        next = next.parent;
+                        toRight = next.right != null;
+                    }
+                }
+
+                return last.value;
+            }
+
+            @Override
+            public void remove() {
+                if (!removeCheck) {
+                    throw new IllegalStateException();
+                }
+                removeCheck = false;
+                delete(last.value);
+                count--;
+            }
+        };
+    }
+
+
     @Override
     public Iterator<E> descendingIterator() {
-        throw new UnsupportedOperationException("todo: implement this");
+        return new Iterator<>() {
+            int index = 0;
+            int count = length;
+            boolean toLeft = false;
+            boolean removeCheck = false;
+            AVLNode<E> next = getMax(root);
+            AVLNode<E> last;
+
+            @Override
+            public boolean hasNext() {
+                return index < count;
+            }
+
+            @Override
+            public E next() {
+                if (!hasNext()) {
+                    throw new NoSuchElementException();
+                }
+                last = next;
+                index++;
+                removeCheck = true;
+                if (toLeft || next.parent == null) {
+                    next = getMax(next.left);
+                    toLeft = false;
+                    return last.value;
+                }
+
+                if (!isLeftSon(next)) {
+                    next = next.parent;
+                    toLeft = next.left != null;
+                } else {
+                    while (next.parent != null && isLeftSon(next)) {
+                        next = next.parent;
+                    }
+                    if (next.parent == null) {
+                        next = getMax(next.left);
+                        toLeft = false;
+                    } else {
+                        next = next.parent;
+                        toLeft = next.left != null;
+                    }
+                }
+
+                return last.value;
+            }
+
+            @Override
+            public void remove() {
+                if (!removeCheck) {
+                    throw new IllegalStateException();
+                }
+                removeCheck = false;
+                delete(last.value);
+                count--;
+            }
+        };
     }
 }

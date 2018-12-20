@@ -14,6 +14,9 @@ public class Student extends AbstractOpenHashTableEntity {
     private final LocalDate birthday;
     private final int groupId;
 
+    private Integer hashCode1 = null;
+    private Integer hashCode2 = null;
+
     public Student(long id, String firstName, String lastName, Gender gender, LocalDate birthday, int groupId) {
         this.id = id;
         this.firstName = Objects.requireNonNull(firstName, "firstName");
@@ -49,20 +52,32 @@ public class Student extends AbstractOpenHashTableEntity {
 
     @Override
     public int hashCode(int tableSize, int probId) throws IllegalArgumentException {
-        //todo: see IOpenHashTableEntity contract
-        //todo: use this in OpenHashTable
-        throw new UnsupportedOperationException("todo: implement this");
+        if (probId == 0)
+            return hashCode();
+        else
+            return (probId * 5 * hashCode2()) % tableSize;
     }
 
     @Override
     public int hashCode() {
-        //todo: don't forget [hashCode - equals] contract
-        throw new UnsupportedOperationException("todo: implement this");
+        if (hashCode1 == null)
+            calculateHashCode1();
+        return hashCode1;
+    }
+
+    private void calculateHashCode1() {
+
     }
 
     @Override
     protected int hashCode2() {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (hashCode2 == null)
+            calculateHashCode2();
+        return hashCode2;
+    }
+
+    private void calculateHashCode2() {
+
     }
 
     @Override
