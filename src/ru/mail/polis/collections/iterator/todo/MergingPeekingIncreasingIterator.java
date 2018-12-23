@@ -1,6 +1,9 @@
 package ru.mail.polis.collections.iterator.todo;
 
+import java.util.Arrays;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
+import java.util.PriorityQueue;
 
 /**
  * Итератор возвращающий последовательность последовательностей элементов возрастающих итераторов в порядке возрастания
@@ -14,6 +17,7 @@ import java.util.Iterator;
  * k — суммарное количество элементов
  */
 public class MergingPeekingIncreasingIterator implements Iterator<Integer> {
+    private PriorityQueue queue =  new PriorityQueue<IntegerIncreasingSequencePeekingIterator>();
 
     /**
      * Creates a {@code MergingPeekingIncreasingIterator} containing the inside all elements of this specified iterators.
@@ -23,7 +27,7 @@ public class MergingPeekingIncreasingIterator implements Iterator<Integer> {
      * @param iterators the iterators whose are to be placed into this merging peeking increasing iterator
      */
     public MergingPeekingIncreasingIterator(IntegerIncreasingSequencePeekingIterator... iterators) {
-        //todo: do some stuff with iterators
+        queue.addAll(Arrays.asList(iterators));
     }
 
     /**
@@ -37,7 +41,7 @@ public class MergingPeekingIncreasingIterator implements Iterator<Integer> {
      */
     @Override
     public boolean hasNext() {
-        throw new UnsupportedOperationException("todo: implement this");
+        return !queue.isEmpty();
     }
 
     /**
@@ -50,6 +54,10 @@ public class MergingPeekingIncreasingIterator implements Iterator<Integer> {
      */
     @Override
     public Integer next() {
-        throw new UnsupportedOperationException("todo: implement this");
+        if (!hasNext()) throw new NoSuchElementException();
+        IntegerIncreasingSequencePeekingIterator iterator = (IntegerIncreasingSequencePeekingIterator) queue.remove();
+        Integer result = iterator.next();
+        if (iterator.hasNext()) queue.add(iterator);
+        return result;
     }
 }
