@@ -34,12 +34,12 @@ public class ArrayDequeFull<E> extends ArrayDequeSimple<E> implements Deque<E> {
 
     @Override
     public E peekFirst() {
-        return isEmpty() ? null : array[startPointer];
+        return isEmpty() ? null : getFirst();
     }
 
     @Override
     public E peekLast() {
-        return isEmpty() ? null : array[endPointer];
+        return isEmpty() ? null : getLast();
     }
 
     @Override
